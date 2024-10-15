@@ -1,4 +1,4 @@
-![LEMS logo](https://i.imgur.com/d4mV2b3.png)
+![LEMS logo](https://i.imgur.com/d4mV2b3.png | width=100)
 # LEMS backend
 ## Prerequisite
 1. Your IDE should run on JDK 17
@@ -35,8 +35,8 @@
 ## APIs
 ### Registration
 `http://localhost:8080/user/register`
-**How to use**
-Store user inputs in an object
+**How to use**<br/>
+Store user inputs in an object<br/>
 Example using React:
 ```
 const [credentials, setCredentials] = useState({
@@ -51,7 +51,7 @@ const [credentials, setCredentials] = useState({
 > [!CAUTION]
 > Make sure that the keys are the same as the column name.
 
-Pass the object using axios or anything
+Pass the object using axios or anything<br/>
 Example using axios:
 ```
 const register = async (credentials) => {
@@ -64,9 +64,9 @@ const register = async (credentials) => {
 };
 ```
 
-###Login
+### Login
 `http://localhost:8080/user/login?idnum=${idnum}&password=${password}`
-**How to use**
+**How to use**<br/>
 Example using axios:
 ```
 const checkLoginCredentials = async(username, password) => {
