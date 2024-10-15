@@ -35,7 +35,7 @@
 
 ## APIs
 ### Registration
-`http://localhost:8080/user/register`
+`http://localhost:8080/user/register`<br/>
 **How to use**<br/>
 Store user inputs in an object<br/>
 Example using React:
@@ -66,7 +66,7 @@ const register = async (credentials) => {
 ```
 
 ### Login
-`http://localhost:8080/user/login?idnum=${idnum}&password=${password}`
+`http://localhost:8080/user/login?idnum=${idnum}&password=${password}`<br/>
 **How to use**<br/>
 Example using axios:
 ```
