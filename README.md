@@ -1,4 +1,4 @@
-![LEMS logo](https://i.imgur.com/d4mV2b3.png | width=100)
+<img src="https://i.imgur.com/d4mV2b3.png" width="50">
 # LEMS backend
 ## Prerequisite
 1. Your IDE should run on JDK 17
