@@ -10,6 +10,6 @@ public class UserController {
 	
 	@GetMapping("/message")
 	public String testMessage() {
-		return "Looking, Good!";
+		return "Looking, Good!!";
 	}
 }
