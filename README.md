@@ -4,7 +4,7 @@
 ## Prerequisite
 1. Your IDE should run on JDK 17
 2. MySQL should be running on services
-3. Manually create a schema(databse) named lemsdb
+3. Manually create a schema(database) named lemsdb
 4. Check application. properties file if database credentials is correct
 
 ## How to pull and use LEMS backend
