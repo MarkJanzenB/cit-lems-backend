@@ -7,15 +7,14 @@
 3. Manually create a schema(database) named lemsdb
 4. Check application. properties file if database credentials is correct
 
-## How to use LEMS backend
-1. **Running**
-   - Create a database/schema on workbench or wherever you prefer and name it lemsdb
-   - In LEMS backend, go to src/main/resources
-   - Open application.properties
-   - Change credentials (if yours is different)
-   - To run, go to src/main/java
-   - Under com.capstone.LEMS open LemsApplication.java
-   - Run as Java Application
+## How to use LEMS backend*
+1. Create a database/schema on workbench or wherever you prefer and name it lemsdb
+2. In LEMS backend, go to src/main/resources
+3. Open application.properties
+4. Change credentials (if yours is different)
+5. To run, go to src/main/java
+6. Under com.capstone.LEMS open LemsApplication.java
+7. Run as Java Application
 
 ## APIs
 ### Registration
