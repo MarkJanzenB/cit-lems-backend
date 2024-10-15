@@ -1,4 +1,5 @@
 <img src="https://i.imgur.com/d4mV2b3.png" width="350">
+
 # LEMS backend
 ## Prerequisite
 1. Your IDE should run on JDK 17
