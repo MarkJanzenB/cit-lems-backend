@@ -7,7 +7,7 @@
 3. Manually create a schema(database) named lemsdb
 4. Check application. properties file if database credentials is correct
 
-## How to use LEMS backend*
+## How to use LEMS backend
 1. Create a database/schema on workbench or wherever you prefer and name it lemsdb
 2. In LEMS backend, go to src/main/resources
 3. Open application.properties
