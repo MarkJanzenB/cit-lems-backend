@@ -8,7 +8,7 @@
 4. Check application. properties file if database credentials is correct
 
 ## How to clone and use LEMS backend
-1. **Clone using Eclipse IDE** *you can use any IDE you want as long as you know how to clone*
+1. **Clone using Eclipse IDE** (*you can use any IDE you want as long as you know how to clone*)
    - Click file
    - Click import
    - Under Git folder click Projects from Git (with smart import)
