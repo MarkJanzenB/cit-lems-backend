@@ -7,24 +7,8 @@
 3. Manually create a schema(database) named lemsdb
 4. Check application. properties file if database credentials is correct
 
-## How to clone and use LEMS backend
-1. **Clone using Eclipse IDE** (*you can use any IDE you want as long as you know how to clone*)
-   - Click file
-   - Click import
-   - Under Git folder click Projects from Git (with smart import)
-   - Click next
-   - Click Clone URI
-   - Enter the URI(git link for this repo)
-   - Click next
-   - Make sure main and testing branches are checked
-   - Click next
-   - (Optional) Select a different directory
-   - Initial branch: testing
-   - Click next
-   - Click finish
-   - Wait for it to load all the files (look at the bottom right)
-  
-2. **Running**
+## How to use LEMS backend
+1. **Running**
    - Create a database/schema on workbench or wherever you prefer and name it lemsdb
    - In LEMS backend, go to src/main/resources
    - Open application.properties
