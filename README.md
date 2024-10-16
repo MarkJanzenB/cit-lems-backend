@@ -6,6 +6,8 @@
 2. MySQL should be running on services
 3. Manually create a schema(database) named lemsdb
 4. Check application. properties file if database credentials is correct
+5. If you are using react, install axios
+   ```npm i axios```
 
 ## How to use LEMS backend
 1. Create a database/schema on workbench or wherever you prefer and name it lemsdb
