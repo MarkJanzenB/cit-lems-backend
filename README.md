@@ -48,6 +48,17 @@ const register = async (credentials) => {
       console.error("Error:", error);
     }
 };
+
+//pass an event in this function if you are using form's submit button/funciton
+const handleSubmit = async (e) => {
+e.preventDefault(); // Prevent default form submission behavior like auto refresh
+        try {
+            const result = await register(credentials);
+            console.log(result); //displays in console if register was successful
+        } catch (e) {
+            console.error("Error submitting form: ", e);
+        }
+    };
 ```
 
 ### Login
@@ -63,5 +74,16 @@ const checkLoginCredentials = async(username, password) => {
     console.error("Error:", error);
   }
 }
+
+//pass an event in this function if you are using form's submit button/funciton
+const handleSubmit = async (e) => {
+e.preventDefault(); // Prevent default form submission behavior like auto refresh
+        try {
+            const result = await checkLoginCredentials(username, password);
+            console.log(result); //displays in console if register was successful
+        } catch (e) {
+            console.error("Error submitting form: ", e);
+        }
+    };
 ```
 
