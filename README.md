@@ -49,12 +49,12 @@ const register = async (credentials) => {
     }
 };
 
-//pass an event in this function if you are using form's submit button/funciton
+// pass an event in this function if you are using form's submit button/funciton
 const handleSubmit = async (e) => {
 e.preventDefault(); // Prevent default form submission behavior like auto refresh
         try {
-            const result = await register(credentials);
-            console.log(result); //displays in console if register was successful
+            const result = await register(credentials); // returns the object you passed
+            console.log(result); // displays in console if register was successful
         } catch (e) {
             console.error("Error submitting form: ", e);
         }
@@ -68,7 +68,7 @@ Example using axios:
 ```
 const checkLoginCredentials = async(username, password) => {
   try {
-    const response = await axios.get(`http://localhost:8080/user/login?idnum=${idnum}&password=${password}`);
+    const response = await axios.get(`http://localhost:8080/user/login?idnum=${idnum}&password=${password}`); 
     return response.data;
   }catch (error) {
     console.error("Error:", error);
@@ -79,7 +79,7 @@ const checkLoginCredentials = async(username, password) => {
 const handleSubmit = async (e) => {
 e.preventDefault(); // Prevent default form submission behavior like auto refresh
         try {
-            const result = await checkLoginCredentials(username, password);
+            const result = await checkLoginCredentials(username, password); // returns a string
             console.log(result); //displays in console if register was successful
         } catch (e) {
             console.error("Error submitting form: ", e);
