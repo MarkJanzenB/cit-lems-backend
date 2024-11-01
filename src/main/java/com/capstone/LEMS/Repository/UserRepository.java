@@ -8,5 +8,5 @@ import com.capstone.LEMS.Entity.UserEntity;
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer>{
 	//mainly used to check if email already exist
-	UserEntity findByIdnum (String idnum);
+	UserEntity findByInstiId (String insti_id);
 }

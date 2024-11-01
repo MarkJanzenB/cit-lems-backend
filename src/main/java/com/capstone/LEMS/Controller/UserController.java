@@ -33,7 +33,7 @@ public class UserController {
 	
 	
 	@GetMapping("/login")
-	public String UserLogin(@RequestParam String idnum, @RequestParam String password) {
-		return userserv.UserLogin(idnum, password);
+	public String UserLogin(@RequestParam String insti_id, @RequestParam String password) {
+		return userserv.UserLogin(insti_id, password);
 	}
 }

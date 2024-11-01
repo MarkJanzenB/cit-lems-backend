@@ -1,5 +1,8 @@
 package com.capstone.LEMS.Entity;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -7,58 +10,62 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="tblusers")
+@Table(name="Users")
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int uid;
+	@Column(name = "user_id")
+	private int userId;
 	
-	private String fname;
-	private String lname;
+	@Column(name = "first_name")
+	private String firstName;
+	@Column(name = "last_name")
+	private String lastName;
 	private String password;
-	private String idnum;
+	@Column(name = "insti_id")
+	private String instiId;
 	private String email;
-	private String acctype;
 	
 	public UserEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
 	
-	public UserEntity(int uid, String fname, String lname, String password, String idnum, String email, String acctype) {
+	public UserEntity(int userId, String firstName, String lastName, String password, String instiId, String email) {
 		super();
-		this.uid = uid;
-		this.fname = fname;
-		this.lname = lname;
+		this.userId = userId;
+		this.firstName = firstName;
+		this.lastName = lastName;
 		this.password = password;
-		this.idnum = idnum;
+		this.instiId = instiId;
 		this.email = email;
-		this.acctype = acctype;
 	}
 
-
+	@JsonProperty("user_id")
 	public int getUid() {
-		return uid;
+		return userId;
 	}
 
-	public void setUid(int uid) {
-		this.uid = uid;
+	public void setUid(int userId) {
+		this.userId = userId;
 	}
 
+	@JsonProperty("first_name")
 	public String getFname() {
-		return fname;
+		return firstName;
 	}
 
-	public void setFname(String fname) {
-		this.fname = fname;
+	public void setFname(String firstName) {
+		this.firstName = firstName;
 	}
 
+	@JsonProperty("last_name")
 	public String getLname() {
-		return lname;
+		return lastName;
 	}
 
-	public void setLname(String lname) {
-		this.lname = lname;
+	public void setLname(String lastName) {
+		this.lastName = lastName;
 	}
 
 	public String getPassword() {
@@ -69,12 +76,13 @@ public class UserEntity {
 		this.password = password;
 	}
 
+	@JsonProperty("insti_id")
 	public String getIdnum() {
-		return idnum;
+		return instiId;
 	}
 
-	public void setIdnum(String idnum) {
-		this.idnum = idnum;
+	public void setIdnum(String instiId) {
+		this.instiId = instiId;
 	}
 
 	public String getEmail() {
@@ -83,14 +91,6 @@ public class UserEntity {
 
 	public void setEmail(String email) {
 		this.email = email;
-	}
-
-	public String getAcctype() {
-		return acctype;
-	}
-
-	public void setAcctype(String acctype) {
-		this.acctype = acctype;
 	}
 	
 	
