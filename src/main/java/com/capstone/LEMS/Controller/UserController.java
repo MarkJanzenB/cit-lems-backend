@@ -19,10 +19,10 @@ public class UserController {
 	@Autowired
 	UserService userserv;
 	
-	//for testing purposes if Springboot is working
+	//for testing purposes
 	@GetMapping("/message")
 	public String testMessage() {
-		return "Looking, Good!";
+		return "UserController is working";
 	}
 	
 	//register mapping
