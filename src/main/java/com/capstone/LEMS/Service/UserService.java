@@ -17,8 +17,8 @@ public class UserService {
 	}
 	
 	//login
-	public String UserLogin (String idnum, String password) {
-		UserEntity user = userrepo.findByIdnum(idnum);
+	public String UserLogin (String insti_id, String password) {
+		UserEntity user = userrepo.findByInstiId(insti_id);
 		
 		if(user != null && user.getPassword().equals(password)) {
 			return "login successfully";

@@ -1,6 +1,7 @@
 package com.capstone.LEMS.Controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,14 +14,15 @@ import com.capstone.LEMS.Service.UserService;
 
 @RestController
 @RequestMapping("/user")
+@CrossOrigin
 public class UserController {
 	@Autowired
 	UserService userserv;
 	
-	//for testing purposes if Springboot is working
+	//for testing purposes
 	@GetMapping("/message")
 	public String testMessage() {
-		return "Looking, Good!";
+		return "UserController is working";
 	}
 	
 	//register mapping
@@ -31,7 +33,7 @@ public class UserController {
 	
 	
 	@GetMapping("/login")
-	public String UserLogin(@RequestParam String idnum, @RequestParam String password) {
-		return userserv.UserLogin(idnum, password);
+	public String UserLogin(@RequestParam String insti_id, @RequestParam String password) {
+		return userserv.UserLogin(insti_id, password);
 	}
 }
