@@ -7,6 +7,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,12 +28,17 @@ public class UserEntity {
 	private String instiId;
 	private String email;
 	
+	@OneToOne
+	@JoinColumn(name = "role_id")
+	private RoleEntity role;
+	
 	public UserEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
-	public UserEntity(int userId, String firstName, String lastName, String password, String instiId, String email) {
+
+	public UserEntity(int userId, String firstName, String lastName, String password, String instiId, String email,
+			RoleEntity role) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -39,6 +46,7 @@ public class UserEntity {
 		this.password = password;
 		this.instiId = instiId;
 		this.email = email;
+		this.role = role;
 	}
 
 	@JsonProperty("user_id")
@@ -92,6 +100,13 @@ public class UserEntity {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
+
+	public RoleEntity getRole() {
+		return role;
+	}
+
+	public void setRole(RoleEntity role) {
+		this.role = role;
+	}
 	
 }
