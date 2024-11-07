@@ -1,6 +1,7 @@
 package com.capstone.LEMS.Entity;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,6 +11,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -21,6 +25,16 @@ public class ReservationEntity {
 	private int reservationId;
 	@JsonFormat(pattern="yyyy-MM-dd HH:mm:ss")
 	private LocalDateTime reservationDate;
+	
+	@ManyToOne
+	@JoinColumn(name="user_id")
+	private UserEntity user;
+	
+	@OneToMany
+	@JoinColumn(name="item_id")
+	private List<ItemEntity> item;
+	
+	//add teacher schedule entity
 	
 	public ReservationEntity() {
 		super();

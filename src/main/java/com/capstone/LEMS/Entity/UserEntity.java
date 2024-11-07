@@ -1,5 +1,7 @@
 package com.capstone.LEMS.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -13,6 +15,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="Users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,6 +26,7 @@ public class UserEntity {
 	private String firstName;
 	@Column(name = "last_name")
 	private String lastName;
+	@JsonIgnore
 	private String password;
 	@Column(name = "insti_id")
 	private String instiId;
