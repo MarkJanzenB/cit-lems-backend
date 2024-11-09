@@ -19,10 +19,7 @@ public class TeacherScheduleEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="teacher_schedule_id")
     private int teacherScheduleId;
-    @Column(name="sched_assign_id")
-    private int schedAssignId;
-    @Column(name = "subject_id")
-    private int subjectId;
+    //Time default format is HH:mm:ss
     @Column(name = "start_time")
     private Time startTime;
     @Column(name = "end_time")
@@ -30,46 +27,35 @@ public class TeacherScheduleEntity {
     @Column(name="lab_num")
     private int labNum;
     @Column(name = "date")
+    //Date default format is YYYY-MM-DD
     private Date date;
     @Column(name = "teacher_id")
     private int teacherId;
+    
+    //Add sched_assign_id FK
+    //Add subject_id FK
 
     public TeacherScheduleEntity() {
         super();
     }
-    public TeacherScheduleEntity(int teacherScheduleId,int schedAssignId,int subjectId,Time startTime,Time endTime,int labNum,Date date,int teacherId) {
-        super();
-        this.teacherScheduleId = teacherScheduleId;
-        this.schedAssignId = schedAssignId;
-        this.subjectId = subjectId;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.labNum = labNum;
-        this.date = date;
-        this.teacherId = teacherId;
-    }
+    
+    public TeacherScheduleEntity(int teacherScheduleId, Time startTime, Time endTime, int labNum, Date date,
+			int teacherId) {
+		super();
+		this.teacherScheduleId = teacherScheduleId;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.labNum = labNum;
+		this.date = date;
+		this.teacherId = teacherId;
+	}
 
-
-    @JsonProperty("teacher_schedule_id")
+	@JsonProperty("teacher_schedule_id")
     public int getTeacherScheduleId() {
         return teacherScheduleId;
     }
-    public void setTeacherScheduleId() {
+    public void setTeacherScheduleId(int teacherScheduleId) {
         this.teacherScheduleId = teacherScheduleId;
-    }
-    @JsonProperty("sched_assign_id")
-    public int getSchedAssignId() {
-        return schedAssignId;
-    }
-    public void setSchedAssignId(int schedAssignId) {
-        this.schedAssignId = schedAssignId;
-    }
-    @JsonProperty("subject_id")
-    public int getSubjectId() {
-        return subjectId;
-    }
-    public void setSubjectId(int subjectId) {
-        this.subjectId = subjectId;
     }
     @JsonProperty("start_time")
     public Time getStartTime() {

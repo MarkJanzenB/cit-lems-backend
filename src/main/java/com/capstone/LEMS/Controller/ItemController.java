@@ -25,7 +25,7 @@ public class ItemController {
         return "ItemController is working";
     }
 
-    @PostMapping("/additem")
+    @PostMapping("/insertitem")
     public ItemEntity addItem(@RequestBody ItemEntity item) {
         return itemserv.AddItem(item);
     }

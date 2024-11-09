@@ -10,6 +10,4 @@ public class LemsApplication {
 		SpringApplication.run(LemsApplication.class, args);
 		System.out.println("backend is running");
 	}
-
-	
 }

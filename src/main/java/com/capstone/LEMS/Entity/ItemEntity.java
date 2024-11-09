@@ -36,8 +36,8 @@ public class ItemEntity {
         super();
         // TODO Auto-generated constructor stub
     }
-
-    public ItemEntity(int itemId, String itemName, double uniqueId, ItemCategoryEntity itemCategory,
+    
+	public ItemEntity(int itemId, String itemName, double uniqueId, ItemCategoryEntity itemCategory,
 			GroupEntity group) {
 		super();
 		this.itemId = itemId;
