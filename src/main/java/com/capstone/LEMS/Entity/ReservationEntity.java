@@ -30,9 +30,13 @@ public class ReservationEntity {
 	@JoinColumn(name="user_id")
 	private UserEntity user;
 	
-	@OneToMany
-	@JoinColumn(name="item_id")
-	private List<ItemEntity> item;
+    @ManyToMany
+    @JoinTable(
+        name = "reservation_items",
+        joinColumns = @JoinColumn(name = "reservation_id"),
+        inverseJoinColumns = @JoinColumn(name = "item_id")
+    )
+    private List<ItemEntity> item;
 	
 	//add teacher schedule entity
 	
@@ -41,10 +45,12 @@ public class ReservationEntity {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ReservationEntity(int reservationId, LocalDateTime reservationDate) {
+	public ReservationEntity(int reservationId, LocalDateTime reservationDate, UserEntity user, List<ItemEntity> item) {
 		super();
 		this.reservationId = reservationId;
 		this.reservationDate = reservationDate;
+		this.user = user;
+		this.item = item;
 	}
 
 	@JsonProperty("reservation_id")
@@ -63,6 +69,24 @@ public class ReservationEntity {
 
 	public void setReservationDate(LocalDateTime reservationDate) {
 		this.reservationDate = reservationDate;
+	}
+
+	@JsonProperty("user_id")
+	public UserEntity getUser() {
+		return user;
+	}
+
+	public void setUser(UserEntity user) {
+		this.user = user;
+	}
+
+	@JsonProperty("get_item")
+	public List<ItemEntity> getItem() {
+		return item;
+	}
+
+	public void setItem(List<ItemEntity> item) {
+		this.item = item;
 	}
 	
 	

@@ -14,7 +14,7 @@ import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Service.ItemService;
 
 @RestController
-@RequestMapping
+@RequestMapping("/item")
 @CrossOrigin
 public class ItemController {
     @Autowired

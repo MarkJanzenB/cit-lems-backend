@@ -4,6 +4,7 @@ package com.capstone.LEMS.Entity;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name="Subject")
 public class SubjectEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
