@@ -1,5 +1,7 @@
 package com.capstone.LEMS.Controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -35,5 +37,10 @@ public class UserController {
 	@GetMapping("/login")
 	public String UserLogin(@RequestParam String insti_id, @RequestParam String password) {
 		return userserv.UserLogin(insti_id, password);
+	}
+	
+	@GetMapping("/getallusers")
+	public List<UserEntity> getAllUser(){
+		return userserv.getAllUsers();
 	}
 }

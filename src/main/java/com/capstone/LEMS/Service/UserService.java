@@ -1,5 +1,7 @@
 package com.capstone.LEMS.Service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,5 +27,9 @@ public class UserService {
 		}else {
 			return "incorrect id number or password";
 		}
+	}
+	
+	public List<UserEntity> getAllUsers(){
+		return userrepo.findAll();
 	}
 }

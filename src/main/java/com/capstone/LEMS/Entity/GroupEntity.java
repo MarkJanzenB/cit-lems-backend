@@ -3,15 +3,19 @@ package com.capstone.LEMS.Entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-
-import javax.swing.*;
+import jakarta.persistence.Table;
 
 @Entity
+//added specifc table name
+//without this, the table name would be Group_entity which is not the same as the ERD
+//ERD has 'group' as entity name however we cannot make that as a table name because the word 'group' is reserved keyword for mysql that is why we added tbl in the end
+@Table(name="Grouptbl")
 public class GroupEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy=GenerationType.IDENTITY)
     private int group_id;
     @Column(name = "group_name")
     private String group_name;
