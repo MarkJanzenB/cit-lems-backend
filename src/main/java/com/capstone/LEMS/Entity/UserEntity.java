@@ -1,6 +1,5 @@
 package com.capstone.LEMS.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -10,7 +9,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -26,13 +25,13 @@ public class UserEntity {
 	private String firstName;
 	@Column(name = "last_name")
 	private String lastName;
-	@JsonIgnore
+	//@JsonIgnore
 	private String password;
 	@Column(name = "insti_id")
 	private String instiId;
 	private String email;
 	
-	@OneToOne
+	@ManyToOne
 	@JoinColumn(name = "role_id")
 	private RoleEntity role;
 	
