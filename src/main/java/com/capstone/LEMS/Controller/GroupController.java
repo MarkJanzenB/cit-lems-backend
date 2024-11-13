@@ -14,7 +14,7 @@ public class GroupController {
     @Autowired
     GroupService gserv;
 
-    @PostMapping("/addgroup")
+    @PostMapping("/insertgroup")
     public GroupEntity addGroup(@RequestBody GroupEntity group){
         return gserv.addGroup(group);
     }

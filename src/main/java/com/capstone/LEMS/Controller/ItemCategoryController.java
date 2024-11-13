@@ -26,7 +26,7 @@ public class ItemCategoryController {
         return "ItemCategoryController is working";
     }
 
-    @PostMapping("/additemcategory")
+    @PostMapping("/insertitemcategory")
     public ItemCategoryEntity addItemCategory(@RequestBody ItemCategoryEntity itemCategory) {
         return itemCatServ.addItemCategory(itemCategory);
     }

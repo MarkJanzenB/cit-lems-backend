@@ -1,7 +1,6 @@
 package com.capstone.LEMS.Entity;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -13,7 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -30,21 +29,27 @@ public class ReservationEntity {
 	@JoinColumn(name="user_id")
 	private UserEntity user;
 	
-	@OneToMany
-	@JoinColumn(name="item_id")
-	private List<ItemEntity> item;
+    @OneToOne
+    @JoinColumn(name="item_id")
+    private ItemEntity item;
 	
-	//add teacher schedule entity
+	@ManyToOne
+	@JoinColumn(name="schedule_id")
+    private TeacherScheduleEntity teacherSchedule;
 	
 	public ReservationEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-
-	public ReservationEntity(int reservationId, LocalDateTime reservationDate) {
+	
+	public ReservationEntity(int reservationId, LocalDateTime reservationDate, UserEntity user, ItemEntity item,
+			TeacherScheduleEntity teacherSchedule) {
 		super();
 		this.reservationId = reservationId;
 		this.reservationDate = reservationDate;
+		this.user = user;
+		this.item = item;
+		this.teacherSchedule = teacherSchedule;
 	}
 
 	@JsonProperty("reservation_id")
@@ -63,6 +68,33 @@ public class ReservationEntity {
 
 	public void setReservationDate(LocalDateTime reservationDate) {
 		this.reservationDate = reservationDate;
+	}
+
+	@JsonProperty("user_id")
+	public UserEntity getUser() {
+		return user;
+	}
+
+	public void setUser(UserEntity user) {
+		this.user = user;
+	}
+
+	@JsonProperty("item_id")
+	public ItemEntity getItem() {
+		return item;
+	}
+
+	public void setItem(ItemEntity item) {
+		this.item = item;
+	}
+
+	@JsonProperty("schedule_id")
+	public TeacherScheduleEntity getTeacherSchedule() {
+		return teacherSchedule;
+	}
+
+	public void setTeacherSchedule(TeacherScheduleEntity teacherSchedule) {
+		this.teacherSchedule = teacherSchedule;
 	}
 	
 	

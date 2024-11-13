@@ -13,4 +13,8 @@ public class TeacherScheduleService {
     public List<TeacherScheduleEntity> getAllTeacherSchedules() {
         return teacherScheduleRepository.findAll();
     }
+    
+    public TeacherScheduleEntity AddTeacherSchedule(TeacherScheduleEntity teachsched) {
+    	return teacherScheduleRepository.save(teachsched);
+    }
 }

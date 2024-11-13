@@ -14,7 +14,7 @@ import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Service.ItemService;
 
 @RestController
-@RequestMapping
+@RequestMapping("/item")
 @CrossOrigin
 public class ItemController {
     @Autowired
@@ -25,7 +25,7 @@ public class ItemController {
         return "ItemController is working";
     }
 
-    @PostMapping("/additem")
+    @PostMapping("/insertitem")
     public ItemEntity addItem(@RequestBody ItemEntity item) {
         return itemserv.AddItem(item);
     }
