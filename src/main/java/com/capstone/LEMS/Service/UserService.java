@@ -3,6 +3,10 @@ package com.capstone.LEMS.Service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.capstone.LEMS.Entity.UserEntity;
@@ -13,19 +17,36 @@ public class UserService {
 	@Autowired
 	UserRepository userrepo;
 	
-	//registration or create user
+	@Autowired
+	AuthenticationManager authmanager;
+	
+	@Autowired
+	JwtService jwtserv;
+	
+	private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
+	
 	public UserEntity UserRegister (UserEntity user) {
+		user.setPassword(encoder.encode(user.getPassword()));
+		
 		return userrepo.save(user);
 	}
 	
-	//login
-	public String UserLogin (String insti_id, String password) {
+	public String verify (String insti_id, String password) {
 		UserEntity user = userrepo.findByInstiId(insti_id);
 		
-		if(user != null && user.getPassword().equals(password)) {
-			return "login successfully";
+		if(user == null) {
+			return "User doesn't exists";
+		}
+		
+		Authentication auth = 
+				authmanager
+					.authenticate(new UsernamePasswordAuthenticationToken(
+							insti_id, 
+							password));
+		if(auth.isAuthenticated()) {
+			return jwtserv.generateToken(insti_id, user.getRole().getRoleId());
 		}else {
-			return "incorrect id number or password";
+			return "Failed";
 		}
 	}
 	

@@ -1,5 +1,6 @@
 package com.capstone.LEMS.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -25,7 +26,6 @@ public class UserEntity {
 	private String firstName;
 	@Column(name = "last_name")
 	private String lastName;
-	//@JsonIgnore
 	private String password;
 	@Column(name = "insti_id")
 	private String instiId;
@@ -79,20 +79,22 @@ public class UserEntity {
 		this.lastName = lastName;
 	}
 
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
+	@JsonProperty
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
 	@JsonProperty("insti_id")
-	public String getIdnum() {
+	public String getInstiId() {
 		return instiId;
 	}
 
-	public void setIdnum(String instiId) {
+	public void setInstiId(String instiId) {
 		this.instiId = instiId;
 	}
 
