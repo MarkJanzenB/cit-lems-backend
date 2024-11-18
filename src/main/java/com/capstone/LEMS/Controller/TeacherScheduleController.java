@@ -17,6 +17,12 @@ import com.capstone.LEMS.Service.TeacherScheduleService;
 public class TeacherScheduleController {
     @Autowired
     TeacherScheduleService teacherScheduleService;
+
+    @GetMapping("/getAllTeacherSchedules")
+    public List<TeacherScheduleEntity> getAllTeacherSchedules() {
+        return teacherScheduleService.getAllTeacherSchedules();
+    }
+
     @GetMapping("/message")
     public String testMessage() {
         return "teacherScheduleService is working";
