@@ -3,11 +3,11 @@ package com.capstone.LEMS;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.capstone.LEMS")
 public class LemsApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(LemsApplication.class, args);
-		System.out.println("backend is running");
+		System.out.println("Backend is Running");
 	}
 }
