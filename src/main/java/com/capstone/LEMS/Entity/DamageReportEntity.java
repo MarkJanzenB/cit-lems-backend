@@ -15,13 +15,28 @@ public class DamageReportEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long report_id;
 
-    private String description;
+    @Column(name = "material_id")
+    private String materialId;
 
-    @Column(name = "item_id")
-    private Long itemId;
+    @Column(name = "material_name")
+    private String materialName;
 
-    @Column(name = "report_date")
-    private LocalDate reportDate;
+    @Column(name = "date_borrowed")
+    private LocalDate dateBorrowed;
+
+    private int qty;
+
+    @Column(name = "group_number")
+    private String group;
+
+    @Column(name = "year_sec")
+    private String yearSec;
+
+    private String instructor;
+
+    private String photo;
+
+    private String accountable;
 
     private String status;
 
@@ -34,28 +49,76 @@ public class DamageReportEntity {
         this.report_id = report_id;
     }
 
-    public String getDescription() {
-        return description;
+    public String getMaterialId() {
+        return materialId;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setMaterialId(String materialId) {
+        this.materialId = materialId;
     }
 
-    public Long getItemId() {
-        return itemId;
+    public String getMaterialName() {
+        return materialName;
     }
 
-    public void setItemId(Long itemId) {
-        this.itemId = itemId;
+    public void setMaterialName(String materialName) {
+        this.materialName = materialName;
     }
 
-    public LocalDate getReportDate() {
-        return reportDate;
+    public LocalDate getDateBorrowed() {
+        return dateBorrowed;
     }
 
-    public void setReportDate(LocalDate reportDate) {
-        this.reportDate = reportDate;
+    public void setDateBorrowed(LocalDate dateBorrowed) {
+        this.dateBorrowed = dateBorrowed;
+    }
+
+    public int getQty() {
+        return qty;
+    }
+
+    public void setQty(int qty) {
+        this.qty = qty;
+    }
+
+    public String getGroup() {
+        return group;
+    }
+
+    public void setGroup(String group) {
+        this.group = group;
+    }
+
+    public String getYearSec() {
+        return yearSec;
+    }
+
+    public void setYearSec(String yearSec) {
+        this.yearSec = yearSec;
+    }
+
+    public String getInstructor() {
+        return instructor;
+    }
+
+    public void setInstructor(String instructor) {
+        this.instructor = instructor;
+    }
+
+    public String getPhoto() {
+        return photo;
+    }
+
+    public void setPhoto(String photo) {
+        this.photo = photo;
+    }
+
+    public String getAccountable() {
+        return accountable;
+    }
+
+    public void setAccountable(String accountable) {
+        this.accountable = accountable;
     }
 
     public String getStatus() {

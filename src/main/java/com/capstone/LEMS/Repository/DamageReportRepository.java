@@ -1,9 +1,7 @@
 package com.capstone.LEMS.Repository;
 
-import com.capstone.LEMS.Entity.DamageReportEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import com.capstone.LEMS.Entity.DamageReportEntity;
 
-@Repository
 public interface DamageReportRepository extends JpaRepository<DamageReportEntity, Long> {
 }

@@ -10,22 +10,27 @@ import java.util.Optional;
 
 @Service
 public class DamageReportService {
+
     @Autowired
     private DamageReportRepository damageReportRepository;
 
-    public List<DamageReportEntity> findAll() {
+    public List<DamageReportEntity> getAllDamageReports() {
         return damageReportRepository.findAll();
     }
 
-    public Optional<DamageReportEntity> findById(Long id) {
+    public Optional<DamageReportEntity> getDamageReportById(Long id) {
         return damageReportRepository.findById(id);
     }
 
-    public DamageReportEntity save(DamageReportEntity damageReport) {
+    public DamageReportEntity saveDamageReport(DamageReportEntity damageReport) {
         return damageReportRepository.save(damageReport);
     }
 
-    public void deleteById(Long id) {
+    public void saveAllDamageReports(List<DamageReportEntity> damageReports) {
+        damageReportRepository.saveAll(damageReports);
+    }
+
+    public void deleteDamageReport(Long id) {
         damageReportRepository.deleteById(id);
     }
 }
