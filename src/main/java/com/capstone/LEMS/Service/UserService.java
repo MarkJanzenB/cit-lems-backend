@@ -27,7 +27,7 @@ public class UserService {
 	
 	public UserEntity UserRegister (UserEntity user) {
 		user.setPassword(encoder.encode(user.getPassword()));
-		
+		user.setNew(true);
 		return userrepo.save(user);
 	}
 	
@@ -52,5 +52,24 @@ public class UserService {
 	
 	public List<UserEntity> getAllUsers(){
 		return userrepo.findAll();
+	}
+	
+	public String notNew(String instiId) {
+		UserEntity user = userrepo.findByInstiId(instiId);
+		
+		if(user == null) {
+			return instiId;
+		}
+		
+		user.setNew(false);
+		userrepo.save(user);
+		
+		return "User is now not new";
+	}
+	
+	public boolean isUserNew(String instiId) {
+		UserEntity user = userrepo.findByInstiId(instiId);
+		
+		return user.isNew();
 	}
 }

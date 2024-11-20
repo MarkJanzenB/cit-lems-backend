@@ -30,6 +30,8 @@ public class UserEntity {
 	@Column(name = "insti_id")
 	private String instiId;
 	private String email;
+	@Column(nullable = false, name = "is_new")
+	private boolean isNew;
 	
 	@ManyToOne
 	@JoinColumn(name = "role_id")
@@ -41,7 +43,7 @@ public class UserEntity {
 	}
 
 	public UserEntity(int userId, String firstName, String lastName, String password, String instiId, String email,
-			RoleEntity role) {
+			boolean isNew, RoleEntity role) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -49,6 +51,7 @@ public class UserEntity {
 		this.password = password;
 		this.instiId = instiId;
 		this.email = email;
+		this.isNew = isNew;
 		this.role = role;
 	}
 
@@ -112,6 +115,15 @@ public class UserEntity {
 
 	public void setRole(RoleEntity role) {
 		this.role = role;
+	}
+
+	@JsonProperty("is_new")
+	public boolean isNew() {
+		return isNew;
+	}
+
+	public void setNew(boolean isNew) {
+		this.isNew = isNew;
 	}
 	
 }

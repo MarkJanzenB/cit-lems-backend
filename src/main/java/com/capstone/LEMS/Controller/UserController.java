@@ -4,11 +4,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.capstone.LEMS.Entity.UserEntity;
@@ -16,7 +17,6 @@ import com.capstone.LEMS.Service.UserService;
 
 @RestController
 @RequestMapping("/user")
-@CrossOrigin
 public class UserController {
 	@Autowired
 	UserService userserv;
@@ -42,5 +42,16 @@ public class UserController {
 	@GetMapping("/getallusers")
 	public List<UserEntity> getAllUser(){
 		return userserv.getAllUsers();
+	}
+	
+	@PutMapping("/tonotnew")
+	public String notNew(@RequestBody Map<String, String> instiId) {
+		String insti_id = instiId.get("insti_id");
+		return userserv.notNew(insti_id);
+	}
+	
+	@GetMapping("/isusernew")
+	public boolean isUserNew(@RequestParam String instiId) {
+		return userserv.isUserNew(instiId);
 	}
 }

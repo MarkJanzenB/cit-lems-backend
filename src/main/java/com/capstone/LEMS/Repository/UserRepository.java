@@ -7,6 +7,5 @@ import com.capstone.LEMS.Entity.UserEntity;
 
 @Repository
 public interface UserRepository extends JpaRepository<UserEntity, Integer>{
-	//mainly used to check if user already exist
 	UserEntity findByInstiId (String insti_id);
 }
