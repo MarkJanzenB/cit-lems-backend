@@ -32,10 +32,11 @@ public class JwtService {
 		}
 	}
 
-	public String generateToken(String insti_id, int roleId) {
+	public String generateToken(String insti_id, int roleId, String first_name) {
 		Map<String, Object> claims = new HashMap<>();
 		
 		claims.put("role_id", roleId);
+		claims.put("first_name", first_name);
 		
 		return Jwts.builder()
 				.claims()

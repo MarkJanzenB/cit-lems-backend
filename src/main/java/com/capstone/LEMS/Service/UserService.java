@@ -44,7 +44,7 @@ public class UserService {
 							insti_id, 
 							password));
 		if(auth.isAuthenticated()) {
-			return jwtserv.generateToken(insti_id, user.getRole().getRoleId());
+			return jwtserv.generateToken(insti_id, user.getRole().getRoleId(), user.getFname());
 		}else {
 			return "Failed";
 		}
