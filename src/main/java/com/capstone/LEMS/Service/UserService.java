@@ -38,16 +38,20 @@ public class UserService {
 			return "User doesn't exists";
 		}
 		
-		Authentication auth = 
-				authmanager
-					.authenticate(new UsernamePasswordAuthenticationToken(
-							insti_id, 
-							password));
-		if(auth.isAuthenticated()) {
-			return jwtserv.generateToken(insti_id, user.getRole().getRoleId(), user.getFname());
-		}else {
-			return "Failed";
+		try {
+			Authentication auth = 
+					authmanager
+						.authenticate(new UsernamePasswordAuthenticationToken(
+								insti_id, 
+								password));
+			if(auth.isAuthenticated()) {
+				return jwtserv.generateToken(insti_id, user.getRole().getRoleId(), user.getFname());
+			}
+		} catch (Exception e) {
+			return "Incorrect Password";
 		}
+		
+		return "Incorrect Password";
 	}
 	
 	public List<UserEntity> getAllUsers(){
