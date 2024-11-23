@@ -76,4 +76,14 @@ public class UserService {
 		
 		return user.isNew();
 	}
+	
+	public boolean isUserAlrdyExists(String instiId) {
+		UserEntity user = userrepo.findByInstiId(instiId);
+		
+		if(user == null) {
+			return false;
+		}else {
+			return true;
+		}
+	}
 }

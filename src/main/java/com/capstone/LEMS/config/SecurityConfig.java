@@ -50,7 +50,7 @@ public class SecurityConfig {
 			.cors(c -> c.configurationSource(corsConfigurationSource()))
 			.csrf(customizer -> customizer.disable())
 			.authorizeHttpRequests(request -> request
-					.requestMatchers("/user/login", "/user/register")
+					.requestMatchers("/user/login", "/user/register", "/user/isuseralrdyexists")
 					.permitAll()
 					.anyRequest()
 					.authenticated())

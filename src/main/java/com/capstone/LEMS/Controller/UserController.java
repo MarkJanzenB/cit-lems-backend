@@ -54,4 +54,9 @@ public class UserController {
 	public boolean isUserNew(@RequestParam String instiId) {
 		return userserv.isUserNew(instiId);
 	}
+	
+	@GetMapping("/isuseralrdyexists")
+	public boolean isUserAlrdyExists(@RequestParam String instiId) {
+		return userserv.isUserAlrdyExists(instiId);
+	}
 }
