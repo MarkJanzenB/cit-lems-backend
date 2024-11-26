@@ -15,6 +15,11 @@ public class ItemService {
 
     //for adding items
     public ItemEntity AddItem(ItemEntity item) {
+    	ItemEntity itemfromdb = itemrepo.findByUniqueId(item.getUniqueId());
+    	
+    	if(itemfromdb != null) {
+    		throw new IllegalArgumentException("Item already exists");
+    	}
         return itemrepo.save(item);
     }
 

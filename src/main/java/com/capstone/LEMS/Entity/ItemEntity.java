@@ -22,28 +22,27 @@ public class ItemEntity {
     @Column(name = "item_name")
     private String itemName;
     @Column(name = "unique_id")
-    private double uniqueId;
+    private String uniqueId;
     
     @ManyToOne
-    @JoinColumn(name="category_id")
-    private ItemCategoryEntity itemCategory;
+    @JoinColumn(name = "inventory_id", nullable = true)
+    private InventoryEntity inventory;
     
     @OneToOne
-    @JoinColumn(name="group_id")
+    @JoinColumn(name="group_id", nullable = true)
     private GroupEntity group;
 
     public ItemEntity() {
         super();
         // TODO Auto-generated constructor stub
     }
-    
-	public ItemEntity(int itemId, String itemName, double uniqueId, ItemCategoryEntity itemCategory,
-			GroupEntity group) {
+
+	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, GroupEntity group) {
 		super();
 		this.itemId = itemId;
 		this.itemName = itemName;
 		this.uniqueId = uniqueId;
-		this.itemCategory = itemCategory;
+		this.inventory = inventory;
 		this.group = group;
 	}
 
@@ -66,22 +65,13 @@ public class ItemEntity {
     }
 
     @JsonProperty("unique_id")
-    public double getUniqueId() {
+    public String getUniqueId() {
         return uniqueId;
     }
 
-    public void setUniqueId(double uniqueId) {
+    public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
     }
-
-    @JsonProperty("category_id")
-	public ItemCategoryEntity getItemCategory() {
-		return itemCategory;
-	}
-
-	public void setItemCategory(ItemCategoryEntity itemCategory) {
-		this.itemCategory = itemCategory;
-	}
 
 	@JsonProperty("group_id")
 	public GroupEntity getGroup() {
@@ -90,5 +80,13 @@ public class ItemEntity {
 
 	public void setGroup(GroupEntity group) {
 		this.group = group;
+	}
+
+	public InventoryEntity getInventory() {
+		return inventory;
+	}
+
+	public void setInventory(InventoryEntity inventory) {
+		this.inventory = inventory;
 	}
 }

@@ -15,5 +15,11 @@ public class InventoryService {
         return inventoryRepository.findAll();
     }
 
-
+    public InventoryEntity addInventory(InventoryEntity inventory) {
+    	return inventoryRepository.save(inventory);
+    }
+    
+    public List<InventoryEntity> getInventoryByCategory(int category_id){
+    	return inventoryRepository.findByItemCategoryCategoryId(category_id);
+    }
 }
