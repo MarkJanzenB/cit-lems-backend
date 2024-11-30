@@ -2,8 +2,11 @@ package com.capstone.LEMS.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,12 +32,22 @@ public class InventoryController {
     }
     
     @PostMapping("/addinventory")
-    public InventoryEntity addInventory(@RequestBody InventoryEntity inventory) {
+    public ResponseEntity<?> addInventory(@RequestBody InventoryEntity inventory) {
     	return inventoryService.addInventory(inventory);
     }
     
     @GetMapping("/getinventorybycategory")
     public List<InventoryEntity> getInventoryByCategory(@RequestParam int categoryId){
     	return inventoryService.getInventoryByCategory(categoryId);
+    }
+    
+    @GetMapping("/isinventoryexists")
+    public ResponseEntity<?> isInventoryExists(@RequestParam String inventoryName){
+    	return inventoryService.isInventoryExists(inventoryName);
+    }
+    
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteInventory(@PathVariable int id){
+    	return inventoryService.deleteInventory(id);
     }
 }

@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface InventoryRepository extends JpaRepository<InventoryEntity, Integer> {
 	List<InventoryEntity> findByItemCategoryCategoryId(int categoryId);
+	
+	InventoryEntity findByNameIgnoreCase(String name);
 }

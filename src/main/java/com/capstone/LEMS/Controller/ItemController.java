@@ -3,6 +3,7 @@ package com.capstone.LEMS.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,7 +27,7 @@ public class ItemController {
     }
 
     @PostMapping("/insertitem")
-    public ItemEntity addItem(@RequestBody ItemEntity item) {
+    public ResponseEntity<?> addItem(@RequestBody ItemEntity item) {
         return itemserv.AddItem(item);
     }
 
