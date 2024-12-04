@@ -56,7 +56,7 @@ public class InventoryService {
     		inventoryRepository.deleteById(id);
     		return ResponseEntity
     				.status(HttpStatus.OK) // 200
-    				.body(id + " Has been deleted. The data that was removed: " + inventory);
+    				.body(inventory);
     	}else {
     		return ResponseEntity
     				.status(HttpStatus.NOT_FOUND) // 404
