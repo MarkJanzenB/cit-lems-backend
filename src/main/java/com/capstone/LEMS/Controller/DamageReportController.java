@@ -7,38 +7,39 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/damage-reports")
+@RequestMapping("/damageReports")
 public class DamageReportController {
+
     @Autowired
     private DamageReportService damageReportService;
 
     @GetMapping
     public List<DamageReportEntity> getAllDamageReports() {
-        return damageReportService.findAll();
+        return damageReportService.getAllDamageReports();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<DamageReportEntity> getDamageReportById(@PathVariable Long id) {
-        Optional<DamageReportEntity> damageReport = damageReportService.findById(id);
-        return damageReport.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+        DamageReportEntity damageReport = damageReportService.getDamageReportById(id);
+        if (damageReport != null) {
+            return ResponseEntity.ok(damageReport);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @PostMapping("/adddamage")
+    @PostMapping
     public DamageReportEntity createDamageReport(@RequestBody DamageReportEntity damageReport) {
-        return damageReportService.save(damageReport);
+        return damageReportService.createDamageReport(damageReport);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<DamageReportEntity> updateDamageReport(@PathVariable Long id, @RequestBody DamageReportEntity damageReportDetails) {
-        Optional<DamageReportEntity> damageReport = damageReportService.findById(id);
-        if (damageReport.isPresent()) {
-            DamageReportEntity report = damageReport.get();
-            report.setDescription(damageReportDetails.getDescription());
-            report.setStatus(damageReportDetails.getStatus());
-            return ResponseEntity.ok(damageReportService.save(report));
+        DamageReportEntity updatedDamageReport = damageReportService.updateDamageReport(id, damageReportDetails);
+        if (updatedDamageReport != null) {
+            return ResponseEntity.ok(updatedDamageReport);
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -46,11 +47,7 @@ public class DamageReportController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteDamageReport(@PathVariable Long id) {
-        if (damageReportService.findById(id).isPresent()) {
-            damageReportService.deleteById(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        damageReportService.deleteDamageReport(id);
+        return ResponseEntity.noContent().build();
     }
 }
