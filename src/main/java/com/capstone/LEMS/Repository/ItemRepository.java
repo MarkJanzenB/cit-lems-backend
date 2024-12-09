@@ -8,4 +8,5 @@ import com.capstone.LEMS.Entity.ItemEntity;
 @Repository
 public interface ItemRepository  extends JpaRepository<ItemEntity, Integer>{
 	ItemEntity findByUniqueId (String uniqueId);
+	ItemEntity findTopByIsAutoUidTrueOrderByItemIdDesc();
 }

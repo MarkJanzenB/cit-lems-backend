@@ -23,6 +23,8 @@ public class ItemEntity {
     private String itemName;
     @Column(name = "unique_id")
     private String uniqueId;
+    @Column(name = "is_auto_uid")
+    private boolean isAutoUid;
     
     @ManyToOne
     @JoinColumn(name = "inventory_id", nullable = true)
@@ -44,6 +46,7 @@ public class ItemEntity {
 		this.uniqueId = uniqueId;
 		this.inventory = inventory;
 		this.group = group;
+		this.isAutoUid = false;
 	}
 
 	@JsonProperty("item_id")
@@ -88,5 +91,13 @@ public class ItemEntity {
 
 	public void setInventory(InventoryEntity inventory) {
 		this.inventory = inventory;
+	}
+
+	public boolean isAutoUid() {
+		return isAutoUid;
+	}
+
+	public void setAutoUid(boolean isAutoUid) {
+		this.isAutoUid = isAutoUid;
 	}
 }

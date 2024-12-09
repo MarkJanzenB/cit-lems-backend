@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.capstone.LEMS.Entity.ItemEntity;
@@ -27,8 +28,8 @@ public class ItemController {
     }
 
     @PostMapping("/insertitem")
-    public ResponseEntity<?> addItem(@RequestBody ItemEntity item) {
-        return itemserv.AddItem(item);
+    public ResponseEntity<?> addItem(@RequestBody ItemEntity item, @RequestParam int bulkSize) {
+        return itemserv.AddItem(item, bulkSize);
     }
 
     @GetMapping("/getallitems")
