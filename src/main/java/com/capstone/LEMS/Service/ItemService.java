@@ -83,12 +83,12 @@ public class ItemService {
     	log.info("Fetching items with name: {}", itemToEdit);
     	List<ItemEntity> items = itemrepo.findByItemName(itemToEdit);
     	
-    	if(items.isEmpty()) {
-    		log.warn("No items found with name: {}", itemToEdit);
-    		return ResponseEntity
-    				.status(HttpStatus.NOT_FOUND) // 404
-    				.body("No items found with name: " + itemToEdit);
-    	}
+//    	if(items.isEmpty()) {
+//    		log.warn("No items found with name: {}", itemToEdit);
+//    		return ResponseEntity
+//    				.status(HttpStatus.NOT_FOUND) // 404
+//    				.body("No items found with name: " + itemToEdit);
+//    	}
     	
     	log.info("Updating items with new name: {}", newItemDetails.getItemName());
     	items.forEach(item -> {
