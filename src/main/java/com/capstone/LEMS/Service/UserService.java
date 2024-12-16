@@ -1,8 +1,13 @@
 package com.capstone.LEMS.Service;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,6 +30,8 @@ public class UserService {
 	
 	private BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(12);
 	
+	private static final Logger log = LoggerFactory.getLogger(UserService.class);
+	
 	public UserEntity UserRegister (UserEntity user) {
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setNew(true);
@@ -45,7 +52,7 @@ public class UserService {
 								insti_id, 
 								password));
 			if(auth.isAuthenticated()) {
-				return jwtserv.generateToken(insti_id, user.getRole().getRoleId(), user.getFname());
+				return jwtserv.generateToken(insti_id, user.getRole().getRoleId(), user.getFname(), user.getUid());
 			}
 		} catch (Exception e) {
 			return "Incorrect Password";
@@ -85,5 +92,21 @@ public class UserService {
 		}else {
 			return true;
 		}
+	}
+	
+	public ResponseEntity<?> getUserDetails(int uid){
+		log.info("Fetching user details for ID: {}", uid);
+		
+		Optional<UserEntity> user = userrepo.findById(uid);
+		
+		if(user.isEmpty()) {
+			log.warn("User not found for ID: {}", uid);
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body("User not found");
+		}
+		
+		log.info("User found: {}", user.get());
+		return ResponseEntity.ok(user.get());
 	}
 }
