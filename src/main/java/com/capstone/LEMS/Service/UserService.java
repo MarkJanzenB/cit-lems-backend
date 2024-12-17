@@ -52,7 +52,7 @@ public class UserService {
 								insti_id, 
 								password));
 			if(auth.isAuthenticated()) {
-				return jwtserv.generateToken(insti_id, user.getRole().getRoleId(), user.getFname(), user.getUid());
+				return jwtserv.generateToken(insti_id, user.getRole().getRoleId(), user.getFname(), user.getLname(), user.getUid());
 			}
 		} catch (Exception e) {
 			return "Incorrect Password";

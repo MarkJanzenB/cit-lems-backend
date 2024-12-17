@@ -25,9 +25,9 @@ public class TeacherScheduleController {
     public List<TeacherScheduleEntity> getAllTeacherSchedules(@RequestBody TeacherScheduleEntity teacherScheduleEntity) {
         return teacherScheduleService.getAllTeacherSchedules();
     }
-    
     @PostMapping("/insertteacherschedule")
     public TeacherScheduleEntity AddTeacherSchedule(@RequestBody TeacherScheduleEntity teachsched) {
     	return teacherScheduleService.AddTeacherSchedule(teachsched);
     }
+
 }
