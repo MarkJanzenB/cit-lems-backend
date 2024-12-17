@@ -10,4 +10,5 @@ import java.util.List;
 public interface BorrowCartRepository extends JpaRepository<BorrowCart, Long> {
 
     List<BorrowCart> findByInstiId(Long instiId);
+    BorrowCart findByItemId(int itemId);
 }

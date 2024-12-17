@@ -23,8 +23,28 @@ public class BorrowCartService {
     }
 
     public BorrowCart addToBorrowCart(int instiId, int itemId, String itemName, String categoryName, int quantity) {
+
+        BorrowCart existingBorrowCart = borrowCartRepository.findByItemId(itemId);
+
+        if(existingBorrowCart != null) {
+            existingBorrowCart.setQuantity(existingBorrowCart.getQuantity() + quantity);
+
+            // Deduct the item quantity from the inventory
+            InventoryEntity inventoryItem = inventoryRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
+
+            if (inventoryItem.getQuantity() < quantity) {
+                throw new RuntimeException("Not enough items in inventory");
+            }
+
+            inventoryItem.setQuantity(inventoryItem.getQuantity() - quantity);
+            inventoryRepository.save(inventoryItem);
+
+            return borrowCartRepository.save(existingBorrowCart);
+        }
+
         // Deduct the item quantity from the inventory
         InventoryEntity inventoryItem = inventoryRepository.findById(itemId).orElseThrow(() -> new RuntimeException("Item not found"));
+
         if (inventoryItem.getQuantity() < quantity) {
             throw new RuntimeException("Not enough items in inventory");
         }
