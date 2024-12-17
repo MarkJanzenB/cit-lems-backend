@@ -65,4 +65,9 @@ public class UserController {
 	public ResponseEntity<?> getUserDetails(@RequestParam int uid){
 		return userserv.getUserDetails(uid);
 	}
+	
+	@GetMapping("/getallusersbyroleid")
+	public ResponseEntity<?> getAllUsersByRoleId(@RequestParam int roleId){
+		return userserv.getAllUsersByRoleId(roleId);
+	}
 }

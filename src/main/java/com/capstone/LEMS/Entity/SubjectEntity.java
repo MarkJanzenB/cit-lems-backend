@@ -1,47 +1,53 @@
 package com.capstone.LEMS.Entity;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import jakarta.persistence.*;
 
 @Entity
-@Table(name="Subject")
+@Table(name="subject")
 public class SubjectEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int subject_id;
+    private int subjectId;
     @Column(name = "subject_name")
-    private String subject_name;
-    @Column(name = "year_section")
-    private String year_section;
+    private String subjectName;
+    
+    @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    private List<RequestEntity> requests = new ArrayList<>();
 
-    public SubjectEntity(){
+	public SubjectEntity() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
 
-    }
-    public SubjectEntity(int subject_id, String subject_name, String year_section){
-        this.subject_id = subject_id;
-        this.subject_name = subject_name;
-        this.year_section = year_section;
-    }
+	public SubjectEntity(int subjectId, String subjectName) {
+		super();
+		this.subjectId = subjectId;
+		this.subjectName = subjectName;
+	}
 
-    public void setSubjectId(int subject_id){
-        this.subject_id = subject_id;
-    }
-    public int getSubjectId(){
-        return subject_id;
-    }
-    public void setSubjectName(String subject_name){
-        this.subject_name = subject_name;
-    }
-    public String getSubjectName(){
-        return subject_name;
-    }
-    public void setYearSection(String year_section){
-        this.year_section = year_section;
-    }
-    public String getYearSection(){
-        return year_section;
-    }
+	public int getSubjectId() {
+		return subjectId;
+	}
 
+	@JsonProperty("subject_id")
+	public void setSubjectId(int subjectId) {
+		this.subjectId = subjectId;
+	}
 
+	@JsonProperty("subject_name")
+	public String getSubjectName() {
+		return subjectName;
+	}
 
+	public void setSubjectName(String subjectName) {
+		this.subjectName = subjectName;
+	}
 }

@@ -1,9 +1,13 @@
 package com.capstone.LEMS.Entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -36,6 +41,10 @@ public class UserEntity {
 	@ManyToOne
 	@JoinColumn(name = "role_id")
 	private RoleEntity role;
+	
+	@OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<RequestEntity> requests = new ArrayList<>();
 	
 	public UserEntity() {
 		super();
@@ -125,5 +134,12 @@ public class UserEntity {
 	public void setNew(boolean isNew) {
 		this.isNew = isNew;
 	}
-	
+
+	public List<RequestEntity> getRequests() {
+		return requests;
+	}
+
+	public void setRequests(List<RequestEntity> requests) {
+		this.requests = requests;
+	}
 }

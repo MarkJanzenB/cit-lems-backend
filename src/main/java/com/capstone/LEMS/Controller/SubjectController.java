@@ -23,10 +23,10 @@ public class SubjectController {
     public List<SubjectEntity> getAllSubject(){
         return sserv.getAllSubject();
     }
-    @PutMapping("/updatesubject/{subject_id}")
-    public SubjectEntity updateSubject(@RequestBody SubjectEntity subject, @PathVariable int subject_id){
-        return sserv.updateSubject(subject,subject_id);
-    }
+//    @PutMapping("/updatesubject/{subject_id}")
+//    public SubjectEntity updateSubject(@RequestBody SubjectEntity subject, @PathVariable int subject_id){
+//        return sserv.updateSubject(subject,subject_id);
+//    }
     @DeleteMapping("/deleteSubject/{subject_id}")
     public void deleteSubject(@PathVariable int subject_id){
         sserv.deleteSubject(subject_id);

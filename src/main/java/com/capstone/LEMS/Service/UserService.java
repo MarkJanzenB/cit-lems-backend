@@ -109,4 +109,18 @@ public class UserService {
 		log.info("User found: {}", user.get());
 		return ResponseEntity.ok(user.get());
 	}
+	
+	public ResponseEntity<?> getAllUsersByRoleId(int roleId){
+		log.info("Fetching users with role Id: {}", roleId);
+		List<UserEntity> users = userrepo.findByRole_RoleId(roleId);
+		
+		if(users.isEmpty()) {
+			log.warn("There are no users with role: {}", roleId);
+			return ResponseEntity
+					.status(HttpStatus.NO_CONTENT)
+					.body("Users with role " + roleId + " does not exist");
+		}
+		
+		return ResponseEntity.ok(users);
+	}
 }

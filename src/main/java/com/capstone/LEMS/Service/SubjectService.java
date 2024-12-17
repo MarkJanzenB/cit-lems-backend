@@ -24,13 +24,13 @@ public class SubjectService {
         return srepo.findAll();
     }
     //update subject
-    public SubjectEntity updateSubject(SubjectEntity updatedSubject, int subject_id){
-        SubjectEntity existingSubject = srepo.findById(subject_id).orElseThrow(()-> new IllegalArgumentException("Subject ID not found."));
-
-        existingSubject.setSubjectName(updatedSubject.getSubjectName());
-        existingSubject.setYearSection(updatedSubject.getYearSection());
-        return srepo.save(existingSubject);
-    }
+//    public SubjectEntity updateSubject(SubjectEntity updatedSubject, int subject_id){
+//        SubjectEntity existingSubject = srepo.findById(subject_id).orElseThrow(()-> new IllegalArgumentException("Subject ID not found."));
+//
+//        existingSubject.setSubjectName(updatedSubject.getSubjectName());
+//        existingSubject.setYearSection(updatedSubject.getYearSection());
+//        return srepo.save(existingSubject);
+//    }
 
     //delete
     public void deleteSubject(int subject_id){
