@@ -42,7 +42,10 @@ public class RequestService {
 		log.info("Getting a list of requests");
 		return ResponseEntity.ok(reqrepo.findAll());
 	}
-	
+	public ResponseEntity<?> getRequestByStatus(String status){
+		log.info("Getting a list of requests by status");
+		return ResponseEntity.ok(reqrepo.findByStatus(status));
+	}
 	public ResponseEntity<?> updateRequest(int reqId, RequestEntity newReq){
 		log.info("Running updateRequest in RequestService");
 		
@@ -132,7 +135,9 @@ public class RequestService {
 			if(newReq.getRoom() != null) {
 				req.setRoom(newReq.getRoom());
 			}
-			
+			if(newReq.getClassStatus()!=null){
+				req.setClassStatus(newReq.getClassStatus());
+			}
 			return ResponseEntity.ok(reqrepo.save(req));
 		}else {
 			return ResponseEntity

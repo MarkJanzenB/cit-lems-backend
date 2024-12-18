@@ -17,7 +17,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="ItemCategory")
-public class ItemCategoryEntity {
+public class ItemCategoryEntity extends GroupEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "category_id")

@@ -35,4 +35,8 @@ public class RequestController {
 	public ResponseEntity<?> updateRequest(@RequestParam int reqId, @RequestBody RequestEntity req){
 		return reqserv.updateRequest(reqId, req);
 	}
+	@GetMapping("/getrequestbystatus")
+	public ResponseEntity<?> getRequestByStatus(@RequestParam String status){
+		return reqserv.getRequestByStatus(status);
+	}
 }

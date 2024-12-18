@@ -26,9 +26,12 @@ public class RequestEntity {
 	@ManyToOne
 	@JoinColumn(name = "teacher_id", nullable = true)
 	private UserEntity teacher;
-	
+
+	@Column(name="class_status")
+	private String classStatus;
+
 	private String status;
-	
+
 	@Column(name="date_requested")
 	private LocalDateTime dateRequested;
 	
@@ -61,12 +64,14 @@ public class RequestEntity {
 		// TODO Auto-generated constructor stub
 	}
 
-	public RequestEntity(int requestId, UserEntity teacher, String status, LocalDateTime dateRequested,
-			LocalDate dateSchedule, LocalTime startTime, LocalTime endTime, UserEntity approver,
-			LocalDateTime dateApproved, String remarks, SubjectEntity subject, String room) {
+
+	public RequestEntity(int requestId, UserEntity teacher, String classStatus, String status, LocalDateTime dateRequested,
+						 LocalDate dateSchedule, LocalTime startTime, LocalTime endTime, UserEntity approver,
+						 LocalDateTime dateApproved, String remarks, SubjectEntity subject, String room) {
 		super();
 		this.requestId = requestId;
 		this.teacher = teacher;
+		this.classStatus = classStatus;
 		this.status = status;
 		this.dateRequested = dateRequested;
 		this.dateSchedule = dateSchedule;
@@ -103,6 +108,16 @@ public class RequestEntity {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+	@JsonProperty("class_status")
+	public String getClassStatus() {
+		return classStatus;
+	}
+
+	public void setClassStatus(String classStatus) {
+		this.classStatus = classStatus;
+	}
+
 
 	@JsonProperty("date_requested")
 	public LocalDateTime getDateRequested() {
