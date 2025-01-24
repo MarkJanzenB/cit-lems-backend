@@ -1,89 +1,31 @@
-<img src="https://i.imgur.com/d4mV2b3.png" width="350">
+# LEMS (Backend)
 
-# LEMS backend
-## Prerequisite
-1. Your IDE should run on JDK 17
-2. MySQL should be running on services
-3. Manually create a schema(database) named lemsdb
-4. Check application. properties file if database credentials is correct
-5. If you are using react, install axios
-   ```npm i axios```
+## Project Description
 
-## How to use LEMS backend
-1. Create a database/schema on workbench or wherever you prefer and name it lemsdb
-2. In LEMS backend, go to src/main/resources
-3. Open application.properties
-4. Change credentials (if yours is different)
-5. To run, go to src/main/java
-6. Under com.capstone.LEMS open LemsApplication.java
-7. Run as Java Application
+This project serves as the backend for LEMS. It is developed using Java Spring Boot to provide REST API endpoints for interacting with MySQL database. Check the frontend repository [here](https://github.com/MarkJanzenB/cit-lems-frontend.git)
 
-## APIs
-### Registration
-`http://localhost:8080/user/register`<br/>
-**How to use**<br/>
-Store user inputs in an object<br/>
-Example using React:
-```
-const [credentials, setCredentials] = useState({
-  fname: 'John',
-  lname: 'Doe',
-  password: 'john123',
-  idnum: '11-1111-111',
-  email: 'johndoe@email.com',
-  acctype: 'LA'
-});
-```
-> [!CAUTION]
-> Make sure that the keys are the same as the column name.
+## Tools/Tech Used
 
-Pass the object using axios or anything<br/>
-Example using axios:
-```
-const register = async (credentials) => {
-    try {
-      const response = await axios.post("http://localhost:8080/user/register", credentials);
-      return response.data;
-    } catch (error) {
-      console.error("Error:", error);
-    }
-};
+![Java](https://skillicons.dev/icons?i=java,spring,mysql) 
 
-// pass an event in this function if you are using form's submit button/funciton
-const handleSubmit = async (e) => {
-e.preventDefault(); // Prevent default form submission behavior like auto refresh
-        try {
-            const result = await register(credentials); // returns the object you passed
-            console.log(result); // displays in console if register was successful
-        } catch (e) {
-            console.error("Error submitting form: ", e);
-        }
-    };
-```
+### Prerequisites
+**MySQL Database**: Ensure MySQL is installed on your system. You can download and install it from [here](https://dev.mysql.com/downloads/installer/)(Windows).
 
-### Login
-`http://localhost:8080/user/login?idnum=${idnum}&password=${password}`<br/>
-**How to use**<br/>
-Example using axios:
-```
-const checkLoginCredentials = async(username, password) => {
-  try {
-    const response = await axios.get(`http://localhost:8080/user/login?idnum=${idnum}&password=${password}`); 
-    return response.data;
-  }catch (error) {
-    console.error("Error:", error);
-  }
-}
+### Steps to Install and Run the Project
+1. **Clone the Repository**: 
+   ```bash
+   git clone https://github.com/MarkJanzenB/cit-lems-backend.git
 
-//pass an event in this function if you are using form's submit button/funciton
-const handleSubmit = async (e) => {
-e.preventDefault(); // Prevent default form submission behavior like auto refresh
-        try {
-            const result = await checkLoginCredentials(username, password); // returns a string
-            console.log(result); //displays in console if register was successful
-        } catch (e) {
-            console.error("Error submitting form: ", e);
-        }
-    };
-```
+2. **Ensure MySQL Database and Schema Exist**: 
+  - Make sure MySQL is running.
+  - Create a database schema named `lemsdb` in your MySQL server. If it doesn't exist, you can create it using MySQL Workbench or any other MySQL management tool.
 
+3. **Configure Application Properties**: 
+- Open `src/main/resources/application.properties` file.
+- Set the username and password for your MySQL database to match your MySQL Workbench credentials:
+  ```properties
+  spring.datasource.username=<your-username>
+  spring.datasource.password=<your-password>
+
+4. **Run the application**: 
+- Run the LemsApplication.java file in `src/main/resources/LemsApplication.java`.
