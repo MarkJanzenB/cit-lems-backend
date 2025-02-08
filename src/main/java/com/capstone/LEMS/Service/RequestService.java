@@ -1,6 +1,7 @@
 package com.capstone.LEMS.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -42,10 +43,12 @@ public class RequestService {
 		log.info("Getting a list of requests");
 		return ResponseEntity.ok(reqrepo.findAll());
 	}
+	
 	public ResponseEntity<?> getRequestByStatus(String status){
 		log.info("Getting a list of requests by status");
 		return ResponseEntity.ok(reqrepo.findByStatus(status));
 	}
+	
 	public ResponseEntity<?> updateRequest(int reqId, RequestEntity newReq){
 		log.info("Running updateRequest in RequestService");
 		
@@ -145,5 +148,19 @@ public class RequestService {
 					.body("Something went wrong. Please check the request details");
 		}
 		
+	}
+	
+	public ResponseEntity<?> getRequestsByTeacherId(int uid){
+		log.info("Fetching requests for teacher_id: {}", uid);
+		
+
+		List<RequestEntity> requests = reqrepo.findByTeacherUserId(uid);
+		
+		if (requests.isEmpty()) {
+			log.warn("No requests found for teacher_id: {}", uid);
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No requests found for the given teacher ID.");
+		}
+		
+		return ResponseEntity.ok(requests);
 	}
 }

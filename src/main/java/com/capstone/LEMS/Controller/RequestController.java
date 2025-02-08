@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,5 +39,10 @@ public class RequestController {
 	@GetMapping("/getrequestbystatus")
 	public ResponseEntity<?> getRequestByStatus(@RequestParam String status){
 		return reqserv.getRequestByStatus(status);
+	}
+	
+	@GetMapping("/teacher/{teacherId}")
+	public ResponseEntity<?> getRequestByTeacherId(@PathVariable int teacherId){
+		return reqserv.getRequestsByTeacherId(teacherId);
 	}
 }
