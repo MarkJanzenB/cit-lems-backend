@@ -6,6 +6,8 @@ import com.capstone.LEMS.Repository.BorrowCartRepository;
 import com.capstone.LEMS.Repository.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -18,15 +20,18 @@ public class BorrowCartService {
     @Autowired
     private InventoryRepository inventoryRepository;
 
+    private static final Logger log = LoggerFactory.getLogger(BorrowCartService.class);
+
     public List<BorrowCart> getAllBorrowCarts() {
         return borrowCartRepository.findAll();
     }
 
     public BorrowCart addToBorrowCart(int instiId, int itemId, String itemName, String categoryName, int quantity) {
 
-        BorrowCart existingBorrowCart = borrowCartRepository.findByItemId(itemId);
+        BorrowCart existingBorrowCart = borrowCartRepository.findByItemIdAndInstiIdStrict(itemId, (long) instiId);
 
         if(existingBorrowCart != null) {
+            log.info("Existing borrow cart: {} " , existingBorrowCart.getInstiId());
             existingBorrowCart.setQuantity(existingBorrowCart.getQuantity() + quantity);
 
             // Deduct the item quantity from the inventory
