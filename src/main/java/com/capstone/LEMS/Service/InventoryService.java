@@ -65,27 +65,6 @@ public class InventoryService {
 		}
 	}
 
-//    public ResponseEntity<?> updateInventory(int id, InventoryEntity inventoryToUpdate){
-//    	InventoryEntity inventoryFromDb = inventoryRepository.findByNameIgnoreCase(inventoryToUpdate.getName());
-//    	if(inventoryFromDb != null) {
-//    		return ResponseEntity
-//    				.status(HttpStatus.CONFLICT) // 409
-//    				.body("The name " + inventoryToUpdate.getName() + " already exists");
-//    	}
-//    	InventoryEntity inventory = new InventoryEntity();
-//
-//    	inventory = inventoryRepository.findById(id).get();
-//
-//    	inventory.setName(inventoryToUpdate.getName());
-//    	inventory.setDescription(inventoryToUpdate.getDescription());
-//    	inventory.setQuantity(inventoryToUpdate.getQuantity());
-//
-//    	return ResponseEntity
-//    			.status(HttpStatus.OK) // 200
-//    			.body(inventoryRepository.save(inventory));
-//    }
-//}
-
 	public ResponseEntity<?> updateInventory(int id, InventoryEntity inventoryToUpdate) {
 		Optional<InventoryEntity> inventoryOptional = inventoryRepository.findById(id);
 		if (inventoryOptional.isPresent()) {

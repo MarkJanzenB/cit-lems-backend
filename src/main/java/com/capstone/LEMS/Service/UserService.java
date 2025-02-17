@@ -123,4 +123,45 @@ public class UserService {
 		
 		return ResponseEntity.ok(users);
 	}
+	
+	public ResponseEntity<?> updateUser(UserEntity newUserDetails){
+		log.info("Fetching user details for ID: {}", newUserDetails.getUid());
+		Optional<UserEntity> user = userrepo.findById(newUserDetails.getUid());
+		
+		if(user.isEmpty()) {
+			log.warn("User not found for ID: {}", newUserDetails.getUid());
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body("User not found");
+		}
+		log.info("user with ID {} is found", newUserDetails.getUid() );
+		
+		UserEntity foundUser = user.orElseThrow();
+		log.info("converting user: {}", newUserDetails.getUid() );
+		
+		if((foundUser.getInstiId().equals(newUserDetails.getInstiId()))) {
+			log.info("updating user: {}", newUserDetails.getUid());
+			foundUser.setFname(newUserDetails.getFname());
+			foundUser.setLname(newUserDetails.getLname());
+			foundUser.setEmail(newUserDetails.getEmail());
+		}else {
+			UserEntity conflictingUser = userrepo.findByInstiId(newUserDetails.getInstiId());
+			if(conflictingUser != null) {
+				log.info("insti id conflict with user ID: {}", newUserDetails.getUid());
+				return ResponseEntity
+						.status(HttpStatus.CONFLICT)
+						.body("Institute ID already exists");
+			}else {
+				log.info("updating user w/ insti ID for user: {}", newUserDetails.getUid());
+				foundUser.setFname(newUserDetails.getFname());
+				foundUser.setLname(newUserDetails.getLname());
+				foundUser.setEmail(newUserDetails.getEmail());
+				foundUser.setInstiId(newUserDetails.getInstiId());
+			}
+		}
+		
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(userrepo.save(foundUser));
+	}
 }

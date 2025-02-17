@@ -70,4 +70,9 @@ public class UserController {
 	public ResponseEntity<?> getAllUsersByRoleId(@RequestParam int roleId){
 		return userserv.getAllUsersByRoleId(roleId);
 	}
+	
+	@PutMapping("/update")
+	public ResponseEntity<?> updateUser(@RequestBody UserEntity newUserDetails){
+		return userserv.updateUser(newUserDetails);
+	}
 }
