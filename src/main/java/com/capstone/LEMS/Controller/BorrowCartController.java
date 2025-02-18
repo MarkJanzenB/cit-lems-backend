@@ -22,13 +22,13 @@ public class BorrowCartController {
     }
 
     @PostMapping("/addToBorrowCart")
-    public ResponseEntity<BorrowCart> addToBorrowCart(@RequestParam int instiId, @RequestParam int itemId, @RequestParam String itemName, @RequestParam String categoryName, @RequestParam int quantity) {
+    public ResponseEntity<BorrowCart> addToBorrowCart(@RequestParam String instiId, @RequestParam int itemId, @RequestParam String itemName, @RequestParam String categoryName, @RequestParam int quantity) {
         System.out.println("instiId: " + instiId);
         return ResponseEntity.ok(borrowCartService.addToBorrowCart(instiId, itemId, itemName, categoryName, quantity));
     }
 
     @GetMapping("/insti/{instiId}")
-    public ResponseEntity<List<BorrowCart>> getBorrowCartsByInsti(@PathVariable Long instiId) {
+    public ResponseEntity<List<BorrowCart>> getBorrowCartsByInsti(@PathVariable String instiId) {
         return ResponseEntity.ok(borrowCartService.getBorrowCartsByInsti(instiId));
     }
 

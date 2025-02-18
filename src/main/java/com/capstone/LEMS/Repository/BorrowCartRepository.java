@@ -11,9 +11,9 @@ import java.util.List;
 @Repository
 public interface BorrowCartRepository extends JpaRepository<BorrowCart, Long> {
 
-    List<BorrowCart> findByInstiId(Long instiId);
+    List<BorrowCart> findByInstiId(String instiId);
     BorrowCart findByItemId(int itemId);
     @Query("SELECT b FROM BorrowCart b WHERE b.itemId = :itemId AND b.instiId = :instiId")
-    BorrowCart findByItemIdAndInstiIdStrict(@Param("itemId") int itemId, @Param("instiId") Long instiId);
+    BorrowCart findByItemIdAndInstiIdStrict(@Param("itemId") int itemId, @Param("instiId") String instiId);
 
 }

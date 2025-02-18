@@ -26,9 +26,9 @@ public class BorrowCartService {
         return borrowCartRepository.findAll();
     }
 
-    public BorrowCart addToBorrowCart(int instiId, int itemId, String itemName, String categoryName, int quantity) {
+    public BorrowCart addToBorrowCart(String instiId, int itemId, String itemName, String categoryName, int quantity) {
 
-        BorrowCart existingBorrowCart = borrowCartRepository.findByItemIdAndInstiIdStrict(itemId, (long) instiId);
+        BorrowCart existingBorrowCart = borrowCartRepository.findByItemIdAndInstiIdStrict(itemId, instiId);
 
         if(existingBorrowCart != null) {
             log.info("Existing borrow cart: {} " , existingBorrowCart.getInstiId());
@@ -61,7 +61,7 @@ public class BorrowCartService {
         return borrowCartRepository.save(borrowCart);
     }
 
-    public List<BorrowCart> getBorrowCartsByInsti(Long instiId) {
+    public List<BorrowCart> getBorrowCartsByInsti(String instiId) {
         return borrowCartRepository.findByInstiId(instiId);
     }
 

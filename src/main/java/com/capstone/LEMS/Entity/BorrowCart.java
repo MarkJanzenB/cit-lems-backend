@@ -11,7 +11,7 @@ public class BorrowCart {
     private Long id;
 
     @Column(nullable = false)
-    private int instiId;
+    private String instiId;
 
     @Column(nullable = false)
     private int itemId;
@@ -30,7 +30,7 @@ public class BorrowCart {
     }
 
     // Constructor
-    public BorrowCart(int instiId, int itemId, String itemName, String categoryName, int quantity) {
+    public BorrowCart(String instiId, int itemId, String itemName, String categoryName, int quantity) {
         this.instiId = instiId;
         this.itemId = itemId;
         this.itemName = itemName;
@@ -46,11 +46,11 @@ public class BorrowCart {
         this.id = id;
     }
 
-    public int getInstiId() {
+    public String getInstiId() {
         return instiId;
     }
 
-    public void setInstiId(int instiId) {
+    public void setInstiId(String instiId) {
         this.instiId = instiId;
     }
 
