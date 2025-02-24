@@ -15,5 +15,6 @@ public interface BorrowCartRepository extends JpaRepository<BorrowCart, Long> {
     BorrowCart findByItemId(int itemId);
     @Query("SELECT b FROM BorrowCart b WHERE b.itemId = :itemId AND b.instiId = :instiId")
     BorrowCart findByItemIdAndInstiIdStrict(@Param("itemId") int itemId, @Param("instiId") String instiId);
+    void deleteByInstiId(String instiId);
 
 }

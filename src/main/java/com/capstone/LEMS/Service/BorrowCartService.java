@@ -1,5 +1,7 @@
 package com.capstone.LEMS.Service;
 
+
+import jakarta.transaction.Transactional;
 import com.capstone.LEMS.Entity.BorrowCart;
 import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Repository.BorrowCartRepository;
@@ -19,6 +21,7 @@ public class BorrowCartService {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
 
     private static final Logger log = LoggerFactory.getLogger(BorrowCartService.class);
 
@@ -64,6 +67,13 @@ public class BorrowCartService {
     public List<BorrowCart> getBorrowCartsByInsti(String instiId) {
         return borrowCartRepository.findByInstiId(instiId);
     }
+
+    @Transactional  // ✅ Ensures transactional delete
+    public void clearCart(String instiId) {
+        System.out.println("Clearing borrow cart for instiId: " + instiId);
+        borrowCartRepository.deleteByInstiId(instiId);
+    }
+
 
     public void deleteBorrowCart(Long id) {
         borrowCartRepository.deleteById(id);

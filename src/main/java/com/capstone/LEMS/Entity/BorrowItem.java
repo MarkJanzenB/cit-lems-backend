@@ -1,105 +1,54 @@
 package com.capstone.LEMS.Entity;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "borrow_item")
+@Table(name = "borrow_items")
 public class BorrowItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private int instiId;
-
-    @Column(nullable = false)
-    private int itemId;
-
-    @Column(nullable = false)
+    private String instiId;
+    private Long itemId;
     private String itemName;
-
-    @Column(nullable = false)
     private String categoryName;
-
-    @Column(nullable = false)
     private int quantity;
+    private String status;
 
-    @Column(nullable = false)
-    private String borrower;
-
-    // Default constructor
-    public BorrowItem() {
-    }
-
-    // Constructor
-    public BorrowItem(int instiId, int itemId, String itemName, String categoryName, int quantity, String borrower) {
+    // ✅ Add this constructor
+    public BorrowItem(String instiId, Long itemId, String itemName, String categoryName, int quantity, String status) {
         this.instiId = instiId;
         this.itemId = itemId;
         this.itemName = itemName;
         this.categoryName = categoryName;
         this.quantity = quantity;
-        this.borrower = borrower;
+        this.status = status;
     }
 
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
+    // ✅ Add a no-args constructor (required by JPA)
+    public BorrowItem() {}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    // ✅ Add getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    @JsonProperty("insti_id")
-    public int getInstiId() {
-        return instiId;
-    }
+    public String getInstiId() { return instiId; }
+    public void setInstiId(String instiId) { this.instiId = instiId; }
 
-    public void setInstiId(int instiId) {
-        this.instiId = instiId;
-    }
+    public Long getItemId() { return itemId; }
+    public void setItemId(Long itemId) { this.itemId = itemId; }
 
-    public int getItemId() {
-        return itemId;
-    }
+    public String getItemName() { return itemName; }
+    public void setItemName(String itemName) { this.itemName = itemName; }
 
-    public void setItemId(int itemId) {
-        this.itemId = itemId;
-    }
+    public String getCategoryName() { return categoryName; }
+    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
 
-    @JsonProperty("item_name")
-    public String getItemName() {
-        return itemName;
-    }
+    public int getQuantity() { return quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    @JsonProperty("category_name")
-    public String getCategoryName() {
-        return categoryName;
-    }
-
-    public void setCategoryName(String categoryName) {
-        this.categoryName = categoryName;
-    }
-
-    public int getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getBorrower() {
-        return borrower;
-    }
-
-    public void setBorrower(String borrower) {
-        this.borrower = borrower;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }

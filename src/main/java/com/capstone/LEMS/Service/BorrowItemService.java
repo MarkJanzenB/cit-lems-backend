@@ -1,15 +1,14 @@
-
-
-
-
 package com.capstone.LEMS.Service;
 
 import com.capstone.LEMS.Entity.BorrowItem;
 import com.capstone.LEMS.Repository.BorrowItemRepository;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BorrowItemService {
@@ -17,71 +16,37 @@ public class BorrowItemService {
     @Autowired
     private BorrowItemRepository borrowItemRepository;
 
-    public void addBorrowItems(List<BorrowItem> borrowItems) {
-        borrowItemRepository.saveAll(borrowItems);
+    public List<BorrowItem> getBorrowItemsByInstiId(String instiId) {
+        List<BorrowItem> items = borrowItemRepository.findByInstiId(instiId);
+        return items != null ? items : List.of(); // Ensure it returns an empty list if null
+    }
+
+
+    public ResponseEntity<?> addBorrowItem(BorrowItem borrowItem) {
+        try {
+            BorrowItem savedItem = borrowItemRepository.save(borrowItem);
+            return ResponseEntity.ok(savedItem);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Failed to add borrow item.");
+        }
     }
 
     public List<BorrowItem> getAllBorrowItems() {
-        return borrowItemRepository.findAll();
+        return borrowItemRepository.findAll(); // Fetch all borrow items
+    }
+
+
+    public void saveBorrowItem(BorrowItem borrowItem) {
+        borrowItemRepository.save(borrowItem);
+    }
+
+    public ResponseEntity<?> deleteBorrowItem(int id) {
+        Optional<BorrowItem> borrowItem = borrowItemRepository.findById((long) id);
+        if (borrowItem.isPresent()) {
+            borrowItemRepository.delete(borrowItem.get());
+            return ResponseEntity.ok("Borrow item deleted successfully.");
+        } else {
+            return ResponseEntity.notFound().build();
+        }
     }
 }
-
-
-//package com.capstone.LEMS.Service;
-//
-//import com.capstone.LEMS.Entity.BorrowItem;
-//import com.capstone.LEMS.Repository.BorrowItemRepository;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.http.ResponseEntity;
-//import org.springframework.stereotype.Service;
-//import org.springframework.web.bind.annotation.GetMapping;
-//import org.springframework.web.bind.annotation.PathVariable;
-//
-//import java.util.List;
-//
-//
-//@Service
-//public class BorrowItemService {
-//
-//    @Autowired
-//    private BorrowItemRepository borrowItemRepository;
-//
-//    // BorrowItemService.java
-//    public ResponseEntity<?> addBorrowItems(List<BorrowItem> borrowItems) {
-//        return ResponseEntity.ok(borrowItemRepository.saveAll(borrowItems));
-//    }
-//
-//
-//    public BorrowItem updateBorrowItem(Long id, int instiId, int itemId, String itemName, String categoryName, int quantity, String borrower) {
-//        BorrowItem borrowItem = borrowItemRepository.findById(id).orElseThrow(() -> new RuntimeException("BorrowItem not found"));
-//        borrowItem.setInstiId(instiId);
-//        borrowItem.setItemId(itemId);
-//        borrowItem.setItemName(itemName);
-//        borrowItem.setCategoryName(categoryName);
-//        borrowItem.setQuantity(quantity);
-//        borrowItem.setBorrower(borrower);
-//        return borrowItemRepository.save(borrowItem);
-//    }
-//
-//    public List<BorrowItem> getAllBorrowItems() {
-//        return borrowItemRepository.findAll();
-//    }
-//
-//    public List<BorrowItem> getBorrowItemsByInsti(Long instiId) {
-//        return borrowItemRepository.findByInstiId(instiId);
-//    }
-//
-//
-//
-////    public ResponseEntity<List<BorrowItem>> getBorrowItemsByBorrower(String borrower) {
-////        List<BorrowItem> borrowItems = borrowItemRepository.findByBorrower(borrower);
-////        return ResponseEntity.ok(borrowItems);
-////    }
-//
-////    public void deleteBorrowItem(List<Integer> id) {
-////       return borrowItemRepository.deleteAllById(id);
-////    }
-//
-//
-//
-//}

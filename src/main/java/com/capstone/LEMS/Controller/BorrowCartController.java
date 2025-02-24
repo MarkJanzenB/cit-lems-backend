@@ -38,4 +38,11 @@ public class BorrowCartController {
         borrowCartService.deleteBorrowCart(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/clear/{instiId}")
+    public ResponseEntity<Void> clearBorrowCart(@PathVariable String instiId) {
+        borrowCartService.clearCart(instiId);
+        return ResponseEntity.noContent().build();
+    }
+
 }
