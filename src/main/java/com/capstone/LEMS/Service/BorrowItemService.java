@@ -18,8 +18,10 @@ public class BorrowItemService {
 
     public List<BorrowItem> getBorrowItemsByInstiId(String instiId) {
         List<BorrowItem> items = borrowItemRepository.findByInstiId(instiId);
-        return items != null ? items : List.of(); // Ensure it returns an empty list if null
+        System.out.println("Fetched items for instiId " + instiId + ": " + items);
+        return items != null ? items : List.of();
     }
+
 
 
     public ResponseEntity<?> addBorrowItem(BorrowItem borrowItem) {
