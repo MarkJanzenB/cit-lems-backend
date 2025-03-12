@@ -3,6 +3,6 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 FROM openjdk:17.0.1-jdk-slim
-COPY --from=build /target/LEMS-0.0.1-SNAPSHOT.jar demo.jar
+COPY --from=build /target/LEMS-0.0.1-SNAPSHOT.jar LEMS.jar
 EXPOSE 8080
 ENTRYPOINT ["java","-jar","LEMS.jar"]
