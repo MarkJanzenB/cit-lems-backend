@@ -1,11 +1,13 @@
 package com.capstone.LEMS.Service;
 
+import com.capstone.LEMS.Entity.BorrowCart;
 import com.capstone.LEMS.Entity.BorrowItem;
 import com.capstone.LEMS.Repository.BorrowItemRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -42,13 +44,5 @@ public class BorrowItemService {
         borrowItemRepository.save(borrowItem);
     }
 
-    public ResponseEntity<?> deleteBorrowItem(int id) {
-        Optional<BorrowItem> borrowItem = borrowItemRepository.findById((long) id);
-        if (borrowItem.isPresent()) {
-            borrowItemRepository.delete(borrowItem.get());
-            return ResponseEntity.ok("Borrow item deleted successfully.");
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
+
 }

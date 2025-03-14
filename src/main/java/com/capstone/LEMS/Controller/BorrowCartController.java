@@ -3,6 +3,7 @@ package com.capstone.LEMS.Controller;
 import com.capstone.LEMS.Entity.BorrowCart;
 import com.capstone.LEMS.Service.BorrowCartService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,10 +35,24 @@ public class BorrowCartController {
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBorrowCart(@PathVariable Long id) {
-        borrowCartService.deleteBorrowCart(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> deleteBorrowCart(@PathVariable Long id, @RequestParam int quantity,
+                                                   @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        if (authorizationHeader == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No Authorization header received.");
+        }
+
+        System.out.println("Authorization Header: " + authorizationHeader); // Debugging step
+
+        try {
+            borrowCartService.restoreStockAndRemoveItem(id, quantity);
+            return ResponseEntity.ok("Item removed from borrow cart and stock restored successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
+
+
+
 
     @DeleteMapping("/clear/{instiId}")
     public ResponseEntity<Void> clearBorrowCart(@PathVariable String instiId) {
