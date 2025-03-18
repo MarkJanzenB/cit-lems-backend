@@ -12,7 +12,10 @@ public class BorrowItem {
     private Long id;
 
     private String borrowedId; // 🆕 Unique Borrowed ID per transaction
-    private String instiId;
+
+
+    @Column(name = "insti_id")
+    private String instiId; // ✅ Properly mapped
     private Long itemId;
     private String itemName;
     private String categoryName;

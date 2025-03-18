@@ -22,6 +22,12 @@ public class BorrowItemController {
     @Autowired
     private BorrowItemService borrowItemService;
 
+
+    @GetMapping("/all")
+    public List<BorrowItem> getAllBorrowItems() {
+        return borrowItemService.getAllItems();
+    }
+
     @GetMapping("/insti/{instiId}")
     public ResponseEntity<List<BorrowItem>> getBorrowItemsByInstiId(@PathVariable String instiId) {
         return ResponseEntity.ok(borrowItemService.getBorrowItemsByInstiId(instiId));
@@ -77,6 +83,17 @@ public class BorrowItemController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
+
+    @PutMapping("/updateStatus/{borrowedId}")
+    public ResponseEntity<String> updateStatusByBorrowedId(@PathVariable String borrowedId, @RequestParam String status) {
+        try {
+            borrowItemService.updateStatusByBorrowedId(borrowedId, status);
+            return ResponseEntity.ok("Status updated successfully.");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
 
 }
 

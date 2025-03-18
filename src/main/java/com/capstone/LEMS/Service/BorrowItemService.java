@@ -39,9 +39,37 @@ public class BorrowItemService {
         return borrowItemRepository.findAll(); // Fetch all borrow items
     }
 
+    public List<BorrowItem> getAllItems() {
+        return borrowItemRepository.findAll(); // Fetch all borrow items from DB
+    }
+
 
     public void saveBorrowItem(BorrowItem borrowItem) {
         borrowItemRepository.save(borrowItem);
+    }
+
+
+    @Transactional
+    public boolean updateBorrowItemStatus(String borrowedId, String status) {
+        List<BorrowItem> items = borrowItemRepository.findByBorrowedId(borrowedId);
+        if (items.isEmpty()) {
+            return false; // Borrowed ID not found
+        }
+
+        for (BorrowItem item : items) {
+            item.setStatus(status);
+        }
+        borrowItemRepository.saveAll(items); // Save updated statuses in batch
+        return true;
+    }
+
+
+    public void updateStatusByBorrowedId(String borrowedId, String status) {
+        List<BorrowItem> borrowItems = borrowItemRepository.findByBorrowedId(borrowedId);
+        for (BorrowItem item : borrowItems) {
+            item.setStatus(status);
+            borrowItemRepository.save(item);
+        }
     }
 
 
