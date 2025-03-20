@@ -11,11 +11,12 @@ public class BorrowItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String borrowedId; // 🆕 Unique Borrowed ID per transaction
+    private String borrowedId; // Unique Borrowed ID per transaction
 
+    @ManyToOne
+    @JoinColumn(name = "uid",  nullable = false)
+    private UserEntity user;
 
-    @Column(name = "insti_id")
-    private String instiId; // ✅ Properly mapped
     private Long itemId;
     private String itemName;
     private String categoryName;
@@ -27,15 +28,16 @@ public class BorrowItem {
 
     public BorrowItem() {}
 
-    public BorrowItem(String borrowedId, String instiId, Long itemId, String itemName, String categoryName, int quantity, String status, Date borrowedDate) {
+    public BorrowItem(String borrowedId, Long itemId, String itemName, String categoryName, int quantity, String status, Date borrowedDate, UserEntity user) {
         this.borrowedId = borrowedId;
-        this.instiId = instiId;
+//        this.instiId = instiId;
         this.itemId = itemId;
         this.itemName = itemName;
         this.categoryName = categoryName;
         this.quantity = quantity;
         this.status = status;
         this.borrowedDate = borrowedDate;
+        this.user = user;
     }
 
     // ✅ Getters and Setters
@@ -45,8 +47,8 @@ public class BorrowItem {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public String getInstiId() { return instiId; }
-    public void setInstiId(String instiId) { this.instiId = instiId; }
+//    public String getInstiId() { return instiId; }
+//    public void setInstiId(String instiId) { this.instiId = instiId; }
 
     public Long getItemId() { return itemId; }
     public void setItemId(Long itemId) { this.itemId = itemId; }
@@ -65,4 +67,7 @@ public class BorrowItem {
 
     public Date getBorrowedDate() { return borrowedDate; }
     public void setBorrowedDate(Date borrowedDate) { this.borrowedDate = borrowedDate; }
+
+    public UserEntity getUser() { return user; }
+    public void setUser(UserEntity user) { this.user = user; }
 }

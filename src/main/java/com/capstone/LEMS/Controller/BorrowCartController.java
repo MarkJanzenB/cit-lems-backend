@@ -29,8 +29,8 @@ public class BorrowCartController {
         return ResponseEntity.ok(borrowCartService.addToBorrowCart(instiId, itemId, itemName, categoryName, quantity));
     }
 
-    @GetMapping("/insti/{instiId}")
-    public ResponseEntity<List<BorrowCart>> getBorrowCartsByInsti(@PathVariable String instiId) {
+    @GetMapping("/instiId/{instiId}")
+    public ResponseEntity<List<BorrowCart>> getBorrowCartsByInstId(@PathVariable String instiId) {
         return ResponseEntity.ok(borrowCartService.getBorrowCartsByInsti(instiId));
     }
 
