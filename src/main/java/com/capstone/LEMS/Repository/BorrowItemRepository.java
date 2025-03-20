@@ -8,5 +8,7 @@ import java.util.List;
 @Repository
 public interface BorrowItemRepository extends JpaRepository<BorrowItem, Long> {
     List<BorrowItem> findByInstiId(String instiId); // ✅ Ensure instiId is a String
+    List<BorrowItem> findByBorrowedId(String borrowedId); // ✅ Fetch by borrowed ID
+
 }
 

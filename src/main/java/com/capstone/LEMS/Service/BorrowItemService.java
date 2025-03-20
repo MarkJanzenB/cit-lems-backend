@@ -1,11 +1,13 @@
 package com.capstone.LEMS.Service;
 
+import com.capstone.LEMS.Entity.BorrowCart;
 import com.capstone.LEMS.Entity.BorrowItem;
 import com.capstone.LEMS.Repository.BorrowItemRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -18,8 +20,10 @@ public class BorrowItemService {
 
     public List<BorrowItem> getBorrowItemsByInstiId(String instiId) {
         List<BorrowItem> items = borrowItemRepository.findByInstiId(instiId);
-        return items != null ? items : List.of(); // Ensure it returns an empty list if null
+        System.out.println("Fetched items for instiId " + instiId + ": " + items);
+        return items != null ? items : List.of();
     }
+
 
 
     public ResponseEntity<?> addBorrowItem(BorrowItem borrowItem) {
@@ -35,18 +39,38 @@ public class BorrowItemService {
         return borrowItemRepository.findAll(); // Fetch all borrow items
     }
 
+    public List<BorrowItem> getAllItems() {
+        return borrowItemRepository.findAll(); // Fetch all borrow items from DB
+    }
+
 
     public void saveBorrowItem(BorrowItem borrowItem) {
         borrowItemRepository.save(borrowItem);
     }
 
-    public ResponseEntity<?> deleteBorrowItem(int id) {
-        Optional<BorrowItem> borrowItem = borrowItemRepository.findById((long) id);
-        if (borrowItem.isPresent()) {
-            borrowItemRepository.delete(borrowItem.get());
-            return ResponseEntity.ok("Borrow item deleted successfully.");
-        } else {
-            return ResponseEntity.notFound().build();
+
+    @Transactional
+    public boolean updateBorrowItemStatus(String borrowedId, String status) {
+        List<BorrowItem> items = borrowItemRepository.findByBorrowedId(borrowedId);
+        if (items.isEmpty()) {
+            return false; // Borrowed ID not found
+        }
+
+        for (BorrowItem item : items) {
+            item.setStatus(status);
+        }
+        borrowItemRepository.saveAll(items); // Save updated statuses in batch
+        return true;
+    }
+
+
+    public void updateStatusByBorrowedId(String borrowedId, String status) {
+        List<BorrowItem> borrowItems = borrowItemRepository.findByBorrowedId(borrowedId);
+        for (BorrowItem item : borrowItems) {
+            item.setStatus(status);
+            borrowItemRepository.save(item);
         }
     }
+
+
 }

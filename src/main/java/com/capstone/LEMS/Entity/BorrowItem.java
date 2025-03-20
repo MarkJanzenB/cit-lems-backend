@@ -1,6 +1,7 @@
 package com.capstone.LEMS.Entity;
 
 import jakarta.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "borrow_items")
@@ -10,27 +11,37 @@ public class BorrowItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String instiId;
+    private String borrowedId; // 🆕 Unique Borrowed ID per transaction
+
+
+    @Column(name = "insti_id")
+    private String instiId; // ✅ Properly mapped
     private Long itemId;
     private String itemName;
     private String categoryName;
     private int quantity;
     private String status;
 
-    // ✅ Add this constructor
-    public BorrowItem(String instiId, Long itemId, String itemName, String categoryName, int quantity, String status) {
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date borrowedDate;
+
+    public BorrowItem() {}
+
+    public BorrowItem(String borrowedId, String instiId, Long itemId, String itemName, String categoryName, int quantity, String status, Date borrowedDate) {
+        this.borrowedId = borrowedId;
         this.instiId = instiId;
         this.itemId = itemId;
         this.itemName = itemName;
         this.categoryName = categoryName;
         this.quantity = quantity;
         this.status = status;
+        this.borrowedDate = borrowedDate;
     }
 
-    // ✅ Add a no-args constructor (required by JPA)
-    public BorrowItem() {}
+    // ✅ Getters and Setters
+    public String getBorrowedId() { return borrowedId; }
+    public void setBorrowedId(String borrowedId) { this.borrowedId = borrowedId; }
 
-    // ✅ Add getters and setters
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
@@ -51,4 +62,7 @@ public class BorrowItem {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public Date getBorrowedDate() { return borrowedDate; }
+    public void setBorrowedDate(Date borrowedDate) { this.borrowedDate = borrowedDate; }
 }

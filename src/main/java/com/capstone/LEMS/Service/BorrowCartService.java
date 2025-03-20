@@ -1,5 +1,5 @@
+// File: src/main/java/com/capstone/LEMS/Service/BorrowCartService.java
 package com.capstone.LEMS.Service;
-
 
 import jakarta.transaction.Transactional;
 import com.capstone.LEMS.Entity.BorrowCart;
@@ -22,7 +22,6 @@ public class BorrowCartService {
     @Autowired
     private InventoryRepository inventoryRepository;
 
-
     private static final Logger log = LoggerFactory.getLogger(BorrowCartService.class);
 
     public List<BorrowCart> getAllBorrowCarts() {
@@ -30,11 +29,10 @@ public class BorrowCartService {
     }
 
     public BorrowCart addToBorrowCart(String instiId, int itemId, String itemName, String categoryName, int quantity) {
-
         BorrowCart existingBorrowCart = borrowCartRepository.findByItemIdAndInstiIdStrict(itemId, instiId);
 
-        if(existingBorrowCart != null) {
-            log.info("Existing borrow cart: {} " , existingBorrowCart.getInstiId());
+        if (existingBorrowCart != null) {
+            log.info("Existing borrow cart: {} ", existingBorrowCart.getInstiId());
             existingBorrowCart.setQuantity(existingBorrowCart.getQuantity() + quantity);
 
             // Deduct the item quantity from the inventory
@@ -64,6 +62,21 @@ public class BorrowCartService {
         return borrowCartRepository.save(borrowCart);
     }
 
+    public void restoreStockAndRemoveItem(Long id, int quantity) {
+        BorrowCart borrowCart = borrowCartRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Borrow cart item not found"));
+
+        // Restore stock in inventory
+        InventoryEntity inventoryItem = inventoryRepository.findById(borrowCart.getItemId())
+                .orElseThrow(() -> new RuntimeException("Item not found in inventory"));
+
+        inventoryItem.setQuantity(inventoryItem.getQuantity() + quantity);
+        inventoryRepository.save(inventoryItem);
+
+        // Remove item from borrow cart
+        borrowCartRepository.delete(borrowCart);
+    }
+
     public List<BorrowCart> getBorrowCartsByInsti(String instiId) {
         return borrowCartRepository.findByInstiId(instiId);
     }
@@ -74,8 +87,43 @@ public class BorrowCartService {
         borrowCartRepository.deleteByInstiId(instiId);
     }
 
-
     public void deleteBorrowCart(Long id) {
-        borrowCartRepository.deleteById(id);
+        BorrowCart borrowCart = borrowCartRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Borrow cart item not found"));
+        borrowCartRepository.delete(borrowCart);
+    }
+
+    public void increaseItemQuantity(Long id) {
+        BorrowCart borrowCart = borrowCartRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Borrow cart item not found"));
+
+        InventoryEntity inventoryItem = inventoryRepository.findById(borrowCart.getItemId())
+                .orElseThrow(() -> new RuntimeException("Item not found in inventory"));
+
+        if (inventoryItem.getQuantity() < 1) {
+            throw new RuntimeException("Not enough items in inventory");
+        }
+
+        borrowCart.setQuantity(borrowCart.getQuantity() + 1);
+        inventoryItem.setQuantity(inventoryItem.getQuantity() - 1);
+        borrowCartRepository.save(borrowCart);
+        inventoryRepository.save(inventoryItem);
+    }
+
+    public void decreaseItemQuantity(Long id) {
+        BorrowCart borrowCart = borrowCartRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Borrow cart item not found"));
+
+        if (borrowCart.getQuantity() <= 1) {
+            throw new RuntimeException("Cannot decrease quantity below 1");
+        }
+
+        InventoryEntity inventoryItem = inventoryRepository.findById(borrowCart.getItemId())
+                .orElseThrow(() -> new RuntimeException("Item not found in inventory"));
+
+        borrowCart.setQuantity(borrowCart.getQuantity() - 1);
+        inventoryItem.setQuantity(inventoryItem.getQuantity() + 1);
+        borrowCartRepository.save(borrowCart);
+        inventoryRepository.save(inventoryItem);
     }
 }
