@@ -1,8 +1,11 @@
 package com.capstone.LEMS.Controller;
 
 import com.capstone.LEMS.Entity.BorrowItem;
+import com.capstone.LEMS.Entity.UserEntity;
+import com.capstone.LEMS.Repository.UserRepository;
 import com.capstone.LEMS.Service.BorrowItemService;
 
+import com.capstone.LEMS.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -21,43 +25,23 @@ public class BorrowItemController {
 
     @Autowired
     private BorrowItemService borrowItemService;
-
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping("/all")
     public List<BorrowItem> getAllBorrowItems() {
         return borrowItemService.getAllItems();
     }
 
-    @GetMapping("/insti/{instiId}")
-    public ResponseEntity<List<BorrowItem>> getBorrowItemsByInstiId(@PathVariable String instiId) {
-        return ResponseEntity.ok(borrowItemService.getBorrowItemsByInstiId(instiId));
+    @GetMapping("/uid/{uid}")
+    public ResponseEntity<List<BorrowItem>> getBorrowItemsByUid(@PathVariable int uid) {
+        return ResponseEntity.ok(borrowItemService.getBorrowItemsByUid(uid));
     }
 
-    @PostMapping("/addBulkBorrowItems")
-    public ResponseEntity<?> addBulkBorrowItems(
-            @RequestParam String instiId,
-            @RequestBody List<BorrowItem> items) {
-
-        try {
-            // 🆕 Generate a unique Borrowed ID for this transaction (date + UUID)
-            String borrowedId = "B" + new SimpleDateFormat("yyyyMMddHHmmss").format(new Date()) + "-" + UUID.randomUUID().toString().substring(0, 6);
-
-            for (BorrowItem item : items) {
-                item.setBorrowedId(borrowedId); // 🆕 Assign same borrowed ID
-                item.setInstiId(instiId);
-                item.setBorrowedDate(new Date()); // Set current date
-                borrowItemService.saveBorrowItem(item);
-            }
-
-            return ResponseEntity.ok("Borrow transaction successfully added with Borrowed ID: " + borrowedId);
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
-        }
-    }
 
     @PostMapping("/addBorrowItems")
     public ResponseEntity<?> addBorrowItems(
-            @RequestParam String instiId,
+            @RequestParam String uid,
             @RequestParam String borrowedId, // ✅ Accept the borrowedId from frontend
             @RequestParam Long itemId,
             @RequestParam String itemName,
@@ -66,8 +50,13 @@ public class BorrowItemController {
             @RequestParam String status) {
 
         try {
+            UserEntity user = userRepository.findByInstiId(uid);
+            if (user == null) {
+                return ResponseEntity.badRequest().body("User not found.");
+            }
+
             BorrowItem borrowItem = new BorrowItem();
-            borrowItem.setInstiId(instiId);
+            borrowItem.setUser(user); // ✅ Set the user
             borrowItem.setBorrowedId(borrowedId);  // ✅ Set the same Borrowed ID
             borrowItem.setItemId(itemId);
             borrowItem.setItemName(itemName);

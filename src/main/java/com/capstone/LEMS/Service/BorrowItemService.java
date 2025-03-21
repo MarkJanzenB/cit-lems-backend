@@ -18,11 +18,12 @@ public class BorrowItemService {
     @Autowired
     private BorrowItemRepository borrowItemRepository;
 
-    public List<BorrowItem> getBorrowItemsByInstiId(String instiId) {
-        List<BorrowItem> items = borrowItemRepository.findByInstiId(instiId);
-        System.out.println("Fetched items for instiId " + instiId + ": " + items);
+    public List<BorrowItem> getBorrowItemsByUid(int uid) {
+        List<BorrowItem> items = borrowItemRepository.findByUser_UserId(uid);
+        System.out.println("Fetched items for uid " + uid + ": " + items);
         return items != null ? items : List.of();
     }
+
 
 
 
