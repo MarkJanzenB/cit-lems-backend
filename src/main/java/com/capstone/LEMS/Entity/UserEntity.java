@@ -50,6 +50,10 @@ public class UserEntity {
 	@JsonIgnore
 	private List<BorrowItem> borrowedItems = new ArrayList<>();
 	
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
+	@JsonIgnore
+	private List<ItemEntity> items = new ArrayList<>();
+	
 	public UserEntity() {
 		super();
 		// TODO Auto-generated constructor stub
