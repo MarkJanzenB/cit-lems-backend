@@ -12,5 +12,7 @@ public interface ItemRepository  extends JpaRepository<ItemEntity, Integer>{
 	ItemEntity findByUniqueId (String uniqueId);
 	ItemEntity findTopByIsAutoUidTrueOrderByItemIdDesc();
 	List<ItemEntity> findByItemName(String itemName);
-	List<ItemEntity> findByItemNameAndGroupIsNullOrderByItemIdDesc(String itemName);
+	List<ItemEntity> findByItemNameAndUserIsNullOrderByItemIdDesc(String itemName);
+	List<ItemEntity> findByItemNameAndStatus(String itemName, String status);
+	List<ItemEntity> findByItemNameAndBorrowCart_Id(String itemName, int borrowCartId);
 }

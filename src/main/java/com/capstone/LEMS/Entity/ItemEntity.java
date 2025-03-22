@@ -9,8 +9,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.ConstraintMode;
 
 @Entity
 @Table(name="Item")
@@ -25,28 +26,35 @@ public class ItemEntity {
     private String uniqueId;
     @Column(name = "is_auto_uid")
     private boolean isAutoUid;
+    private String status;
     
     @ManyToOne
     @JoinColumn(name = "inventory_id", nullable = true)
     private InventoryEntity inventory;
     
-    @OneToOne
-    @JoinColumn(name="group_id", nullable = true)
-    private GroupEntity group;
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = true)
+    private UserEntity user;
+    
+    @ManyToOne
+    @JoinColumn(name = "borrowcart_id", nullable = true)
+    private BorrowCart borrowCart;
 
     public ItemEntity() {
         super();
         // TODO Auto-generated constructor stub
     }
 
-	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, GroupEntity group) {
+	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart) {
 		super();
 		this.itemId = itemId;
 		this.itemName = itemName;
 		this.uniqueId = uniqueId;
 		this.inventory = inventory;
-		this.group = group;
 		this.isAutoUid = false;
+		this.user = user;
+		this.status = status;
+		this.borrowCart = borrowCart;
 	}
 
 	@JsonProperty("item_id")
@@ -75,15 +83,14 @@ public class ItemEntity {
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
     }
-
-	@JsonProperty("group_id")
-	public GroupEntity getGroup() {
-		return group;
-	}
-
-	public void setGroup(GroupEntity group) {
-		this.group = group;
-	}
+    
+    public UserEntity getUser() {
+    	return user;
+    }
+    
+    public void setUser(UserEntity user) {
+    	this.user = user;
+    }
 
 	public InventoryEntity getInventory() {
 		return inventory;
@@ -99,5 +106,21 @@ public class ItemEntity {
 
 	public void setAutoUid(boolean isAutoUid) {
 		this.isAutoUid = isAutoUid;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public BorrowCart getBorrowCart() {
+		return borrowCart;
+	}
+
+	public void setBorrowCart(BorrowCart borrowCart) {
+		this.borrowCart = borrowCart;
 	}
 }

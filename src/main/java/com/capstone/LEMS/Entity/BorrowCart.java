@@ -1,5 +1,10 @@
 package com.capstone.LEMS.Entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -8,7 +13,7 @@ public class BorrowCart {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     @Column(nullable = false)
     private String instiId;
@@ -24,6 +29,10 @@ public class BorrowCart {
 
     @Column(nullable = false)
     private int quantity;
+    
+	@OneToMany(mappedBy = "borrowCart", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
+	@JsonIgnore
+	private List<ItemEntity> items = new ArrayList<>();
 
     // Default constructor
     public BorrowCart() {
@@ -38,11 +47,11 @@ public class BorrowCart {
         this.quantity = quantity;
     }
 
-    public Long getId() {
+    public int getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(int id) {
         this.id = id;
     }
 

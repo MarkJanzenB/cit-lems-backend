@@ -35,7 +35,7 @@ public class BorrowCartController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBorrowCart(@PathVariable Long id, @RequestParam int quantity,
+    public ResponseEntity<String> deleteBorrowCart(@PathVariable int id, @RequestParam int quantity,
                                                    @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         if (authorizationHeader == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No Authorization header received.");
@@ -67,7 +67,7 @@ public class BorrowCartController {
     }
 
     @PostMapping("/increase/{id}")
-    public ResponseEntity<String> increaseItemQuantity(@PathVariable Long id) {
+    public ResponseEntity<String> increaseItemQuantity(@PathVariable int id) {
         try {
             borrowCartService.increaseItemQuantity(id);
             return ResponseEntity.ok("Item quantity increased successfully.");
@@ -77,7 +77,7 @@ public class BorrowCartController {
     }
 
     @PostMapping("/decrease/{id}")
-    public ResponseEntity<String> decreaseItemQuantity(@PathVariable Long id) {
+    public ResponseEntity<String> decreaseItemQuantity(@PathVariable int id) {
         try {
             borrowCartService.decreaseItemQuantity(id);
             return ResponseEntity.ok("Item quantity decreased successfully.");
