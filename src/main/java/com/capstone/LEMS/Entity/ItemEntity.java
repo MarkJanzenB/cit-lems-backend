@@ -10,8 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.ConstraintMode;
 
 @Entity
 @Table(name="Item")
@@ -39,13 +37,17 @@ public class ItemEntity {
     @ManyToOne
     @JoinColumn(name = "borrowcart_id", nullable = true)
     private BorrowCart borrowCart;
+    
+    @ManyToOne
+    @JoinColumn(name = "borrowitem_id", nullable = true)
+    private BorrowItem borrowItem;
 
     public ItemEntity() {
         super();
         // TODO Auto-generated constructor stub
     }
 
-	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart) {
+	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart, BorrowItem borrowItem) {
 		super();
 		this.itemId = itemId;
 		this.itemName = itemName;
@@ -55,6 +57,7 @@ public class ItemEntity {
 		this.user = user;
 		this.status = status;
 		this.borrowCart = borrowCart;
+		this.borrowItem = borrowItem;
 	}
 
 	@JsonProperty("item_id")
@@ -122,5 +125,13 @@ public class ItemEntity {
 
 	public void setBorrowCart(BorrowCart borrowCart) {
 		this.borrowCart = borrowCart;
+	}
+
+	public BorrowItem getBorrowItem() {
+		return borrowItem;
+	}
+
+	public void setBorrowItem(BorrowItem borrowItem) {
+		this.borrowItem = borrowItem;
 	}
 }
