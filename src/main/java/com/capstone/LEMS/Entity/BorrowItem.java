@@ -1,7 +1,12 @@
 package com.capstone.LEMS.Entity;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "borrow_items")
@@ -25,6 +30,10 @@ public class BorrowItem {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date borrowedDate;
+    
+	@OneToMany(mappedBy = "borrowItem", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
+	@JsonIgnore
+	private List<ItemEntity> items = new ArrayList<>();
 
     public BorrowItem() {}
 
