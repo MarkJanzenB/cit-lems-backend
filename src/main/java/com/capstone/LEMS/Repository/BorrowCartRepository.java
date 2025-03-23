@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BorrowCartRepository extends JpaRepository<BorrowCart, Long> {
+public interface BorrowCartRepository extends JpaRepository<BorrowCart, Integer> {
 
     List<BorrowCart> findByInstiId(String instiId);
     BorrowCart findByItemId(int itemId);

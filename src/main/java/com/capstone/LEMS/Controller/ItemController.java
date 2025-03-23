@@ -1,6 +1,7 @@
 package com.capstone.LEMS.Controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -47,5 +48,15 @@ public class ItemController {
     @GetMapping("/getallitems")
     public List<ItemEntity> getAllItems(){
         return itemserv.getAllItems();
+    }
+    
+    @PutMapping("/borrow")
+    public ResponseEntity<?> borrowItem(@RequestBody Map<String, Object> request){
+    	return itemserv.borrowItem(request);
+    }
+    
+    @PutMapping("/return")
+    public ResponseEntity<?> returnItem(@RequestBody List<Map<String, Object>> itemsRequest) {
+        return itemserv.returnItem(itemsRequest);
     }
 }

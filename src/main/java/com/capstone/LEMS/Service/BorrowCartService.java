@@ -62,7 +62,7 @@ public class BorrowCartService {
         return borrowCartRepository.save(borrowCart);
     }
 
-    public void restoreStockAndRemoveItem(Long id, int quantity) {
+    public void restoreStockAndRemoveItem(int id, int quantity) {
         BorrowCart borrowCart = borrowCartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Borrow cart item not found"));
 
@@ -87,13 +87,13 @@ public class BorrowCartService {
         borrowCartRepository.deleteByInstiId(instiId);
     }
 
-    public void deleteBorrowCart(Long id) {
+    public void deleteBorrowCart(int id) {
         BorrowCart borrowCart = borrowCartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Borrow cart item not found"));
         borrowCartRepository.delete(borrowCart);
     }
 
-    public void increaseItemQuantity(Long id) {
+    public void increaseItemQuantity(int id) {
         BorrowCart borrowCart = borrowCartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Borrow cart item not found"));
 
@@ -110,7 +110,7 @@ public class BorrowCartService {
         inventoryRepository.save(inventoryItem);
     }
 
-    public void decreaseItemQuantity(Long id) {
+    public void decreaseItemQuantity(int id) {
         BorrowCart borrowCart = borrowCartRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Borrow cart item not found"));
 
