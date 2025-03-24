@@ -14,7 +14,7 @@ public class BorrowItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private int id;
 
     private String borrowedId; // Unique Borrowed ID per transaction
 
@@ -53,8 +53,8 @@ public class BorrowItem {
     public String getBorrowedId() { return borrowedId; }
     public void setBorrowedId(String borrowedId) { this.borrowedId = borrowedId; }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public int getId() { return id; }
+    public void setId(int id) { this.id = id; }
 
 //    public String getInstiId() { return instiId; }
 //    public void setInstiId(String instiId) { this.instiId = instiId; }

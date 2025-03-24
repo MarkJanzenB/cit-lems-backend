@@ -13,10 +13,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.capstone.LEMS.Entity.BorrowCart;
+import com.capstone.LEMS.Entity.BorrowItem;
 import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Repository.BorrowCartRepository;
+import com.capstone.LEMS.Repository.BorrowItemRepository;
 import com.capstone.LEMS.Repository.InventoryRepository;
 import com.capstone.LEMS.Repository.ItemRepository;
 import com.capstone.LEMS.Repository.UserRepository;
@@ -38,6 +40,9 @@ public class ItemService {
     
     @Autowired
     BorrowCartRepository borrowcartrepo;
+    
+    @Autowired
+    BorrowItemRepository borrowitemrepo;
 
     //Transactional is used when something goes wrong in this method, the items would not be added
     @Transactional
@@ -254,4 +259,29 @@ public class ItemService {
                 .body(itemsToUpdate);
     }
 
+    @Transactional
+    public ResponseEntity<?> proceedToBorrowItems(String itemName, int borrowCartID, int borrowItemsID){
+    	List<ItemEntity> items = itemrepo.findByItemNameAndBorrowCart_Id(itemName, borrowCartID);
+    	BorrowItem borrowItem = borrowitemrepo.findById(borrowItemsID).orElse(null);
+    	
+    	if (items.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Items with name " + itemName + "or with id " +borrowCartID + " could not be found.");
+        }else if(borrowItem == null) {
+        	return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Borrow Item with id " +borrowItemsID + " could not be found.");
+        }
+    	
+    	items.forEach(item -> {
+            item.setBorrowCart(null);
+            item.setBorrowItem(borrowItem);
+        });
+    	itemrepo.saveAll(items);
+    	
+    	return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(items);
+    }
 }
