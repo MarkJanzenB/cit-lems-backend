@@ -65,9 +65,7 @@ public class BorrowItemController {
             borrowItem.setStatus(status);
             borrowItem.setBorrowedDate(new Date());
 
-            borrowItemService.saveBorrowItem(borrowItem);
-
-            return ResponseEntity.ok("Borrow item successfully added.");
+            return borrowItemService.addBorrowItem(borrowItem);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }

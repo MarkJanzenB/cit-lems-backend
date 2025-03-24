@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface BorrowItemRepository extends JpaRepository<BorrowItem, Long> {
+public interface BorrowItemRepository extends JpaRepository<BorrowItem, Integer> {
 
     // ✅ Fetch borrow items by institution ID (instiId) with user details
 //    @Query("SELECT b FROM BorrowItem b JOIN FETCH b.user WHERE b.instiId = :instiId ORDER BY b.borrowedDate DESC")
