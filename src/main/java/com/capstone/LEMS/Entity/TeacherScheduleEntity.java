@@ -9,6 +9,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.sql.Time;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 
 import java.util.Date;
 
@@ -35,7 +37,12 @@ public class TeacherScheduleEntity {
     private Date date;
     @Column(name = "teacher_id")
     private int teacherId;
-    
+    @ManyToOne
+    @JoinColumn(name = "year_id")
+    private YearSectionEntity yearSection;
+
+
+
     //Add sched_assign_id FK
     //Add subject_id FK
 
@@ -44,7 +51,7 @@ public class TeacherScheduleEntity {
     }
     
     public TeacherScheduleEntity(int teacherScheduleId, Time startTime, Time endTime, int labNum, Date date,
-			int teacherId) {
+			int teacherId, YearSectionEntity yearSection) {
 		super();
 		this.teacherScheduleId = teacherScheduleId;
 		this.startTime = startTime;
@@ -52,6 +59,7 @@ public class TeacherScheduleEntity {
 		this.labNum = labNum;
 		this.date = date;
 		this.teacherId = teacherId;
+        this.yearSection = new YearSectionEntity();
 	}
 
 	@JsonProperty("teacher_schedule_id")
@@ -96,5 +104,12 @@ public class TeacherScheduleEntity {
     public void setTeacherId(int teacherId) {
         this.teacherId = teacherId;
     }
+    @JsonProperty("year_section")
+    public YearSectionEntity getYearSection() {
+        return yearSection;
+    }
 
+    public void setYearSection(YearSectionEntity yearSection) {
+        this.yearSection = yearSection;
+    }
 }
