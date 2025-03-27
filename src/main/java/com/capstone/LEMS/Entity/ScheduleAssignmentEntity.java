@@ -2,6 +2,7 @@ package com.capstone.LEMS.Entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -22,13 +24,17 @@ public class ScheduleAssignmentEntity {
 	private String status;
 	private String remarks;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "requester_id")
+	@ManyToOne
+	@JoinColumn(name = "requester_id", nullable = true)
 	private UserEntity requester;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "approver_id")
+	@ManyToOne
+	@JoinColumn(name = "approver_id", nullable = true)
 	private UserEntity approver;
+	
+	@OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "teacher_schedule_id", referencedColumnName = "teacher_schedule_id", nullable = true)
+    private TeacherScheduleEntity teacherSchedule;
 	
 	public ScheduleAssignmentEntity() {
 		super();
@@ -36,13 +42,14 @@ public class ScheduleAssignmentEntity {
 	}
 
 	public ScheduleAssignmentEntity(int schedAssignId, String status, String remarks, UserEntity requester,
-			UserEntity approver) {
+			UserEntity approver, TeacherScheduleEntity teacherSchedule) {
 		super();
 		this.schedAssignId = schedAssignId;
 		this.status = status;
 		this.remarks = remarks;
 		this.requester = requester;
 		this.approver = approver;
+		this.teacherSchedule = teacherSchedule;
 	}
 
 
@@ -88,6 +95,15 @@ public class ScheduleAssignmentEntity {
 
 	public void setApprover(UserEntity approver) {
 		this.approver = approver;
+	}
+
+	@JsonProperty("teacher_schedule")
+	public TeacherScheduleEntity getTeacherSchedule() {
+		return teacherSchedule;
+	}
+
+	public void setTeacherSchedule(TeacherScheduleEntity teacherSchedule) {
+		this.teacherSchedule = teacherSchedule;
 	}
 	
 	

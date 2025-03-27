@@ -35,7 +35,8 @@ public class DamageReportEntity {
 
     private String accountable;
 
-    private String status;
+    @Column(name = "incident_status")
+    private String incidentStatus;
 
     // Getters and Setters
     public Long getReportId() {
@@ -110,11 +111,11 @@ public class DamageReportEntity {
         this.accountable = accountable;
     }
 
-    public String getStatus() {
-        return status;
+    public String getIncidentStatus() {
+        return incidentStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setIncidentStatus(String status) {
+        this.incidentStatus = status;
     }
 }

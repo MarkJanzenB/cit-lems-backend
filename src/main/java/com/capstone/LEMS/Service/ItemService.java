@@ -1,8 +1,10 @@
 package com.capstone.LEMS.Service;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +47,13 @@ public class ItemService {
     BorrowItemRepository borrowitemrepo;
 
     //Transactional is used when something goes wrong in this method, the items would not be added
-    @Transactional
-    public ResponseEntity<?> AddItem(ItemEntity item, int bulkSize) {
+    @SuppressWarnings("unchecked")
+	@Transactional
+    public ResponseEntity<?> AddItem(Map<String, Object> itemsToAdd, int bulkSize) {
+    	String itemName = (String) itemsToAdd.get("item_name");
+    	// int userId = (int) itemsToAdd.get("user_id");
+    	int inventoryId = (int) itemsToAdd.get("inventory_id");
+    	List<String> uniqueIds = (List<String>) itemsToAdd.get("unique_ids");
     	// Prevents adding of items when bulk size is zero or less
     	if(bulkSize <= 0) {
     		return ResponseEntity
@@ -54,32 +61,60 @@ public class ItemService {
     				.body("Invalid bulk size. It must be greater than zero");
     	}
     	
-    	// Prevents adding of items when an Item with the same unique id already exists
-    	ItemEntity itemfromdb = itemrepo.findByUniqueId(item.getUniqueId());
-    	if(itemfromdb != null) {
+    	if(uniqueIds != null && !uniqueIds.isEmpty() && uniqueIds.size() != bulkSize) {
     		return ResponseEntity
-    				.status(HttpStatus.CONFLICT) // 409
-    				.body("Item with "+item.getUniqueId()+" unique ID already exists");
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Number of unique IDs must match bulk size.");
+    	}
+    	
+    	InventoryEntity inventory = invrepo.findById(inventoryId).orElse(null);
+    	if(inventory == null) {
+    		return ResponseEntity
+    				.status(HttpStatus.BAD_REQUEST) // 400
+    				.body("Inventory ID: " + inventoryId + " does not exists");
+    	}
+    	
+//    	UserEntity user = userrepo.findById(userId).orElse(null);
+//    	if(user == null) {
+//    		return ResponseEntity
+//    				.status(HttpStatus.BAD_REQUEST) // 400
+//    				.body("User ID: " + userId + " does not exists");
+//    	}
+    	
+    	// Prevents adding of items when an Item with the same unique id already exists
+    	List<ItemEntity> foundItems = itemrepo.findByUniqueIdIn(uniqueIds);
+    	if(!foundItems.isEmpty()) {
+    		List<String> foundUniqueIds = foundItems.stream()
+    												.map(ItemEntity::getUniqueId)
+    												.collect(Collectors.toList());
+    		
+    		Map<String, Object> response = new HashMap<>();
+    		response.put("message", "The following Unique IDs already exist");
+    		response.put("unique_ids", foundUniqueIds);
+    		return ResponseEntity
+    				.status(HttpStatus.CONFLICT)
+    				.body(response);
     	}
     	
     	// Creation of adding items
     	List<ItemEntity> itemsToSave = new ArrayList<>();
     	for(int i = 1; i <= bulkSize; i++) {
     		ItemEntity newItem = new ItemEntity();
-    		newItem.setItemName(item.getItemName());
-    		newItem.setInventory(item.getInventory());
-    		newItem.setUniqueId(item.getUniqueId());
-    		newItem.setUser(item.getUser()); // for testing purposes
+    		newItem.setItemName(itemName);
+    		newItem.setInventory(inventory);
+    		// newItem.setUser(user); 
     		newItem.setStatus("Available");
     		
     		// Generates a unique ID if it is not specifically provided
-    		if(newItem.getUniqueId() == null || item.getUniqueId().isBlank()) {
-        		String prefix = item.getItemName().substring(0, 2).toUpperCase()
-        				+ item.getItemName().substring(item.getItemName().length() - 1).toUpperCase();
+    		if(uniqueIds == null || uniqueIds.isEmpty()) {
+        		String prefix = itemName.substring(0, 2).toUpperCase()
+        				+ itemName.substring(itemName.length() - 1).toUpperCase();
         		int nextNumber = idcountserv.getNextId() + i;
         		String uniqueId = prefix + String.format("%04d", nextNumber);
         		newItem.setUniqueId(uniqueId);
         		newItem.setAutoUid(true);
+        	}else {
+        		newItem.setUniqueId(uniqueIds.get(i - 1));
         	}
     		
     		// Saving items to database
@@ -207,7 +242,7 @@ public class ItemService {
             List<ItemEntity> itemsToAssign = availableItems.subList(0, quantity);
             itemsToAssign.forEach(item -> {
             	item.setUser(user);
-            	item.setStatus("Borrowed");
+            	item.setStatus("Preparing");
             	item.setBorrowCart(borrowCart);
             });
             itemsToBorrow.addAll(itemsToAssign);

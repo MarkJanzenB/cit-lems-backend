@@ -2,6 +2,7 @@ package com.capstone.LEMS.Entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -11,6 +12,7 @@ import jakarta.persistence.Table;
 import java.sql.Time;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
 
 import java.util.Date;
 
@@ -40,6 +42,9 @@ public class TeacherScheduleEntity {
     @ManyToOne
     @JoinColumn(name = "year_id")
     private YearSectionEntity yearSection;
+    
+    @OneToOne(mappedBy = "teacherSchedule")
+	private ScheduleAssignmentEntity scheduleAssignment;
 
 
 

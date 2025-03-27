@@ -36,7 +36,7 @@ public class DamageReportService {
             damageReport.setInstructor(damageReportDetails.getInstructor());
             damageReport.setPhoto(damageReportDetails.getPhoto());
             damageReport.setAccountable(damageReportDetails.getAccountable());
-            damageReport.setStatus(damageReportDetails.getStatus());
+            damageReport.setIncidentStatus(damageReportDetails.getIncidentStatus());
             return damageReportRepository.save(damageReport);
         }
         return null;

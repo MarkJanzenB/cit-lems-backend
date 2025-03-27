@@ -15,4 +15,5 @@ public interface ItemRepository  extends JpaRepository<ItemEntity, Integer>{
 	List<ItemEntity> findByItemNameAndUserIsNullOrderByItemIdDesc(String itemName);
 	List<ItemEntity> findByItemNameAndStatus(String itemName, String status);
 	List<ItemEntity> findByItemNameAndBorrowCart_Id(String itemName, int borrowCartId);
+	List<ItemEntity> findByUniqueIdIn(List<String> uniqueIds);
 }

@@ -32,8 +32,8 @@ public class ItemController {
     }
 
     @PostMapping("/insertitem")
-    public ResponseEntity<?> addItem(@RequestBody ItemEntity item, @RequestParam int bulkSize) {
-        return itemserv.AddItem(item, bulkSize);
+    public ResponseEntity<?> addItem(@RequestBody Map<String, Object> itemsToAdd, @RequestParam int bulkSize) {
+        return itemserv.AddItem(itemsToAdd, bulkSize);
     }
     
     @PutMapping("/updateitems")
