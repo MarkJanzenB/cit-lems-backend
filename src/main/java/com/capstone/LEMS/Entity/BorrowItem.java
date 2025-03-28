@@ -34,10 +34,14 @@ public class BorrowItem {
 	@OneToMany(mappedBy = "borrowItem", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
 	@JsonIgnore
 	private List<ItemEntity> items = new ArrayList<>();
+	
+	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
+	@JoinColumn(name = "teacher_schedule_id", referencedColumnName = "teacher_schedule_id", nullable = true)
+	private TeacherScheduleEntity teacherSchedule;
 
     public BorrowItem() {}
 
-    public BorrowItem(String borrowedId, Long itemId, String itemName, String categoryName, int quantity, String status, Date borrowedDate, UserEntity user) {
+    public BorrowItem(String borrowedId, Long itemId, String itemName, String categoryName, int quantity, String status, Date borrowedDate, UserEntity user, TeacherScheduleEntity teacherSchedule) {
         this.borrowedId = borrowedId;
 //        this.instiId = instiId;
         this.itemId = itemId;
@@ -47,6 +51,7 @@ public class BorrowItem {
         this.status = status;
         this.borrowedDate = borrowedDate;
         this.user = user;
+        this.teacherSchedule = teacherSchedule;
     }
 
     // ✅ Getters and Setters
@@ -79,4 +84,12 @@ public class BorrowItem {
 
     public UserEntity getUser() { return user; }
     public void setUser(UserEntity user) { this.user = user; }
+
+	public TeacherScheduleEntity getTeacherSchedule() {
+		return teacherSchedule;
+	}
+
+	public void setTeacherSchedule(TeacherScheduleEntity teacherSchedule) {
+		this.teacherSchedule = teacherSchedule;
+	}
 }

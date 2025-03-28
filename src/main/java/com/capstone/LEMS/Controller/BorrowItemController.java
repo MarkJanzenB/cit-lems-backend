@@ -1,7 +1,9 @@
 package com.capstone.LEMS.Controller;
 
 import com.capstone.LEMS.Entity.BorrowItem;
+import com.capstone.LEMS.Entity.TeacherScheduleEntity;
 import com.capstone.LEMS.Entity.UserEntity;
+import com.capstone.LEMS.Repository.TeacherScheduleRepository;
 import com.capstone.LEMS.Repository.UserRepository;
 import com.capstone.LEMS.Service.BorrowItemService;
 
@@ -27,6 +29,8 @@ public class BorrowItemController {
     private BorrowItemService borrowItemService;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TeacherScheduleRepository tsrepo;
 
     @GetMapping("/all")
     public List<BorrowItem> getAllBorrowItems() {
@@ -47,12 +51,16 @@ public class BorrowItemController {
             @RequestParam String itemName,
             @RequestParam String categoryName,
             @RequestParam Integer quantity,
-            @RequestParam String status) {
+            @RequestParam String status,
+            @RequestParam Integer teacherScheduleId) {
 
         try {
             UserEntity user = userRepository.findByInstiId(uid);
+            TeacherScheduleEntity teacherSchedule = tsrepo.findById(teacherScheduleId).orElse(null);
             if (user == null) {
                 return ResponseEntity.badRequest().body("User not found.");
+            }else if(teacherSchedule == null) {
+            	return ResponseEntity.badRequest().body("teacher schedule with ID: " + teacherScheduleId + " could not be found");
             }
 
             BorrowItem borrowItem = new BorrowItem();
@@ -64,6 +72,7 @@ public class BorrowItemController {
             borrowItem.setQuantity(quantity);
             borrowItem.setStatus(status);
             borrowItem.setBorrowedDate(new Date());
+            borrowItem.setTeacherSchedule(teacherSchedule);
 
             return borrowItemService.addBorrowItem(borrowItem);
         } catch (Exception e) {

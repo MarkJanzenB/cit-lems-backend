@@ -1,5 +1,7 @@
 package com.capstone.LEMS.Entity;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import jakarta.persistence.Column;
@@ -9,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
@@ -25,6 +28,8 @@ public class ItemEntity {
     @Column(name = "is_auto_uid")
     private boolean isAutoUid;
     private String status;
+    @Column(name = "date_added")
+    private LocalDate dateAdded;
     
     @ManyToOne
     @JoinColumn(name = "inventory_id", nullable = true)
@@ -58,6 +63,11 @@ public class ItemEntity {
 		this.status = status;
 		this.borrowCart = borrowCart;
 		this.borrowItem = borrowItem;
+	}
+	
+	@PrePersist
+	protected void onCreate() {
+		this.dateAdded = LocalDate.now();
 	}
 
 	@JsonProperty("item_id")
@@ -133,5 +143,14 @@ public class ItemEntity {
 
 	public void setBorrowItem(BorrowItem borrowItem) {
 		this.borrowItem = borrowItem;
+	}
+
+	@JsonProperty("date_added")
+	public LocalDate getDateAdded() {
+		return dateAdded;
+	}
+
+	public void setDateAdded(LocalDate dateAdded) {
+		this.dateAdded = dateAdded;
 	}
 }

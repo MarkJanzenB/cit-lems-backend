@@ -46,7 +46,8 @@ public class TeacherScheduleEntity {
     @OneToOne(mappedBy = "teacherSchedule")
 	private ScheduleAssignmentEntity scheduleAssignment;
 
-
+    @OneToOne(mappedBy = "teacherSchedule")
+	private BorrowItem borrowItem;
 
     //Add sched_assign_id FK
     //Add subject_id FK
