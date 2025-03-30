@@ -6,7 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.capstone.LEMS.Entity.InventoryEntity;
+import com.capstone.LEMS.Entity.ItemCategoryEntity;
 import com.capstone.LEMS.Repository.InventoryRepository;
+import com.capstone.LEMS.Repository.ItemCategoryRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,6 +16,9 @@ import java.util.Optional;
 public class InventoryService {
 	@Autowired
 	InventoryRepository inventoryRepository;
+	
+	@Autowired
+	ItemCategoryRepository icrepo;
 
 	public List<InventoryEntity> getAllInventory() {
 		return inventoryRepository.findAll();
@@ -21,6 +26,7 @@ public class InventoryService {
 
 	public ResponseEntity<?> addInventory(InventoryEntity inventory) {
 		InventoryEntity inventoryfromdb = inventoryRepository.findByNameIgnoreCase(inventory.getName());
+		ItemCategoryEntity itemCategory = icrepo.findById(inventory.getItemCategory().getCategoryId()).orElse(null);
 
 		if (inventoryfromdb != null) {
 			return ResponseEntity
@@ -28,6 +34,7 @@ public class InventoryService {
 					.body(inventory.getName() + " Inventory already exists");
 		}
 
+		inventory.setItemCategory(itemCategory);
 		return ResponseEntity
 				.status(HttpStatus.CREATED) //201
 				.body(inventoryRepository.save(inventory));

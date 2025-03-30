@@ -51,20 +51,15 @@ public class ItemService {
 	@Transactional
     public ResponseEntity<?> AddItem(Map<String, Object> itemsToAdd, int bulkSize) {
     	String itemName = (String) itemsToAdd.get("item_name");
-    	// int userId = (int) itemsToAdd.get("user_id");
     	int inventoryId = (int) itemsToAdd.get("inventory_id");
+    	String category = (String) itemsToAdd.get("category");
     	List<String> uniqueIds = (List<String>) itemsToAdd.get("unique_ids");
-    	// Prevents adding of items when bulk size is zero or less
+    	List<ItemEntity> itemsToSave = new ArrayList<>();
+    	
     	if(bulkSize <= 0) {
     		return ResponseEntity
     				.status(HttpStatus.BAD_REQUEST) // 400
     				.body("Invalid bulk size. It must be greater than zero");
-    	}
-    	
-    	if(uniqueIds != null && !uniqueIds.isEmpty() && uniqueIds.size() != bulkSize) {
-    		return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body("Number of unique IDs must match bulk size.");
     	}
     	
     	InventoryEntity inventory = invrepo.findById(inventoryId).orElse(null);
@@ -74,52 +69,56 @@ public class ItemService {
     				.body("Inventory ID: " + inventoryId + " does not exists");
     	}
     	
-//    	UserEntity user = userrepo.findById(userId).orElse(null);
-//    	if(user == null) {
-//    		return ResponseEntity
-//    				.status(HttpStatus.BAD_REQUEST) // 400
-//    				.body("User ID: " + userId + " does not exists");
-//    	}
-    	
-    	// Prevents adding of items when an Item with the same unique id already exists
-    	List<ItemEntity> foundItems = itemrepo.findByUniqueIdIn(uniqueIds);
-    	if(!foundItems.isEmpty()) {
-    		List<String> foundUniqueIds = foundItems.stream()
-    												.map(ItemEntity::getUniqueId)
-    												.collect(Collectors.toList());
-    		
-    		Map<String, Object> response = new HashMap<>();
-    		response.put("message", "The following Unique IDs already exist");
-    		response.put("unique_ids", foundUniqueIds);
-    		return ResponseEntity
-    				.status(HttpStatus.CONFLICT)
-    				.body(response);
-    	}
-    	
-    	// Creation of adding items
-    	List<ItemEntity> itemsToSave = new ArrayList<>();
-    	for(int i = 1; i <= bulkSize; i++) {
+    	if(category.equalsIgnoreCase("Consumables")) {
     		ItemEntity newItem = new ItemEntity();
     		newItem.setItemName(itemName);
     		newItem.setInventory(inventory);
-    		// newItem.setUser(user); 
     		newItem.setStatus("Available");
-    		
-    		// Generates a unique ID if it is not specifically provided
-    		if(uniqueIds == null || uniqueIds.isEmpty()) {
-        		String prefix = itemName.substring(0, 2).toUpperCase()
-        				+ itemName.substring(itemName.length() - 1).toUpperCase();
-        		int nextNumber = idcountserv.getNextId() + i;
-        		String uniqueId = prefix + String.format("%04d", nextNumber);
-        		newItem.setUniqueId(uniqueId);
-        		newItem.setAutoUid(true);
-        	}else {
-        		newItem.setUniqueId(uniqueIds.get(i - 1));
+    		newItem.setAutoUid(false);
+    		itemsToSave.add(newItem);
+    		//add supply batch id soon
+    	}else {
+    		if(uniqueIds != null && !uniqueIds.isEmpty() && uniqueIds.size() != bulkSize) {
+        		return ResponseEntity
+                        .status(HttpStatus.BAD_REQUEST)
+                        .body("Number of unique IDs must match bulk size.");
         	}
     		
-    		// Saving items to database
-    		itemsToSave.add(newItem);
+    		List<ItemEntity> foundItems = itemrepo.findByUniqueIdIn(uniqueIds);
+        	if(!foundItems.isEmpty()) {
+        		List<String> foundUniqueIds = foundItems.stream()
+        												.map(ItemEntity::getUniqueId)
+        												.collect(Collectors.toList());
+        		
+        		Map<String, Object> response = new HashMap<>();
+        		response.put("message", "The following Unique IDs already exist");
+        		response.put("unique_ids", foundUniqueIds);
+        		return ResponseEntity
+        				.status(HttpStatus.CONFLICT)
+        				.body(response);
+        	}
+        	
+        	for(int i = 1; i <= bulkSize; i++) {
+        		ItemEntity newItem = new ItemEntity();
+        		newItem.setItemName(itemName);
+        		newItem.setInventory(inventory);
+        		newItem.setStatus("Available");
+        		
+        		if(uniqueIds == null || uniqueIds.isEmpty()) {
+            		String prefix = itemName.substring(0, 2).toUpperCase()
+            				+ itemName.substring(itemName.length() - 1).toUpperCase();
+            		int nextNumber = idcountserv.getNextId() + i;
+            		String uniqueId = prefix + String.format("%04d", nextNumber);
+            		newItem.setUniqueId(uniqueId);
+            		newItem.setAutoUid(true);
+            	}else {
+            		newItem.setUniqueId(uniqueIds.get(i - 1));
+            	}
+        		
+        		itemsToSave.add(newItem);
+        	}
     	}
+    	
     	List<ItemEntity> savedItems = itemrepo.saveAll(itemsToSave);
         return ResponseEntity
         		.status(HttpStatus.CREATED) // 201
