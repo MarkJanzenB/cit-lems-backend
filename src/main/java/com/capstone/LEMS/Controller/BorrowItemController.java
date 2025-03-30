@@ -52,15 +52,12 @@ public class BorrowItemController {
             @RequestParam String categoryName,
             @RequestParam Integer quantity,
             @RequestParam String status,
-            @RequestParam Integer teacherScheduleId) {
+            @RequestParam(required = false) Integer teacherScheduleId) {
 
         try {
             UserEntity user = userRepository.findByInstiId(uid);
-            TeacherScheduleEntity teacherSchedule = tsrepo.findById(teacherScheduleId).orElse(null);
             if (user == null) {
                 return ResponseEntity.badRequest().body("User not found.");
-            }else if(teacherSchedule == null) {
-            	return ResponseEntity.badRequest().body("teacher schedule with ID: " + teacherScheduleId + " could not be found");
             }
 
             BorrowItem borrowItem = new BorrowItem();
@@ -72,7 +69,13 @@ public class BorrowItemController {
             borrowItem.setQuantity(quantity);
             borrowItem.setStatus(status);
             borrowItem.setBorrowedDate(new Date());
-            borrowItem.setTeacherSchedule(teacherSchedule);
+            if(teacherScheduleId != null) {
+            	TeacherScheduleEntity teacherSchedule = tsrepo.findById(teacherScheduleId).orElse(null);
+            	if (teacherSchedule == null) {
+                	return ResponseEntity.badRequest().body("teacher schedule with ID: " + teacherScheduleId + " could not be found");
+                }
+            	borrowItem.setTeacherSchedule(teacherSchedule);
+            }
 
             return borrowItemService.addBorrowItem(borrowItem);
         } catch (Exception e) {
