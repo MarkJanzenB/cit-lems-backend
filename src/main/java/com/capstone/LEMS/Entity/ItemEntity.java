@@ -30,6 +30,9 @@ public class ItemEntity {
     private String status;
     @Column(name = "date_added")
     private LocalDate dateAdded;
+    private int quantity;
+    @Column(name = "expiry_date")
+    private LocalDate expiryDate;
     
     @ManyToOne
     @JoinColumn(name = "inventory_id", nullable = true)
@@ -52,7 +55,7 @@ public class ItemEntity {
         // TODO Auto-generated constructor stub
     }
 
-	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart, BorrowItem borrowItem) {
+	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart, BorrowItem borrowItem, int quantity, LocalDate expiryDate) {
 		super();
 		this.itemId = itemId;
 		this.itemName = itemName;
@@ -63,6 +66,8 @@ public class ItemEntity {
 		this.status = status;
 		this.borrowCart = borrowCart;
 		this.borrowItem = borrowItem;
+		this.quantity = quantity;
+		this.expiryDate = expiryDate;
 	}
 	
 	@PrePersist
@@ -153,4 +158,22 @@ public class ItemEntity {
 	public void setDateAdded(LocalDate dateAdded) {
 		this.dateAdded = dateAdded;
 	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
+	}
+
+	public LocalDate getExpiryDate() {
+		return expiryDate;
+	}
+
+	public void setExpiryDate(LocalDate expiryDate) {
+		this.expiryDate = expiryDate;
+	}
+	
+	
 }

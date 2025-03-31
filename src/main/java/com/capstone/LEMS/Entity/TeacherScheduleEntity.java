@@ -2,7 +2,6 @@ package com.capstone.LEMS.Entity;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -42,9 +41,6 @@ public class TeacherScheduleEntity {
     @ManyToOne
     @JoinColumn(name = "year_id")
     private YearSectionEntity yearSection;
-    
-    @OneToOne(mappedBy = "teacherSchedule")
-	private ScheduleAssignmentEntity scheduleAssignment;
 
     @OneToOne(mappedBy = "teacherSchedule")
 	private BorrowItem borrowItem;

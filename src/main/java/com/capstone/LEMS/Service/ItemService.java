@@ -1,5 +1,6 @@
 package com.capstone.LEMS.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +56,9 @@ public class ItemService {
     	String category = (String) itemsToAdd.get("category");
     	List<String> uniqueIds = (List<String>) itemsToAdd.get("unique_ids");
     	List<ItemEntity> itemsToSave = new ArrayList<>();
+    	int quantity = (int) itemsToAdd.get("quantity");
+    	String expiryDateStr = (String) itemsToAdd.get("expiry_date");
+    	LocalDate expiryDate = expiryDateStr != null ? LocalDate.parse(expiryDateStr) : null;
     	
     	if(bulkSize <= 0) {
     		return ResponseEntity
@@ -75,6 +79,8 @@ public class ItemService {
     		newItem.setInventory(inventory);
     		newItem.setStatus("Available");
     		newItem.setAutoUid(false);
+    		newItem.setQuantity(quantity);
+    		newItem.setExpiryDate(expiryDate);
     		itemsToSave.add(newItem);
     		//add supply batch id soon
     	}else {
@@ -103,6 +109,7 @@ public class ItemService {
         		newItem.setItemName(itemName);
         		newItem.setInventory(inventory);
         		newItem.setStatus("Available");
+        		newItem.setQuantity(1);
         		
         		if(uniqueIds == null || uniqueIds.isEmpty()) {
             		String prefix = itemName.substring(0, 2).toUpperCase()
