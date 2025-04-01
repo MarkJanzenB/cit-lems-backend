@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +59,14 @@ public class ItemService {
     	List<ItemEntity> itemsToSave = new ArrayList<>();
     	int quantity = (int) itemsToAdd.get("quantity");
     	String expiryDateStr = (String) itemsToAdd.get("expiry_date");
-    	LocalDate expiryDate = expiryDateStr != null ? LocalDate.parse(expiryDateStr) : null;
+    	LocalDate expiryDate = (expiryDateStr != null  && !expiryDateStr.isEmpty()) ? LocalDate.parse(expiryDateStr) : null;
+    	String variant = (String) itemsToAdd.get("variant");
+    	
+    	if(variant == null) {
+    		return ResponseEntity
+    				.status(HttpStatus.BAD_REQUEST)
+    				.body("Variant field should not be blank");
+    	}
     	
     	if(bulkSize <= 0) {
     		return ResponseEntity
@@ -81,6 +89,7 @@ public class ItemService {
     		newItem.setAutoUid(false);
     		newItem.setQuantity(quantity);
     		newItem.setExpiryDate(expiryDate);
+    		newItem.setVariant(variant);
     		itemsToSave.add(newItem);
     		//add supply batch id soon
     	}else {
@@ -109,6 +118,7 @@ public class ItemService {
         		newItem.setItemName(itemName);
         		newItem.setInventory(inventory);
         		newItem.setStatus("Available");
+        		newItem.setVariant(variant);
         		newItem.setQuantity(1);
         		
         		if(uniqueIds == null || uniqueIds.isEmpty()) {
