@@ -56,12 +56,24 @@ public class ItemEntity {
     @JoinColumn(name = "manufacturer_id", nullable = true)
     private ManufacturerEntity manufacturer;
 
+	@ManyToOne
+	@JoinColumn(name = "resupply_id")
+	private BatchResupplyEntity batchResupply;
+
+
     public ItemEntity() {
         super();
         // TODO Auto-generated constructor stub
     }
 
-	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart, BorrowItem borrowItem, int quantity, LocalDate expiryDate, String variant, ManufacturerEntity manufacturer) {
+	public BatchResupplyEntity getBatchResupply() {
+		return batchResupply;
+	}
+
+	public void setBatchResupply(BatchResupplyEntity batchResupply) {
+		this.batchResupply = batchResupply;
+	}
+	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart, BorrowItem borrowItem, int quantity, LocalDate expiryDate, String variant) {
 		super();
 		this.itemId = itemId;
 		this.itemName = itemName;
