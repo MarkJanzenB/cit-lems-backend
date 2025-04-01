@@ -20,11 +20,13 @@ import com.capstone.LEMS.Entity.BorrowCart;
 import com.capstone.LEMS.Entity.BorrowItem;
 import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
+import com.capstone.LEMS.Entity.ManufacturerEntity;
 import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Repository.BorrowCartRepository;
 import com.capstone.LEMS.Repository.BorrowItemRepository;
 import com.capstone.LEMS.Repository.InventoryRepository;
 import com.capstone.LEMS.Repository.ItemRepository;
+import com.capstone.LEMS.Repository.ManufacturerRepository;
 import com.capstone.LEMS.Repository.UserRepository;
 
 @Service
@@ -47,6 +49,9 @@ public class ItemService {
     
     @Autowired
     BorrowItemRepository borrowitemrepo;
+    
+    @Autowired
+    ManufacturerRepository mrepo;
 
     //Transactional is used when something goes wrong in this method, the items would not be added
     @SuppressWarnings("unchecked")
@@ -61,6 +66,11 @@ public class ItemService {
     	String expiryDateStr = (String) itemsToAdd.get("expiry_date");
     	LocalDate expiryDate = (expiryDateStr != null  && !expiryDateStr.isEmpty()) ? LocalDate.parse(expiryDateStr) : null;
     	String variant = (String) itemsToAdd.get("variant");
+    	Integer manufacturerId = (Integer) itemsToAdd.get("manufacturer_id");
+    	ManufacturerEntity manufacturer = null;
+    	if(manufacturerId != null) {
+    		manufacturer = mrepo.findById(manufacturerId).orElse(null);
+    	}
     	
     	if(variant == null) {
     		return ResponseEntity
@@ -77,7 +87,7 @@ public class ItemService {
     	InventoryEntity inventory = invrepo.findById(inventoryId).orElse(null);
     	if(inventory == null) {
     		return ResponseEntity
-    				.status(HttpStatus.BAD_REQUEST) // 400
+    				.status(HttpStatus.BAD_REQUEST) // 400hy7h
     				.body("Inventory ID: " + inventoryId + " does not exists");
     	}
     	
@@ -90,6 +100,9 @@ public class ItemService {
     		newItem.setQuantity(quantity);
     		newItem.setExpiryDate(expiryDate);
     		newItem.setVariant(variant);
+    		if(manufacturer != null) {
+    			newItem.setManufacturer(manufacturer);
+    		}
     		itemsToSave.add(newItem);
     		//add supply batch id soon
     	}else {
@@ -120,6 +133,9 @@ public class ItemService {
         		newItem.setStatus("Available");
         		newItem.setVariant(variant);
         		newItem.setQuantity(1);
+        		if(manufacturer != null) {
+        			newItem.setManufacturer(manufacturer);
+        		}
         		
         		if(uniqueIds == null || uniqueIds.isEmpty()) {
             		String prefix = itemName.substring(0, 2).toUpperCase()
