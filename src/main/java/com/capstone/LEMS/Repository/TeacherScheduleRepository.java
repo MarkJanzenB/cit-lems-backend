@@ -11,6 +11,6 @@ import java.util.List;
 public interface TeacherScheduleRepository extends JpaRepository<TeacherScheduleEntity, Integer> {
     // Custom finder methods that are used in your service
     List<TeacherScheduleEntity> findByTeacherId(int teacherId);
-    List<TeacherScheduleEntity> findByLabNum(int labNum);
+    List<TeacherScheduleEntity> findByLabNum(String labNum);
     List<TeacherScheduleEntity> findByDate(Date date);
 }

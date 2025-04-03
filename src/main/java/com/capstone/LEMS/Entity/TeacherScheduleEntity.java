@@ -12,7 +12,9 @@ import java.sql.Time;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.PrePersist;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 
@@ -33,21 +35,21 @@ public class TeacherScheduleEntity {
     @Column(name = "end_time")
     private Time endTime;
     @Column(name="lab_num")
-    private int labNum;
+    private String labNum;
     @Column(name = "date")
     //Date default format is YYYY-MM-DD
     private Date date;
     @Column(name = "teacher_id")
     private int teacherId;
     @ManyToOne
-    @JoinColumn(name = "year_id")
+    @JoinColumn(name = "year_id", nullable = true)
     private YearSectionEntity yearSection;
     @ManyToOne
     @JoinColumn(name = "createdby_id", nullable = true)
     private UserEntity createdBy;
 
     @Column(name = "date_created")
-    private LocalDateTime dateCreated;
+    private LocalDate dateCreated;
 
 
     @OneToOne(mappedBy = "teacherSchedule")
@@ -60,19 +62,28 @@ public class TeacherScheduleEntity {
         super();
     }
     
-    public TeacherScheduleEntity(int teacherScheduleId, Time startTime, Time endTime, int labNum, Date date,
-	        int teacherId, YearSectionEntity yearSection, UserEntity createdBy, LocalDateTime dateCreated) {
-	    super();
-	    this.teacherScheduleId = teacherScheduleId;
-	    this.startTime = startTime;
-	    this.endTime = endTime;
-	    this.labNum = labNum;
-	    this.date = date;
-	    this.teacherId = teacherId;
-	    this.yearSection = yearSection;
-	    this.createdBy = createdBy;
-	    this.dateCreated = dateCreated;
+   
+    
+    public TeacherScheduleEntity(int teacherScheduleId, Time startTime, Time endTime, String labNum, Date date,
+			int teacherId, YearSectionEntity yearSection, UserEntity createdBy, LocalDate dateCreated) {
+		super();
+		this.teacherScheduleId = teacherScheduleId;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.labNum = labNum;
+		this.date = date;
+		this.teacherId = teacherId;
+		this.yearSection = yearSection;
+		this.createdBy = createdBy;
+		this.dateCreated = dateCreated;
 	}
+
+
+
+	@PrePersist
+    protected void onCreate() {
+    	this.dateCreated = LocalDate.now();
+    }
 
 	@JsonProperty("teacher_schedule_id")
     public int getTeacherScheduleId() {
@@ -96,10 +107,10 @@ public class TeacherScheduleEntity {
         this.endTime = endTime;
     }
     @JsonProperty("lab_num")
-    public int getLabNum() {
+    public String getLabNum() {
         return labNum;
     }
-    public void setLabNum(int labNum) {
+    public void setLabNum(String labNum) {
         this.labNum = labNum;
     }
     @JsonProperty("date")
@@ -120,7 +131,7 @@ public class TeacherScheduleEntity {
     public YearSectionEntity getYearSection() {
         return yearSection;
     }
-    @JsonProperty("createdby")
+    @JsonProperty("created_by")
     public UserEntity getCreatedBy() {
         return createdBy;
     }
@@ -130,11 +141,11 @@ public class TeacherScheduleEntity {
     }
 
     @JsonProperty("date_created")
-    public LocalDateTime getDateCreated() {
+    public LocalDate getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(LocalDateTime dateCreated) {
+    public void setDateCreated(LocalDate dateCreated) {
         this.dateCreated = dateCreated;
     }
 

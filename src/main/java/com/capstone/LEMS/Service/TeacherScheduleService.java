@@ -13,8 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.capstone.LEMS.Entity.TeacherScheduleEntity;
+import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Entity.YearSectionEntity;
 import com.capstone.LEMS.Repository.TeacherScheduleRepository;
+import com.capstone.LEMS.Repository.UserRepository;
 import com.capstone.LEMS.Repository.YearSectionRepository;
 
 @Service
@@ -24,6 +26,9 @@ public class TeacherScheduleService {
 
     @Autowired
     YearSectionRepository yearSectionRepository;
+    
+    @Autowired
+    UserRepository userrepo;
 
     private static final Logger log = LoggerFactory.getLogger(TeacherScheduleService.class);
 
@@ -31,9 +36,12 @@ public class TeacherScheduleService {
         return teacherScheduleRepository.findAll();
     }
 
-    public TeacherScheduleEntity AddTeacherSchedule(TeacherScheduleEntity teachsched) {
+    public TeacherScheduleEntity AddTeacherSchedule(TeacherScheduleEntity teachsched, int createdby) {
+    	UserEntity user = userrepo.findById(createdby).orElse(null);
+    	
+    	teachsched.setCreatedBy(user);
+    	
         log.info("Adding new teacher schedule");
-        teachsched.setDateCreated(LocalDateTime.now());
         // You would typically get the current user from the security context
         // teachsched.setCreatedBy(currentUser);
         return teacherScheduleRepository.save(teachsched);
@@ -65,7 +73,7 @@ public class TeacherScheduleService {
         return ResponseEntity.ok(schedules);
     }
 
-    public ResponseEntity<?> getSchedulesByLabNum(int labNum) {
+    public ResponseEntity<?> getSchedulesByLabNum(String labNum) {
         log.info("Fetching schedules for lab number: {}", labNum);
         List<TeacherScheduleEntity> schedules = teacherScheduleRepository.findByLabNum(labNum);
 
@@ -107,7 +115,7 @@ public class TeacherScheduleService {
                 schedule.setEndTime(newSchedule.getEndTime());
             }
 
-            if(newSchedule.getLabNum() != 0) {
+            if(newSchedule.getLabNum() != null) {
                 schedule.setLabNum(newSchedule.getLabNum());
             }
 
