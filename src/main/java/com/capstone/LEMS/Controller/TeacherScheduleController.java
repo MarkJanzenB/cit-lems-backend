@@ -2,12 +2,8 @@ package com.capstone.LEMS.Controller;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import com.capstone.LEMS.Entity.TeacherScheduleEntity;
 import com.capstone.LEMS.Service.TeacherScheduleService;
 
@@ -16,18 +12,26 @@ import com.capstone.LEMS.Service.TeacherScheduleService;
 @CrossOrigin
 public class TeacherScheduleController {
     @Autowired
-    TeacherScheduleService teacherScheduleService;
+    TeacherScheduleService tcherschedserv;
     @GetMapping("/message")
     public String testMessage() {
         return "teacherScheduleService is working";
     }
+    @GetMapping("/getTeacherScheds")
+    public ResponseEntity<?> getTeacherScheds() {
+        return ResponseEntity.ok(tcherschedserv.getAllTeacherSchedules());
+    }
     @PostMapping("/getAllTeacherSchedules")
     public List<TeacherScheduleEntity> getAllTeacherSchedules(@RequestBody TeacherScheduleEntity teacherScheduleEntity) {
-        return teacherScheduleService.getAllTeacherSchedules();
+        return tcherschedserv.getAllTeacherSchedules();
     }
-    @PostMapping("/insertteacherschedule")
+    @PostMapping("/addtsched")
     public TeacherScheduleEntity AddTeacherSchedule(@RequestBody TeacherScheduleEntity teachsched) {
-    	return teacherScheduleService.AddTeacherSchedule(teachsched);
+    	return tcherschedserv.AddTeacherSchedule(teachsched);
     }
+   @GetMapping("/teacher/{teacherId}")
+   public ResponseEntity<?> getTSchedByTeacherId(@PathVariable int teacherId){
+       return tcherschedserv.getSchedulesByTeacherId(teacherId);
+   }
 
 }

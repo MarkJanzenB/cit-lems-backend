@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 
@@ -20,7 +21,7 @@ import java.util.Date;
 
 //to be revised
 @Entity
-@Table(name = "TeacherSchedule")
+@Table(name = "teacher_schedule")
 public class TeacherScheduleEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,6 +42,13 @@ public class TeacherScheduleEntity {
     @ManyToOne
     @JoinColumn(name = "year_id")
     private YearSectionEntity yearSection;
+    @ManyToOne
+    @JoinColumn(name = "createdby_id", nullable = true)
+    private UserEntity createdBy;
+
+    @Column(name = "date_created")
+    private LocalDateTime dateCreated;
+
 
     @OneToOne(mappedBy = "teacherSchedule")
 	private BorrowItem borrowItem;
@@ -53,15 +61,17 @@ public class TeacherScheduleEntity {
     }
     
     public TeacherScheduleEntity(int teacherScheduleId, Time startTime, Time endTime, int labNum, Date date,
-			int teacherId, YearSectionEntity yearSection) {
-		super();
-		this.teacherScheduleId = teacherScheduleId;
-		this.startTime = startTime;
-		this.endTime = endTime;
-		this.labNum = labNum;
-		this.date = date;
-		this.teacherId = teacherId;
-        this.yearSection = new YearSectionEntity();
+	        int teacherId, YearSectionEntity yearSection, UserEntity createdBy, LocalDateTime dateCreated) {
+	    super();
+	    this.teacherScheduleId = teacherScheduleId;
+	    this.startTime = startTime;
+	    this.endTime = endTime;
+	    this.labNum = labNum;
+	    this.date = date;
+	    this.teacherId = teacherId;
+	    this.yearSection = yearSection;
+	    this.createdBy = createdBy;
+	    this.dateCreated = dateCreated;
 	}
 
 	@JsonProperty("teacher_schedule_id")
@@ -106,9 +116,26 @@ public class TeacherScheduleEntity {
     public void setTeacherId(int teacherId) {
         this.teacherId = teacherId;
     }
-    @JsonProperty("year_section")
+    @JsonProperty("year_and_section")
     public YearSectionEntity getYearSection() {
         return yearSection;
+    }
+    @JsonProperty("createdby")
+    public UserEntity getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(UserEntity createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    @JsonProperty("date_created")
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
     }
 
     public void setYearSection(YearSectionEntity yearSection) {
