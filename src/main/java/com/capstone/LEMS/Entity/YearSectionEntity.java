@@ -1,33 +1,41 @@
 package com.capstone.LEMS.Entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.persistence.*;
+import java.util.List;
 
 @Entity
-@Table(name="year_section")
+@Table(name = "year_section")
 public class YearSectionEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "year_id")
 	private int yearId;
-	
-	@Column(name="year_and_section")
-	private String yearAndSection;
+
+	@Column(name = "year")
+	private String year;
+
+	@Column(name = "section")
+	private String section;
+
+	@Column(name = "is_active")
+	private boolean active;
+
+	@OneToMany(mappedBy = "yearSection")
+	private List<TeacherScheduleEntity> teacherSchedules;
 
 	public YearSectionEntity() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public YearSectionEntity(int yearId, String yearAndSection) {
-		super();
+	public YearSectionEntity(int yearId, String year, String section, boolean active, String department) {
 		this.yearId = yearId;
-		this.yearAndSection = yearAndSection;
+		this.year = year;
+		this.section = section;
+		this.active = active;
 	}
 
+	@JsonProperty("year_id")
 	public int getYearId() {
 		return yearId;
 	}
@@ -36,11 +44,31 @@ public class YearSectionEntity {
 		this.yearId = yearId;
 	}
 
-	public String getYearAndSection() {
-		return yearAndSection;
+	@JsonProperty("year")
+	public String getYear() {
+		return year;
 	}
 
-	public void setYearAndSection(String yearAndSection) {
-		this.yearAndSection = yearAndSection;
+	public void setYear(String year) {
+		this.year = year;
 	}
+
+	@JsonProperty("section")
+	public String getSection() {
+		return section;
+	}
+
+	public void setSection(String section) {
+		this.section = section;
+	}
+
+	@JsonProperty("is_active")
+	public boolean isActive() {
+		return active;
+	}
+
+	public void setActive(boolean active) {
+		this.active = active;
+	}
+
 }

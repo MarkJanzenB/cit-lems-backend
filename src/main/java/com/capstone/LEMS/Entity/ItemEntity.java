@@ -52,12 +52,30 @@ public class ItemEntity {
     @JoinColumn(name = "borrowitem_id", nullable = true)
     private BorrowItemEntity borrowItemEntity;
 
+
+    @ManyToOne
+    @JoinColumn(name = "manufacturer_id", nullable = true)
+    private ManufacturerEntity manufacturer;
+
+	@ManyToOne
+	@JoinColumn(name = "resupply_id")
+	private BatchResupplyEntity batchResupply;
+
+
     public ItemEntity() {
         super();
         // TODO Auto-generated constructor stub
     }
 
 	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCartEntity borrowCart, BorrowItemEntity borrowItemEntity, int quantity, LocalDate expiryDate, String variant) {
+	public BatchResupplyEntity getBatchResupply() {
+		return batchResupply;
+	}
+
+	public void setBatchResupply(BatchResupplyEntity batchResupply) {
+		this.batchResupply = batchResupply;
+	}
+	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart, BorrowItem borrowItem, int quantity, LocalDate expiryDate, String variant) {
 		super();
 		this.itemId = itemId;
 		this.itemName = itemName;
@@ -71,6 +89,7 @@ public class ItemEntity {
 		this.quantity = quantity;
 		this.expiryDate = expiryDate;
 		this.variant = variant;
+		this.manufacturer = manufacturer;
 	}
 	
 	@PrePersist
@@ -185,6 +204,14 @@ public class ItemEntity {
 	public void setVariant(String variant) {
 		this.variant = variant;
 	}
-	
+
+	public ManufacturerEntity getManufacturer() {
+		return manufacturer;
+	}
+
+	public void setManufacturer(ManufacturerEntity manufacturer) {
+		this.manufacturer = manufacturer;
+	}
+
 	
 }
