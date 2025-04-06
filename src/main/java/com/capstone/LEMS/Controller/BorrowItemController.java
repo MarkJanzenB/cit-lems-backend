@@ -1,23 +1,19 @@
 package com.capstone.LEMS.Controller;
 
-import com.capstone.LEMS.Entity.BorrowItem;
+import com.capstone.LEMS.Entity.BorrowItemEntity;
 import com.capstone.LEMS.Entity.TeacherScheduleEntity;
 import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Repository.TeacherScheduleRepository;
 import com.capstone.LEMS.Repository.UserRepository;
 import com.capstone.LEMS.Service.BorrowItemService;
 
-import com.capstone.LEMS.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.security.access.prepost.PreAuthorize;
+
 import java.util.List;
-import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
 
 
 @RestController
@@ -33,12 +29,12 @@ public class BorrowItemController {
     private TeacherScheduleRepository tsrepo;
 
     @GetMapping("/all")
-    public List<BorrowItem> getAllBorrowItems() {
+    public List<BorrowItemEntity> getAllBorrowItems() {
         return borrowItemService.getAllItems();
     }
 
     @GetMapping("/uid/{uid}")
-    public ResponseEntity<List<BorrowItem>> getBorrowItemsByUid(@PathVariable int uid) {
+    public ResponseEntity<List<BorrowItemEntity>> getBorrowItemsByUid(@PathVariable int uid) {
         return ResponseEntity.ok(borrowItemService.getBorrowItemsByUid(uid));
     }
 
@@ -60,24 +56,24 @@ public class BorrowItemController {
                 return ResponseEntity.badRequest().body("User not found.");
             }
 
-            BorrowItem borrowItem = new BorrowItem();
-            borrowItem.setUser(user); // ✅ Set the user
-            borrowItem.setBorrowedId(borrowedId);  // ✅ Set the same Borrowed ID
-            borrowItem.setItemId(itemId);
-            borrowItem.setItemName(itemName);
-            borrowItem.setCategoryName(categoryName);
-            borrowItem.setQuantity(quantity);
-            borrowItem.setStatus(status);
-            borrowItem.setBorrowedDate(new Date());
+            BorrowItemEntity borrowItemEntity = new BorrowItemEntity();
+            borrowItemEntity.setUser(user); // ✅ Set the user
+            borrowItemEntity.setBorrowedId(borrowedId);  // ✅ Set the same Borrowed ID
+            borrowItemEntity.setItemId(itemId);
+            borrowItemEntity.setItemName(itemName);
+            borrowItemEntity.setCategoryName(categoryName);
+            borrowItemEntity.setQuantity(quantity);
+            borrowItemEntity.setStatus(status);
+            borrowItemEntity.setBorrowedDate(new Date());
             if(teacherScheduleId != null) {
             	TeacherScheduleEntity teacherSchedule = tsrepo.findById(teacherScheduleId).orElse(null);
             	if (teacherSchedule == null) {
                 	return ResponseEntity.badRequest().body("teacher schedule with ID: " + teacherScheduleId + " could not be found");
                 }
-            	borrowItem.setTeacherSchedule(teacherSchedule);
+            	borrowItemEntity.setTeacherSchedule(teacherSchedule);
             }
 
-            return borrowItemService.addBorrowItem(borrowItem);
+            return borrowItemService.addBorrowItem(borrowItemEntity);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }

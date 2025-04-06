@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "borrow_items")
-public class BorrowItem {
+public class BorrowItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,9 +39,9 @@ public class BorrowItem {
 	@JoinColumn(name = "teacher_schedule_id", referencedColumnName = "teacher_schedule_id", nullable = true)
 	private TeacherScheduleEntity teacherSchedule;
 
-    public BorrowItem() {}
+    public BorrowItemEntity() {}
 
-    public BorrowItem(String borrowedId, Long itemId, String itemName, String categoryName, int quantity, String status, Date borrowedDate, UserEntity user, TeacherScheduleEntity teacherSchedule) {
+    public BorrowItemEntity(String borrowedId, Long itemId, String itemName, String categoryName, int quantity, String status, Date borrowedDate, UserEntity user, TeacherScheduleEntity teacherSchedule) {
         this.borrowedId = borrowedId;
 //        this.instiId = instiId;
         this.itemId = itemId;

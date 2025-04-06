@@ -1,15 +1,10 @@
 package com.capstone.LEMS.Entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
 
 @Entity
 @Table(name = "borrow_cart")
-public class BorrowCart {
+public class BorrowCartEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,8 +13,8 @@ public class BorrowCart {
     @Column(nullable = false)
     private String instiId;
 
-    @Column(nullable = false)
-    private int itemId;
+    @Column(nullable = true) // Nullable since itemId is assigned only after finalization
+    private Integer itemId;
 
     @Column(nullable = false)
     private String itemName;
@@ -29,17 +24,21 @@ public class BorrowCart {
 
     @Column(nullable = false)
     private int quantity;
-    
-	@OneToMany(mappedBy = "borrowCart", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
-	@JsonIgnore
-	private List<ItemEntity> items = new ArrayList<>();
 
     // Default constructor
-    public BorrowCart() {
+    public BorrowCartEntity() {
     }
 
-    // Constructor
-    public BorrowCart(String instiId, int itemId, String itemName, String categoryName, int quantity) {
+    // Constructor without itemId (for unfinalized items)
+    public BorrowCartEntity(String instiId, String itemName, String categoryName, int quantity) {
+        this.instiId = instiId;
+        this.itemName = itemName;
+        this.categoryName = categoryName;
+        this.quantity = quantity;
+    }
+
+    // Constructor with itemId (optional, when itemId is assigned later)
+    public BorrowCartEntity(String instiId, Integer itemId, String itemName, String categoryName, int quantity) {
         this.instiId = instiId;
         this.itemId = itemId;
         this.itemName = itemName;
@@ -47,6 +46,7 @@ public class BorrowCart {
         this.quantity = quantity;
     }
 
+    // Getters and Setters
     public int getId() {
         return id;
     }
@@ -63,11 +63,11 @@ public class BorrowCart {
         this.instiId = instiId;
     }
 
-    public int getItemId() {
+    public Integer getItemId() {
         return itemId;
     }
 
-    public void setItemId(int itemId) {
+    public void setItemId(Integer itemId) {
         this.itemId = itemId;
     }
 

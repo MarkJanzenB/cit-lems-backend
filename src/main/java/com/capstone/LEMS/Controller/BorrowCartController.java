@@ -1,8 +1,10 @@
 // File: src/main/java/com/capstone/LEMS/Controller/BorrowCartController.java
 package com.capstone.LEMS.Controller;
 
-import com.capstone.LEMS.Entity.BorrowCart;
+import com.capstone.LEMS.Entity.BorrowCartEntity;
+import com.capstone.LEMS.Repository.PreparingItemRepository;
 import com.capstone.LEMS.Service.BorrowCartService;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,19 +20,22 @@ public class BorrowCartController {
     @Autowired
     private BorrowCartService borrowCartService;
 
+    @Autowired
+    private PreparingItemRepository preparingItemRepository;
+
     @GetMapping("/getAllBorrowCarts")
-    public ResponseEntity<List<BorrowCart>> getAllBorrowCarts() {
+    public ResponseEntity<List<BorrowCartEntity>> getAllBorrowCarts() {
         return ResponseEntity.ok(borrowCartService.getAllBorrowCarts());
     }
 
     @PostMapping("/addToBorrowCart")
-    public ResponseEntity<BorrowCart> addToBorrowCart(@RequestParam String instiId, @RequestParam int itemId, @RequestParam String itemName, @RequestParam String categoryName, @RequestParam int quantity) {
+    public ResponseEntity<BorrowCartEntity> addToBorrowCart(@RequestParam String instiId, @RequestParam int itemId, @RequestParam String itemName, @RequestParam String categoryName, @RequestParam int quantity) {
         System.out.println("instiId: " + instiId);
         return ResponseEntity.ok(borrowCartService.addToBorrowCart(instiId, itemId, itemName, categoryName, quantity));
     }
 
     @GetMapping("/instiId/{instiId}")
-    public ResponseEntity<List<BorrowCart>> getBorrowCartsByInstId(@PathVariable String instiId) {
+    public ResponseEntity<List<BorrowCartEntity>> getBorrowCartsByInstId(@PathVariable String instiId) {
         return ResponseEntity.ok(borrowCartService.getBorrowCartsByInsti(instiId));
     }
 
@@ -44,7 +49,7 @@ public class BorrowCartController {
         System.out.println("Authorization Header: " + authorizationHeader); // Debugging step
 
         try {
-            borrowCartService.restoreStockAndRemoveItem(id, quantity);
+            borrowCartService.deleteBorrowCart(id);
             return ResponseEntity.ok("Item removed from borrow cart and stock restored successfully.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
@@ -66,23 +71,37 @@ public class BorrowCartController {
         }
     }
 
-    @PostMapping("/increase/{id}")
-    public ResponseEntity<String> increaseItemQuantity(@PathVariable int id) {
+//    @PostMapping("/increase/{id}")
+//    public ResponseEntity<String> increaseItemQuantity(@PathVariable int id) {
+//        try {
+//            borrowCartService.increaseItemQuantity(id);
+//            return ResponseEntity.ok("Item quantity increased successfully.");
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+//        }
+//    }
+//
+//    @PostMapping("/decrease/{id}")
+//    public ResponseEntity<String> decreaseItemQuantity(@PathVariable int id) {
+//        try {
+//            borrowCartService.decreaseItemQuantity(id);
+//            return ResponseEntity.ok("Item quantity decreased successfully.");
+//        } catch (Exception e) {
+//            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+//        }
+//    }
+
+
+    @PostMapping("/finalize/{instiId}")
+    public ResponseEntity<String> finalizeBorrowCart(@PathVariable String instiId) {
         try {
-            borrowCartService.increaseItemQuantity(id);
-            return ResponseEntity.ok("Item quantity increased successfully.");
+            // Move items from borrow_cart to preparing_item without reducing stock
+            borrowCartService.moveToPreparingItem(instiId);
+            return ResponseEntity.ok("Items moved to 'preparing_item' successfully.");
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+            return ResponseEntity.status(500).body("Error finalizing borrow cart: " + e.getMessage());
         }
     }
 
-    @PostMapping("/decrease/{id}")
-    public ResponseEntity<String> decreaseItemQuantity(@PathVariable int id) {
-        try {
-            borrowCartService.decreaseItemQuantity(id);
-            return ResponseEntity.ok("Item quantity decreased successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
-        }
-    }
+
 }

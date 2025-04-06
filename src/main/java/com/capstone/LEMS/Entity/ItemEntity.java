@@ -46,18 +46,18 @@ public class ItemEntity {
     
     @ManyToOne
     @JoinColumn(name = "borrowcart_id", nullable = true)
-    private BorrowCart borrowCart;
+    private BorrowCartEntity borrowCart;
     
     @ManyToOne
     @JoinColumn(name = "borrowitem_id", nullable = true)
-    private BorrowItem borrowItem;
+    private BorrowItemEntity borrowItemEntity;
 
     public ItemEntity() {
         super();
         // TODO Auto-generated constructor stub
     }
 
-	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart, BorrowItem borrowItem, int quantity, LocalDate expiryDate, String variant) {
+	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCartEntity borrowCart, BorrowItemEntity borrowItemEntity, int quantity, LocalDate expiryDate, String variant) {
 		super();
 		this.itemId = itemId;
 		this.itemName = itemName;
@@ -67,7 +67,7 @@ public class ItemEntity {
 		this.user = user;
 		this.status = status;
 		this.borrowCart = borrowCart;
-		this.borrowItem = borrowItem;
+		this.borrowItemEntity = borrowItemEntity;
 		this.quantity = quantity;
 		this.expiryDate = expiryDate;
 		this.variant = variant;
@@ -137,20 +137,20 @@ public class ItemEntity {
 		this.status = status;
 	}
 
-	public BorrowCart getBorrowCart() {
+	public BorrowCartEntity getBorrowCart() {
 		return borrowCart;
 	}
 
-	public void setBorrowCart(BorrowCart borrowCart) {
+	public void setBorrowCart(BorrowCartEntity borrowCart) {
 		this.borrowCart = borrowCart;
 	}
 
-	public BorrowItem getBorrowItem() {
-		return borrowItem;
+	public BorrowItemEntity getBorrowItem() {
+		return borrowItemEntity;
 	}
 
-	public void setBorrowItem(BorrowItem borrowItem) {
-		this.borrowItem = borrowItem;
+	public void setBorrowItem(BorrowItemEntity borrowItemEntity) {
+		this.borrowItemEntity = borrowItemEntity;
 	}
 
 	@JsonProperty("date_added")

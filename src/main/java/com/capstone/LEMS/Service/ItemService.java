@@ -7,20 +7,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.capstone.LEMS.Entity.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.capstone.LEMS.Entity.BorrowCart;
-import com.capstone.LEMS.Entity.BorrowItem;
-import com.capstone.LEMS.Entity.InventoryEntity;
-import com.capstone.LEMS.Entity.ItemEntity;
-import com.capstone.LEMS.Entity.UserEntity;
+import com.capstone.LEMS.Entity.BorrowItemEntity;
 import com.capstone.LEMS.Repository.BorrowCartRepository;
 import com.capstone.LEMS.Repository.BorrowItemRepository;
 import com.capstone.LEMS.Repository.InventoryRepository;
@@ -233,7 +229,7 @@ public class ItemService {
     	List<ItemEntity> itemsToBorrow = new ArrayList<>();
     	UserEntity user = userrepo.findById(userID).orElse(null);
     	int borrowCartID = (int) request.get("borrowCartID");
-        BorrowCart borrowCart = borrowcartrepo.findById(borrowCartID).orElse(null);
+        BorrowCartEntity borrowCart = borrowcartrepo.findById(borrowCartID).orElse(null);
     	
     	// Prevents borrowing of item if user is not found
     	if(user == null) {
@@ -313,13 +309,13 @@ public class ItemService {
     @Transactional
     public ResponseEntity<?> proceedToBorrowItems(String itemName, int borrowCartID, int borrowItemsID){
     	List<ItemEntity> items = itemrepo.findByItemNameAndBorrowCart_Id(itemName, borrowCartID);
-    	BorrowItem borrowItem = borrowitemrepo.findById(borrowItemsID).orElse(null);
+    	BorrowItemEntity borrowItemEntity = borrowitemrepo.findById(borrowItemsID).orElse(null);
     	
     	if (items.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("Items with name " + itemName + "or with id " +borrowCartID + " could not be found.");
-        }else if(borrowItem == null) {
+        }else if(borrowItemEntity == null) {
         	return ResponseEntity
                     .status(HttpStatus.NOT_FOUND)
                     .body("Borrow Item with id " +borrowItemsID + " could not be found.");
@@ -327,7 +323,7 @@ public class ItemService {
     	
     	items.forEach(item -> {
             item.setBorrowCart(null);
-            item.setBorrowItem(borrowItem);
+            item.setBorrowItem(borrowItemEntity);
         });
     	itemrepo.saveAll(items);
     	
