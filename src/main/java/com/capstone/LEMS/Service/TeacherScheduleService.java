@@ -36,17 +36,18 @@ public class TeacherScheduleService {
         return teacherScheduleRepository.findAll();
     }
 
-    public TeacherScheduleEntity AddTeacherSchedule(TeacherScheduleEntity teachsched, int createdby) {
-    	UserEntity user = userrepo.findById(createdby).orElse(null);
-    	
-    	teachsched.setCreatedBy(user);
-    	
-        log.info("Adding new teacher schedule");
-        // You would typically get the current user from the security context
-        // teachsched.setCreatedBy(currentUser);
+    public TeacherScheduleEntity AddTeacherSchedule(TeacherScheduleEntity teachsched, int teacherId, int createdby) {
+        // Get the teacher user entity
+        UserEntity teacher = userrepo.findById(teacherId).orElse(null);
+        teachsched.setTeacher(teacher);
+
+        // Set the created by user
+        UserEntity user = userrepo.findById(createdby).orElse(null);
+        teachsched.setCreatedBy(user);
+
+        log.info("Adding new teacher schedule for teacher ID: {}", teacherId);
         return teacherScheduleRepository.save(teachsched);
     }
-
     public ResponseEntity<?> getScheduleById(int scheduleId) {
         log.info("Fetching schedule with ID: {}", scheduleId);
         Optional<TeacherScheduleEntity> schedule = teacherScheduleRepository.findById(scheduleId);
@@ -62,7 +63,15 @@ public class TeacherScheduleService {
 
     public ResponseEntity<?> getSchedulesByTeacherId(int teacherId) {
         log.info("Fetching schedules for teacher ID: {}", teacherId);
-        List<TeacherScheduleEntity> schedules = teacherScheduleRepository.findByTeacherId(teacherId);
+        UserEntity teacher = userrepo.findById(teacherId).orElse(null);
+
+        if (teacher == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body("Teacher with ID " + teacherId + " not found");
+        }
+
+        List<TeacherScheduleEntity> schedules = teacherScheduleRepository.findByTeacher(teacher);
 
         if(schedules.isEmpty()) {
             return ResponseEntity
@@ -72,7 +81,6 @@ public class TeacherScheduleService {
 
         return ResponseEntity.ok(schedules);
     }
-
     public ResponseEntity<?> getSchedulesByLabNum(String labNum) {
         log.info("Fetching schedules for lab number: {}", labNum);
         List<TeacherScheduleEntity> schedules = teacherScheduleRepository.findByLabNum(labNum);
@@ -123,8 +131,8 @@ public class TeacherScheduleService {
                 schedule.setDate(newSchedule.getDate());
             }
 
-            if(newSchedule.getTeacherId() != 0) {
-                schedule.setTeacherId(newSchedule.getTeacherId());
+            if(newSchedule.getTeacher() != null) {
+                schedule.setTeacher(newSchedule.getTeacher());
             }
 
             if(newSchedule.getYearSection() != null && newSchedule.getYearSection().getYearId() != 0) {

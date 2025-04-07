@@ -39,8 +39,11 @@ public class TeacherScheduleEntity {
     @Column(name = "date")
     //Date default format is YYYY-MM-DD
     private Date date;
-    @Column(name = "teacher_id")
-    private int teacherId;
+//    @Column(name = "teacher_id")
+//    private int teacherId;
+@ManyToOne
+@JoinColumn(name = "teacher_id", nullable = true)
+private UserEntity teacher;
     @ManyToOne
     @JoinColumn(name = "year_id", nullable = true)
     private YearSectionEntity yearSection;
@@ -65,14 +68,14 @@ public class TeacherScheduleEntity {
    
     
     public TeacherScheduleEntity(int teacherScheduleId, Time startTime, Time endTime, String labNum, Date date,
-			int teacherId, YearSectionEntity yearSection, UserEntity createdBy, LocalDate dateCreated) {
+			UserEntity teacher, YearSectionEntity yearSection, UserEntity createdBy, LocalDate dateCreated) {
 		super();
 		this.teacherScheduleId = teacherScheduleId;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.labNum = labNum;
 		this.date = date;
-		this.teacherId = teacherId;
+		this.teacher = teacher;
 		this.yearSection = yearSection;
 		this.createdBy = createdBy;
 		this.dateCreated = dateCreated;
@@ -120,13 +123,20 @@ public class TeacherScheduleEntity {
     public void setDate(Date date) {
         this.date = date;
     }
-    @JsonProperty("teacher_id")
-    public int getTeacherId() {
-        return teacherId;
-    }
-    public void setTeacherId(int teacherId) {
-        this.teacherId = teacherId;
-    }
+//    @JsonProperty("teacher_id")
+//    public int getTeacherId() {
+//        return teacherId;
+//    }
+@JsonProperty("teacher")
+public UserEntity getTeacher() {
+    return teacher;
+}
+
+    public void setTeacher(UserEntity teacher) {
+        this.teacher = teacher;}
+//    public void setTeacherId(int teacherId) {
+//        this.teacherId = teacherId;
+//    }
     @JsonProperty("year_and_section")
     public YearSectionEntity getYearSection() {
         return yearSection;
