@@ -25,9 +25,17 @@ public class TeacherScheduleController {
     public List<TeacherScheduleEntity> getAllTeacherSchedules() {
         return tcherschedserv.getAllTeacherSchedules();
     }
+//    @PostMapping("/addtsched")
+//    public TeacherScheduleEntity AddTeacherSchedule(@RequestBody TeacherScheduleEntity teachsched, @RequestParam int createdby) {
+//        return tcherschedserv.AddTeacherSchedule(teachsched, createdby);
+//    }
+
     @PostMapping("/addtsched")
-    public TeacherScheduleEntity AddTeacherSchedule(@RequestBody TeacherScheduleEntity teachsched, @RequestParam int createdby) {
-    	return tcherschedserv.AddTeacherSchedule(teachsched, createdby);
+    public TeacherScheduleEntity AddTeacherSchedule(
+            @RequestBody TeacherScheduleEntity teachsched,
+            @RequestParam int teacherId,
+            @RequestParam int createdby) {
+        return tcherschedserv.AddTeacherSchedule(teachsched, teacherId, createdby);
     }
    @GetMapping("/teacher/{teacherId}")
    public ResponseEntity<?> getTSchedByTeacherId(@PathVariable int teacherId){
