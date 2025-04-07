@@ -13,9 +13,6 @@ public class BorrowCartEntity {
     @Column(nullable = false)
     private String instiId;
 
-    @Column(nullable = true) // Nullable since itemId is assigned only after finalization
-    private Integer itemId;
-
     @Column(nullable = false)
     private String itemName;
 
@@ -26,21 +23,11 @@ public class BorrowCartEntity {
     private int quantity;
 
     // Default constructor
-    public BorrowCartEntity() {
-    }
+    public BorrowCartEntity() {}
 
     // Constructor without itemId (for unfinalized items)
     public BorrowCartEntity(String instiId, String itemName, String categoryName, int quantity) {
         this.instiId = instiId;
-        this.itemName = itemName;
-        this.categoryName = categoryName;
-        this.quantity = quantity;
-    }
-
-    // Constructor with itemId (optional, when itemId is assigned later)
-    public BorrowCartEntity(String instiId, Integer itemId, String itemName, String categoryName, int quantity) {
-        this.instiId = instiId;
-        this.itemId = itemId;
         this.itemName = itemName;
         this.categoryName = categoryName;
         this.quantity = quantity;
@@ -61,14 +48,6 @@ public class BorrowCartEntity {
 
     public void setInstiId(String instiId) {
         this.instiId = instiId;
-    }
-
-    public Integer getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(Integer itemId) {
-        this.itemId = itemId;
     }
 
     public String getItemName() {

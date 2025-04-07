@@ -70,7 +70,7 @@ public class BorrowItemController {
             	if (teacherSchedule == null) {
                 	return ResponseEntity.badRequest().body("teacher schedule with ID: " + teacherScheduleId + " could not be found");
                 }
-            	borrowItemEntity.setTeacherSchedule(teacherSchedule);
+//            	borrowItemEntity.setTeacherSchedule(teacherSchedule);
             }
 
             return borrowItemService.addBorrowItem(borrowItemEntity);

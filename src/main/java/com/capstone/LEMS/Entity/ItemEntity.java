@@ -15,67 +15,64 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="Item")
+@Table(name = "Item")
 public class ItemEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "item_id")
-    private int itemId;
-    @Column(name = "item_name")
-    private String itemName;
-    @Column(name = "unique_id")
-    private String uniqueId;
-    @Column(name = "is_auto_uid")
-    private boolean isAutoUid;
-    private String status;
-    @Column(name = "date_added")
-    private LocalDate dateAdded;
-    private int quantity;
-    @Column(name = "expiry_date")
-    private LocalDate expiryDate;
-    @Column(nullable = false)
-    private String variant;
-    
-    @ManyToOne
-    @JoinColumn(name = "inventory_id", nullable = true)
-    private InventoryEntity inventory;
-    
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true)
-    private UserEntity user;
-    
-    @ManyToOne
-    @JoinColumn(name = "borrowcart_id", nullable = true)
-    private BorrowCartEntity borrowCart;
-    
-    @ManyToOne
-    @JoinColumn(name = "borrowitem_id", nullable = true)
-    private BorrowItemEntity borrowItemEntity;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "item_id")
+	private int itemId;
 
+	@Column(name = "item_name")
+	private String itemName;
 
-    @ManyToOne
-    @JoinColumn(name = "manufacturer_id", nullable = true)
-    private ManufacturerEntity manufacturer;
+	@Column(name = "unique_id")
+	private String uniqueId;
+
+	@Column(name = "is_auto_uid")
+	private boolean isAutoUid;
+
+	private String status;
+
+	@Column(name = "date_added")
+	private LocalDate dateAdded;
+
+	private int quantity;
+
+	@Column(name = "expiry_date")
+	private LocalDate expiryDate;
+
+	@Column(nullable = false)
+	private String variant;
 
 	@ManyToOne
-	@JoinColumn(name = "resupply_id")
+	@JoinColumn(name = "inventory_id", nullable = true)
+	private InventoryEntity inventory;
+
+	@ManyToOne
+	@JoinColumn(name = "user_id", nullable = true)
+	private UserEntity user;
+
+	@ManyToOne
+	@JoinColumn(name = "borrowcart_id", nullable = true)
+	private BorrowCartEntity borrowCart;
+
+	@ManyToOne
+	@JoinColumn(name = "BorrowItemEntity_id", nullable = true)
+	private BorrowItemEntity BorrowItemEntity;
+
+	@ManyToOne
+	@JoinColumn(name = "manufacturer_id", nullable = true)
+	private ManufacturerEntity manufacturer;
+
+	@ManyToOne
+	@JoinColumn(name = "resupply_id", nullable = true)
 	private BatchResupplyEntity batchResupply;
 
-
-    public ItemEntity() {
-        super();
-        // TODO Auto-generated constructor stub
-    }
-
-	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCartEntity borrowCart, BorrowItemEntity borrowItemEntity, int quantity, LocalDate expiryDate, String variant) {
-	public BatchResupplyEntity getBatchResupply() {
-		return batchResupply;
+	public ItemEntity() {
+		super();
 	}
 
-	public void setBatchResupply(BatchResupplyEntity batchResupply) {
-		this.batchResupply = batchResupply;
-	}
-	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCart borrowCart, BorrowItem borrowItem, int quantity, LocalDate expiryDate, String variant) {
+	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCartEntity borrowCart, BorrowItemEntity BorrowItemEntity, int quantity, LocalDate expiryDate, String variant, ManufacturerEntity manufacturer, BatchResupplyEntity batchResupply) {
 		super();
 		this.itemId = itemId;
 		this.itemName = itemName;
@@ -85,59 +82,44 @@ public class ItemEntity {
 		this.user = user;
 		this.status = status;
 		this.borrowCart = borrowCart;
-		this.borrowItemEntity = borrowItemEntity;
+		this.BorrowItemEntity = BorrowItemEntity;
 		this.quantity = quantity;
 		this.expiryDate = expiryDate;
 		this.variant = variant;
 		this.manufacturer = manufacturer;
+		this.batchResupply = batchResupply;
 	}
-	
+
 	@PrePersist
 	protected void onCreate() {
 		this.dateAdded = LocalDate.now();
 	}
 
 	@JsonProperty("item_id")
-    public int getItemId() {
-        return itemId;
-    }
-
-    public void setItemId(int itemId) {
-        this.itemId = itemId;
-    }
-
-    @JsonProperty("item_name")
-    public String getItemName() {
-        return itemName;
-    }
-
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
-    }
-
-    @JsonProperty("unique_id")
-    public String getUniqueId() {
-        return uniqueId;
-    }
-
-    public void setUniqueId(String uniqueId) {
-        this.uniqueId = uniqueId;
-    }
-    
-    public UserEntity getUser() {
-    	return user;
-    }
-    
-    public void setUser(UserEntity user) {
-    	this.user = user;
-    }
-
-	public InventoryEntity getInventory() {
-		return inventory;
+	public int getItemId() {
+		return itemId;
 	}
 
-	public void setInventory(InventoryEntity inventory) {
-		this.inventory = inventory;
+	public void setItemId(int itemId) {
+		this.itemId = itemId;
+	}
+
+	@JsonProperty("item_name")
+	public String getItemName() {
+		return itemName;
+	}
+
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	@JsonProperty("unique_id")
+	public String getUniqueId() {
+		return uniqueId;
+	}
+
+	public void setUniqueId(String uniqueId) {
+		this.uniqueId = uniqueId;
 	}
 
 	public boolean isAutoUid() {
@@ -154,22 +136,6 @@ public class ItemEntity {
 
 	public void setStatus(String status) {
 		this.status = status;
-	}
-
-	public BorrowCartEntity getBorrowCart() {
-		return borrowCart;
-	}
-
-	public void setBorrowCart(BorrowCartEntity borrowCart) {
-		this.borrowCart = borrowCart;
-	}
-
-	public BorrowItemEntity getBorrowItem() {
-		return borrowItemEntity;
-	}
-
-	public void setBorrowItem(BorrowItemEntity borrowItemEntity) {
-		this.borrowItemEntity = borrowItemEntity;
 	}
 
 	@JsonProperty("date_added")
@@ -205,6 +171,38 @@ public class ItemEntity {
 		this.variant = variant;
 	}
 
+	public InventoryEntity getInventory() {
+		return inventory;
+	}
+
+	public void setInventory(InventoryEntity inventory) {
+		this.inventory = inventory;
+	}
+
+	public UserEntity getUser() {
+		return user;
+	}
+
+	public void setUser(UserEntity user) {
+		this.user = user;
+	}
+
+	public BorrowCartEntity getBorrowCart() {
+		return borrowCart;
+	}
+
+	public void setBorrowCart(BorrowCartEntity borrowCart) {
+		this.borrowCart = borrowCart;
+	}
+
+	public BorrowItemEntity getBorrowItemEntity() {
+		return BorrowItemEntity;
+	}
+
+	public void setBorrowItemEntity(BorrowItemEntity BorrowItemEntity) {
+		this.BorrowItemEntity = BorrowItemEntity;
+	}
+
 	public ManufacturerEntity getManufacturer() {
 		return manufacturer;
 	}
@@ -213,5 +211,11 @@ public class ItemEntity {
 		this.manufacturer = manufacturer;
 	}
 
-	
+	public BatchResupplyEntity getBatchResupply() {
+		return batchResupply;
+	}
+
+	public void setBatchResupply(BatchResupplyEntity batchResupply) {
+		this.batchResupply = batchResupply;
+	}
 }

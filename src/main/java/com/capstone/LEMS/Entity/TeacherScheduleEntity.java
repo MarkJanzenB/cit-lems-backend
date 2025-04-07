@@ -53,7 +53,7 @@ public class TeacherScheduleEntity {
 
 
     @OneToOne(mappedBy = "teacherSchedule")
-	private BorrowItemEntity borrowItemEntity;
+	private BorrowItemEntity BorrowItemEntity;
 
     //Add sched_assign_id FK
     //Add subject_id FK

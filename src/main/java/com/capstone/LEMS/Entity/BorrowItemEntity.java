@@ -1,12 +1,13 @@
 package com.capstone.LEMS.Entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.util.ArrayList;
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "borrow_items")
@@ -19,10 +20,14 @@ public class BorrowItemEntity {
     private String borrowedId; // Unique Borrowed ID per transaction
 
     @ManyToOne
-    @JoinColumn(name = "uid",  nullable = false)
+    @JoinColumn(name = "uid", nullable = false)
     private UserEntity user;
 
-    private Long itemId;
+    private Long itemId; // Unique Item ID from PreparingItemEntity
+
+    @Column(name = "unique_id", nullable = false)
+    private String uniqueId; // Unique ID manually assigned by lab in-charge
+
     private String itemName;
     private String categoryName;
     private int quantity;
@@ -30,66 +35,122 @@ public class BorrowItemEntity {
 
     @Temporal(TemporalType.TIMESTAMP)
     private Date borrowedDate;
-    
-	@OneToMany(mappedBy = "borrowItem", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
-	@JsonIgnore
-	private List<ItemEntity> items = new ArrayList<>();
-	
-	@OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
-	@JoinColumn(name = "teacher_schedule_id", referencedColumnName = "teacher_schedule_id", nullable = true)
-	private TeacherScheduleEntity teacherSchedule;
+
+    @OneToOne
+    @JoinColumn(name = "teacher_schedule_id")
+    private TeacherScheduleEntity teacherSchedule;
+
+    @OneToMany(mappedBy = "BorrowItemEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
+    @JsonIgnore
+    private List<ItemEntity> items = new ArrayList<>();
+
+    // Static atomic counter for auto increment number (per month/year)
+    private static final AtomicInteger autoIncrement = new AtomicInteger(1);
 
     public BorrowItemEntity() {}
 
-    public BorrowItemEntity(String borrowedId, Long itemId, String itemName, String categoryName, int quantity, String status, Date borrowedDate, UserEntity user, TeacherScheduleEntity teacherSchedule) {
-        this.borrowedId = borrowedId;
-//        this.instiId = instiId;
+    public BorrowItemEntity(UserEntity user, Long itemId, String uniqueId, String itemName, String categoryName, int quantity, String status, Date borrowedDate) {
+        this.user = user;
         this.itemId = itemId;
+        this.uniqueId = uniqueId;
         this.itemName = itemName;
         this.categoryName = categoryName;
         this.quantity = quantity;
         this.status = status;
         this.borrowedDate = borrowedDate;
-        this.user = user;
-        this.teacherSchedule = teacherSchedule;
+        this.borrowedId = generateBorrowedId();  // Generate Borrowed ID
     }
 
-    // ✅ Getters and Setters
-    public String getBorrowedId() { return borrowedId; }
-    public void setBorrowedId(String borrowedId) { this.borrowedId = borrowedId; }
+    private String generateBorrowedId() {
+        // Get current date in MMYY format
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMyy");
+        String datePart = dateFormat.format(new Date());
 
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
+        // Generate random auto-increment number, formatted as a 3-digit number
+        String incrementPart = String.format("%03d", autoIncrement.getAndIncrement());
 
-//    public String getInstiId() { return instiId; }
-//    public void setInstiId(String instiId) { this.instiId = instiId; }
+        // Combine to form the borrowed ID
+        return "BI" + datePart + incrementPart;
+    }
 
-    public Long getItemId() { return itemId; }
-    public void setItemId(Long itemId) { this.itemId = itemId; }
+    // Getters and Setters
+    public String getBorrowedId() {
+        return borrowedId;
+    }
 
-    public String getItemName() { return itemName; }
-    public void setItemName(String itemName) { this.itemName = itemName; }
+    public void setBorrowedId(String borrowedId) {
+        this.borrowedId = borrowedId;
+    }
 
-    public String getCategoryName() { return categoryName; }
-    public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
+    public int getId() {
+        return id;
+    }
 
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setId(int id) {
+        this.id = id;
+    }
 
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public Long getItemId() {
+        return itemId;
+    }
 
-    public Date getBorrowedDate() { return borrowedDate; }
-    public void setBorrowedDate(Date borrowedDate) { this.borrowedDate = borrowedDate; }
+    public void setItemId(Long itemId) {
+        this.itemId = itemId;
+    }
 
-    public UserEntity getUser() { return user; }
-    public void setUser(UserEntity user) { this.user = user; }
+    public String getUniqueId() {
+        return uniqueId;
+    }
 
-	public TeacherScheduleEntity getTeacherSchedule() {
-		return teacherSchedule;
-	}
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
 
-	public void setTeacherSchedule(TeacherScheduleEntity teacherSchedule) {
-		this.teacherSchedule = teacherSchedule;
-	}
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
+    }
+
+    public String getCategoryName() {
+        return categoryName;
+    }
+
+    public void setCategoryName(String categoryName) {
+        this.categoryName = categoryName;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public Date getBorrowedDate() {
+        return borrowedDate;
+    }
+
+    public void setBorrowedDate(Date borrowedDate) {
+        this.borrowedDate = borrowedDate;
+    }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
 }

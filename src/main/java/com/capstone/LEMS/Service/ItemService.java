@@ -344,7 +344,7 @@ public class ItemService {
     	
     	items.forEach(item -> {
             item.setBorrowCart(null);
-            item.setBorrowItem(borrowItemEntity);
+            item.setBorrowItemEntity(borrowItemEntity);
         });
     	itemrepo.saveAll(items);
     	

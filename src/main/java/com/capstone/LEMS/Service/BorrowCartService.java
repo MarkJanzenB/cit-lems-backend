@@ -2,7 +2,10 @@
 package com.capstone.LEMS.Service;
 
 import com.capstone.LEMS.Entity.BorrowCartEntity;
+import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Entity.PreparingItemEntity;
+import com.capstone.LEMS.Repository.InventoryRepository;
+import com.capstone.LEMS.Repository.PreparingItemRepository;
 import jakarta.transaction.Transactional;
 import com.capstone.LEMS.Repository.BorrowCartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,23 +21,31 @@ public class BorrowCartService {
     @Autowired
     private BorrowCartRepository borrowCartRepository;
 
+    @Autowired
+    private PreparingItemRepository preparingItemRepository;
+
+    @Autowired
+    private InventoryRepository inventoryRepository;
+
     private static final Logger log = LoggerFactory.getLogger(BorrowCartService.class);
 
     public List<BorrowCartEntity> getAllBorrowCarts() {
         return borrowCartRepository.findAll();
     }
 
-    public BorrowCartEntity addToBorrowCart(String instiId, int itemId, String itemName, String categoryName, int quantity) {
-        BorrowCartEntity existingBorrowCart = borrowCartRepository.findByItemIdAndInstiIdStrict(itemId, instiId);
+    public BorrowCartEntity addToBorrowCart(String instiId, String itemName, String categoryName, int quantity) {
+        // Find existing borrow cart based on itemName and instiId
+        BorrowCartEntity existingBorrowCart = borrowCartRepository.findByItemNameAndInstiId(itemName, instiId);
 
         if (existingBorrowCart != null) {
             log.info("Existing borrow cart: {} ", existingBorrowCart.getInstiId());
+            // If item already exists in the borrow cart, just update the quantity
             existingBorrowCart.setQuantity(existingBorrowCart.getQuantity() + quantity);
             return borrowCartRepository.save(existingBorrowCart);
         }
 
-        // Add the item to the borrow cart WITHOUT modifying inventory
-        BorrowCartEntity borrowCart = new BorrowCartEntity(instiId, itemId, itemName, categoryName, quantity);
+        // Otherwise, create a new borrow cart entity with item details and save
+        BorrowCartEntity borrowCart = new BorrowCartEntity(instiId, itemName, categoryName, quantity);
         return borrowCartRepository.save(borrowCart);
     }
 
@@ -58,6 +69,11 @@ public class BorrowCartService {
     }
 
 
+
+
+
+
+
     @Transactional
     public void moveToPreparingItem(String instiId) {
         List<BorrowCartEntity> cartItems = borrowCartRepository.findByInstiId(instiId);
@@ -69,7 +85,6 @@ public class BorrowCartService {
         for (BorrowCartEntity cartItem : cartItems) {
             PreparingItemEntity preparingItem = new PreparingItemEntity();
             preparingItem.setInstiId(instiId);
-            preparingItem.setItemId(cartItem.getItemId());
             preparingItem.setItemName(cartItem.getItemName());
             preparingItem.setCategoryName(cartItem.getCategoryName());
             preparingItem.setQuantity(cartItem.getQuantity());
@@ -82,5 +97,4 @@ public class BorrowCartService {
         // Clear the borrow cart after moving items to preparing_item
         borrowCartRepository.deleteByInstiId(instiId);
     }
-
 }

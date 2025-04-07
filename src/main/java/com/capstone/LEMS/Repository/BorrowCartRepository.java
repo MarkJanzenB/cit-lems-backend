@@ -10,11 +10,14 @@ import java.util.List;
 
 @Repository
 public interface BorrowCartRepository extends JpaRepository<BorrowCartEntity, Integer> {
-
+    // Find all borrow carts by institution ID
     List<BorrowCartEntity> findByInstiId(String instiId);
-    BorrowCartEntity findByItemId(int itemId);
-    @Query("SELECT b FROM BorrowCartEntity b WHERE b.itemId = :itemId AND b.instiId = :instiId")
-    BorrowCartEntity findByItemIdAndInstiIdStrict(@Param("itemId") int itemId, @Param("instiId") String instiId);
+
+    // Delete all borrow carts by institution ID
     void deleteByInstiId(String instiId);
 
+    // Custom query method to find BorrowCartEntity by itemName and instiId
+    BorrowCartEntity findByItemNameAndInstiId(String itemName, String instiId);
+
+    // Optionally, you can add more methods as needed
 }

@@ -18,7 +18,7 @@ public class BatchReturnEntity {
 
     @ManyToOne
     @JoinColumn(name = "borrow_id", nullable = false)
-    private BorrowItem BorrowItem;
+    private BorrowItemEntity BorrowItemEntity;
 
     @ManyToOne
     @JoinColumn(name = "received_by", nullable = false)
@@ -26,10 +26,10 @@ public class BatchReturnEntity {
 
     public BatchReturnEntity() {}
 
-    public BatchReturnEntity(int returnId, Date dateReturned, BorrowItem BorrowItem, UserEntity receivedBy) {
+    public BatchReturnEntity(int returnId, Date dateReturned, BorrowItemEntity BorrowItemEntity, UserEntity receivedBy) {
         this.returnId = returnId;
         this.dateReturned = dateReturned;
-        this.BorrowItem = BorrowItem;
+        this.BorrowItemEntity = BorrowItemEntity;
         this.receivedBy = receivedBy;
     }
 
@@ -50,12 +50,11 @@ public class BatchReturnEntity {
         this.dateReturned = dateReturned;
     }
 
-    public BorrowItem getBorrowItem() {
-        return BorrowItem;
-    }
+//    public BorrowItemEntity getBorrowItemEntity() {return BorrowItemEntity;
+//    }
 
-    public void setBorrowItem(BorrowItem BorrowItem) {
-        this.BorrowItem = BorrowItem;
+    public void setBorrowItemEntity(BorrowItemEntity BorrowItemEntity) {
+        this.BorrowItemEntity = BorrowItemEntity;
     }
 
     public UserEntity getReceivedBy() {
