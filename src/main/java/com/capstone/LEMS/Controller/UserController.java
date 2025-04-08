@@ -75,4 +75,9 @@ public class UserController {
 	public ResponseEntity<?> updateUser(@RequestBody UserEntity newUserDetails){
 		return userserv.updateUser(newUserDetails);
 	}
+	
+	@PutMapping("/editpfp")
+	public ResponseEntity<?> editPfp(@RequestBody Map<String, Object> newPfpDetails){
+		return userserv.editPfp(newPfpDetails);
+	}
 }

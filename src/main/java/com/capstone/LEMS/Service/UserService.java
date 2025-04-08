@@ -1,6 +1,7 @@
 package com.capstone.LEMS.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -163,5 +164,23 @@ public class UserService {
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body(userrepo.save(foundUser));
+	}
+	
+	public ResponseEntity<?> editPfp(Map<String, Object> newPfpDetails){
+		String newPfp = (String) newPfpDetails.get("pfp_url");
+		int uid = (int) newPfpDetails.get("uid");
+		UserEntity user = userrepo.findById(uid).orElse(null);
+		
+		if(user == null) {
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body("user " + uid + " not found");
+		}
+		
+		user.setPfp(newPfp);
+		
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(userrepo.save(user));
 	}
 }

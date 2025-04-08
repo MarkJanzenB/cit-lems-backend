@@ -37,6 +37,7 @@ public class UserEntity {
 	private String email;
 	@Column(nullable = false, name = "is_new")
 	private boolean isNew;
+	private String pfp;
 	
 	@ManyToOne
 	@JoinColumn(name = "role_id")
@@ -59,8 +60,7 @@ public class UserEntity {
 		// TODO Auto-generated constructor stub
 	}
 
-	public UserEntity(int userId, String firstName, String lastName, String password, String instiId, String email,
-			boolean isNew, RoleEntity role) {
+	public UserEntity(int userId, String firstName, String lastName, String password, String instiId, String email, boolean isNew, RoleEntity role, String pfp) {
 		super();
 		this.userId = userId;
 		this.firstName = firstName;
@@ -70,6 +70,7 @@ public class UserEntity {
 		this.email = email;
 		this.isNew = isNew;
 		this.role = role;
+		this.pfp = pfp;
 	}
 
 	@JsonProperty("user_id")
@@ -149,5 +150,13 @@ public class UserEntity {
 
 	public void setRequests(List<RequestEntity> requests) {
 		this.requests = requests;
+	}
+
+	public String getPfp() {
+		return pfp;
+	}
+
+	public void setPfp(String pfp) {
+		this.pfp = pfp;
 	}
 }
