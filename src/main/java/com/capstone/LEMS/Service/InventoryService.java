@@ -104,4 +104,9 @@ public class InventoryService {
 					.body(id + " Does not exist");
 		}
 	}
+
+	public InventoryEntity getInventoryByName(String itemName) {
+		return inventoryRepository.findByNameIgnoreCase(itemName);
+	}
+
 }

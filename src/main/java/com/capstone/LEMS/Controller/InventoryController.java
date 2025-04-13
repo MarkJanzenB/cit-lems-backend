@@ -56,5 +56,21 @@ public class InventoryController {
     public ResponseEntity<?> updateInventory(@RequestParam int id, @RequestBody InventoryEntity inventory){
     	return inventoryService.updateInventory(id, inventory);
     }
+
+    // Add this new endpoint
+    @GetMapping("/items")
+    public ResponseEntity<List<InventoryEntity>> getAllInventoryItems() {
+        return ResponseEntity.ok(inventoryService.getAllInventory());
+    }
+
+
+    @GetMapping("/item/{itemName}")
+    public ResponseEntity<InventoryEntity> getInventoryItemByName(@PathVariable String itemName) {
+        InventoryEntity inventoryItem = inventoryService.getInventoryByName(itemName);
+        if (inventoryItem == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(inventoryItem);
+    }
     
 }

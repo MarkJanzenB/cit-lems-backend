@@ -8,7 +8,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -46,18 +48,17 @@ public class BorrowCartController {
         return ResponseEntity.ok(borrowCartService.getBorrowCartsByInsti(instiId));
     }
 
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteBorrowCart(@PathVariable int id, @RequestParam int quantity,
+    public ResponseEntity<String> deleteBorrowCart(@PathVariable int id,
                                                    @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
         if (authorizationHeader == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No Authorization header received.");
         }
 
-        System.out.println("Authorization Header: " + authorizationHeader); // Debugging step
-
         try {
             borrowCartService.deleteBorrowCart(id);
-            return ResponseEntity.ok("Item removed from borrow cart and stock restored successfully.");
+            return ResponseEntity.ok("Item removed from borrow cart successfully.");
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
         }
@@ -101,14 +102,17 @@ public class BorrowCartController {
 
     @PostMapping("/finalize/{instiId}")
     public ResponseEntity<String> finalizeBorrowCart(@PathVariable String instiId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if(authentication == null || !authentication.isAuthenticated()){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+
         try {
-            // Move items from borrow_cart to preparing_item without reducing stock
             borrowCartService.moveToPreparingItem(instiId);
             return ResponseEntity.ok("Items moved to 'preparing_item' successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error finalizing borrow cart: " + e.getMessage());
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
-
 
 }

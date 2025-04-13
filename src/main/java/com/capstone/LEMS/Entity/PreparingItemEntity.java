@@ -1,6 +1,7 @@
 package com.capstone.LEMS.Entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime; // Import LocalDateTime
 
 @Entity
 @Table(name = "preparing_item")
@@ -8,47 +9,65 @@ public class PreparingItemEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id; // Auto-generated ID (primary key)
+    private int id;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private UserEntity user;
+
+    @Column(nullable = false, length = 255) // Added length constraint
+    private String referenceCode;
+
+    @Column(name = "unique_id", length = 255) // Added length constraint
+    private String uniqueId;
+
+    @Column(nullable = false, length = 255) // Added length constraint
+    private String instiId;
+
+    @Column(nullable = false, length = 255) // Added length constraint
+    private String itemName;
+
+    @Column(nullable = false, length = 255) // Added length constraint
+    private String categoryName;
 
     @Column(nullable = false)
-    private String referenceCode;  // Reference code like PI-LA0015 (automatically generated)
+    private int quantity;
 
-    @Column(name = "unique_id", nullable = true)
-    private String uniqueId;  // Lab in charge assigns a unique ID (if applicable)
+    @Column(nullable = false, length = 255) // Added length constraint
+    private String status;
 
-    @Column(nullable = false)
-    private String instiId;  // Institution/borrower's ID (temporary reference for whom the items are being prepared)
+    @Column(name = "date_created") // Added date_created field
+    private LocalDateTime dateCreated;
 
-    @Column(nullable = false)
-    private String itemName;  // Name of the item
-
-    @Column(nullable = false)
-    private String categoryName;  // Category of the item (e.g., Electronics, Furniture)
-
-    @Column(nullable = false)
-    private int quantity;  // Number of items requested by the borrower
-
-    @Column(nullable = false)
-    private String status;  // Status of the preparation (e.g., "preparing", "finalized")
-
-    // Relationship to ItemEntity (many PreparingItemEntities can refer to one ItemEntity)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", nullable = false)  // Foreign key reference to ItemEntity
+    @JoinColumn(name = "item_id")
     private ItemEntity item;
 
-    // Constructor, Getters, and Setters
+
+    // Default constructor
     public PreparingItemEntity() {}
 
-    public PreparingItemEntity(String referenceCode, String instiId, String itemName, String categoryName, int quantity, String status, ItemEntity item) {
+    // Parameterized constructor (excluding id and uniqueId)
+    public PreparingItemEntity(String referenceCode, String instiId, String itemName, String categoryName, int quantity, String status, LocalDateTime dateCreated, ItemEntity item) {
         this.referenceCode = referenceCode;
-        this.uniqueId = null;  // Initially null, can be set later
         this.instiId = instiId;
         this.itemName = itemName;
         this.categoryName = categoryName;
         this.quantity = quantity;
         this.status = status;
-        this.item = item;  // Associate the ItemEntity with the PreparingItem
+        this.dateCreated = dateCreated;
+        this.item = item;
+
     }
+
+    public UserEntity getUser() {
+        return user;
+    }
+
+    public void setUser(UserEntity user) {
+        this.user = user;
+    }
+
 
     // Getters and setters
     public int getId() {
@@ -115,7 +134,14 @@ public class PreparingItemEntity {
         this.status = status;
     }
 
-    // Getter and setter for the associated ItemEntity
+    public LocalDateTime getDateCreated() {
+        return dateCreated;
+    }
+
+    public void setDateCreated(LocalDateTime dateCreated) {
+        this.dateCreated = dateCreated;
+    }
+
     public ItemEntity getItem() {
         return item;
     }

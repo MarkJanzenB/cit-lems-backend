@@ -3,6 +3,7 @@ package com.capstone.LEMS.Service;
 
 import com.capstone.LEMS.Entity.BorrowCartEntity;
 import com.capstone.LEMS.Entity.InventoryEntity;
+import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.PreparingItemEntity;
 import com.capstone.LEMS.Repository.InventoryRepository;
 import com.capstone.LEMS.Repository.PreparingItemRepository;
@@ -13,7 +14,10 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class BorrowCartService {
@@ -26,6 +30,10 @@ public class BorrowCartService {
 
     @Autowired
     private InventoryRepository inventoryRepository;
+
+    @Autowired
+    private PreparingItemService preparingItemService; // Autowire PreparingItemService
+
 
     private static final Logger log = LoggerFactory.getLogger(BorrowCartService.class);
 
@@ -70,31 +78,62 @@ public class BorrowCartService {
 
 
 
-
-
-
-
     @Transactional
     public void moveToPreparingItem(String instiId) {
-        List<BorrowCartEntity> cartItems = borrowCartRepository.findByInstiId(instiId);
+        log.info("Starting move to preparing items for instiId: {}", instiId);
+        System.out.println("Fetching borrow cart for instiId: " + instiId);
 
-        if (cartItems.isEmpty()) {
-            throw new RuntimeException("No items in the borrow cart to finalize.");
+        List<BorrowCartEntity> carts = borrowCartRepository.findByInstiId(instiId);
+        if (carts.isEmpty()) {
+            log.warn("No items to move for instiId: {}", instiId);
+            throw new IllegalStateException("No items to move for instiId: " + instiId);
         }
 
-        for (BorrowCartEntity cartItem : cartItems) {
+        // Generate a single reference ID for all items from the borrow cart.
+        String referenceId = "PI-" + instiId + "-" + ThreadLocalRandom.current().nextInt(1000, 10000);
+
+        for (BorrowCartEntity cartItem : carts) {
+            log.info("Processing item: {} for instiId: {}", cartItem.getItemName(), instiId);
+            System.out.println("Processing item: " + cartItem.getItemName() + " for instiId: " + instiId);
+
             PreparingItemEntity preparingItem = new PreparingItemEntity();
             preparingItem.setInstiId(instiId);
             preparingItem.setItemName(cartItem.getItemName());
             preparingItem.setCategoryName(cartItem.getCategoryName());
             preparingItem.setQuantity(cartItem.getQuantity());
-            preparingItem.setStatus("Preparing"); // Set status as "Preparing"
+            preparingItem.setStatus("Preparing");
 
-            // Save to preparing_item table
+            // Set the dateCreated field when moving from borrow cart to preparing item.
+            preparingItem.setDateCreated(LocalDateTime.now()); // Update line
+
+            InventoryEntity inventoryItem = inventoryRepository.findByNameIgnoreCase(cartItem.getItemName());
+            if (inventoryItem == null) {
+                log.error("Item not found in inventory: {}", cartItem.getItemName());
+                throw new RuntimeException("Item not found in inventory: " + cartItem.getItemName());
+            }
+
+            log.info("Inventory item: {}, Quantity: {}, Requested: {}", inventoryItem.getName(), inventoryItem.getQuantity(), cartItem.getQuantity());
+
+            if (inventoryItem.getQuantity() < cartItem.getQuantity()) {
+                log.error("Not enough stock for item: {}. Requested: {}, Available: {}", cartItem.getItemName(), cartItem.getQuantity(), inventoryItem.getQuantity());
+                throw new RuntimeException("Not enough stock available in inventory for item: " + cartItem.getItemName() + ". Requested: " + cartItem.getQuantity() + ", Available: " + inventoryItem.getQuantity());
+            }
+
+            inventoryItem.setQuantity(inventoryItem.getQuantity() - cartItem.getQuantity());
+            inventoryRepository.save(inventoryItem);
+            log.info("Inventory updated for item: {}, New Quantity: {}", inventoryItem.getName(), inventoryItem.getQuantity());
+
+            // Set the generated reference ID.
+            preparingItem.setReferenceCode(referenceId);
+
             preparingItemRepository.save(preparingItem);
+            log.info("Preparing item created with reference ID: {}", referenceId);
+
+            // Do NOT call finalizePreparingItem here.
         }
 
-        // Clear the borrow cart after moving items to preparing_item
         borrowCartRepository.deleteByInstiId(instiId);
+        log.info("Borrow cart cleared for instiId: {}", instiId);
+        log.info("Finished move to preparing items for instiId: {}", instiId);
     }
 }
