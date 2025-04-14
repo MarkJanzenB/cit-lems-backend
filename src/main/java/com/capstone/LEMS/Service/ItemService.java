@@ -92,7 +92,7 @@ public class ItemService {
     				.body("Inventory ID: " + inventoryId + " does not exists");
     	}
     	
-    	if(category.equalsIgnoreCase("Consumables")) {
+    	if(category != null && category.equalsIgnoreCase("Consumables")) {
     		ItemEntity newItem = new ItemEntity();
     		newItem.setItemName(itemName);
     		newItem.setInventory(inventory);
@@ -107,11 +107,6 @@ public class ItemService {
     		itemsToSave.add(newItem);
     		//add supply batch id soon
     	}else {
-    		if(uniqueIds != null && !uniqueIds.isEmpty() && uniqueIds.size() != bulkSize) {
-        		return ResponseEntity
-                        .status(HttpStatus.BAD_REQUEST)
-                        .body("Number of unique IDs must match bulk size.");
-        	}
     		
     		List<ItemEntity> foundItems = itemrepo.findByUniqueIdIn(uniqueIds);
         	if(!foundItems.isEmpty()) {
@@ -137,17 +132,16 @@ public class ItemService {
         		if(manufacturer != null) {
         			newItem.setManufacturer(manufacturer);
         		}
-
-        		if(uniqueIds == null || uniqueIds.isEmpty()) {
-            		String prefix = itemName.substring(0, 2).toUpperCase()
+        		if(i <= uniqueIds.size()) {
+        			newItem.setUniqueId(uniqueIds.get(i - 1));
+        		}else {
+        			String prefix = itemName.substring(0, 2).toUpperCase()
             				+ itemName.substring(itemName.length() - 1).toUpperCase();
             		int nextNumber = idcountserv.getNextId() + i;
             		String uniqueId = prefix + String.format("%04d", nextNumber);
             		newItem.setUniqueId(uniqueId);
             		newItem.setAutoUid(true);
-            	}else {
-            		newItem.setUniqueId(uniqueIds.get(i - 1));
-            	}
+        		}
         		
         		itemsToSave.add(newItem);
         	}
