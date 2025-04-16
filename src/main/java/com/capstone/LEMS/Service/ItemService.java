@@ -54,7 +54,6 @@ public class ItemService {
     @Autowired
     ManufacturerRepository mrepo;
 
-    //Transactional is used when something goes wrong in this method, the items would not be added
     @SuppressWarnings("unchecked")
 	@Transactional
     public ResponseEntity<?> AddItem(Map<String, Object> itemsToAdd, int bulkSize) {

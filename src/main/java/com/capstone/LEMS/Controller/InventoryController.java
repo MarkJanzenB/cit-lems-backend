@@ -33,8 +33,8 @@ public class InventoryController {
     }
     
     @PostMapping("/addinventory")
-    public ResponseEntity<?> addInventory(@RequestBody InventoryEntity inventory) {
-    	return inventoryService.addInventory(inventory);
+    public ResponseEntity<?> addInventory(@RequestBody List<InventoryEntity> inventoryArray) {
+    	return inventoryService.addInventory(inventoryArray);
     }
     
     @GetMapping("/getinventorybycategory")

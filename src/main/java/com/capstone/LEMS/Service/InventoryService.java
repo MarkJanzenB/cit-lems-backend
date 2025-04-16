@@ -10,6 +10,9 @@ import com.capstone.LEMS.Entity.ItemCategoryEntity;
 import com.capstone.LEMS.Repository.InventoryRepository;
 import com.capstone.LEMS.Repository.ItemCategoryRepository;
 
+import jakarta.transaction.Transactional;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 @Service
@@ -24,20 +27,25 @@ public class InventoryService {
 		return inventoryRepository.findAll();
 	}
 
-	public ResponseEntity<?> addInventory(InventoryEntity inventory) {
-		InventoryEntity inventoryfromdb = inventoryRepository.findByNameIgnoreCase(inventory.getName());
-		ItemCategoryEntity itemCategory = icrepo.findById(inventory.getItemCategory().getCategoryId()).orElse(null);
-
-		if (inventoryfromdb != null) {
-			return ResponseEntity
-					.status(HttpStatus.CONFLICT) // 409
-					.body(inventory.getName() + " Inventory already exists");
+	@Transactional
+	public ResponseEntity<?> addInventory(List<InventoryEntity> inventoryArray) {
+		List<InventoryEntity> inventoryToAdd = new ArrayList<>();
+		for(InventoryEntity inventory: inventoryArray) {
+			InventoryEntity inventoryfromdb = inventoryRepository.findByNameIgnoreCase(inventory.getName());
+			ItemCategoryEntity itemCategory = icrepo.findById(inventory.getItemCategory().getCategoryId()).orElse(null);
+			
+			if (inventoryfromdb != null) {
+				return ResponseEntity
+						.status(HttpStatus.CONFLICT) // 409
+						.body(inventory.getName() + " Inventory already exists");
+			}
+			inventory.setItemCategory(itemCategory);
+			
+			inventoryToAdd.add(inventory);
 		}
-
-		inventory.setItemCategory(itemCategory);
 		return ResponseEntity
 				.status(HttpStatus.CREATED) //201
-				.body(inventoryRepository.save(inventory));
+				.body(inventoryRepository.saveAll(inventoryToAdd));
 	}
 
 	public List<InventoryEntity> getInventoryByCategory(int category_id) {
