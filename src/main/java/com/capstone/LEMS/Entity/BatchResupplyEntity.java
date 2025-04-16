@@ -1,5 +1,6 @@
 package com.capstone.LEMS.Entity;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,7 +24,7 @@ public class BatchResupplyEntity {
     private int resupplyId;
 
     @Column(name = "date_resupply")
-    private Date dateResupply;
+    private LocalDate dateResupply;
 
     @ManyToOne
     @JoinColumn(name = "added_by", nullable = false)
@@ -36,7 +37,7 @@ public class BatchResupplyEntity {
         super();
     }
 
-    public BatchResupplyEntity(int resupplyId, Date dateResupply, UserEntity addedBy, List<ItemEntity> items) {
+    public BatchResupplyEntity(int resupplyId, LocalDate dateResupply, UserEntity addedBy, List<ItemEntity> items) {
         super();
         this.resupplyId = resupplyId;
         this.dateResupply = dateResupply;
@@ -54,11 +55,11 @@ public class BatchResupplyEntity {
     }
 
     @JsonProperty("date_resupply")
-    public Date getDateResupply() {
+    public LocalDate getDateResupply() {
         return dateResupply;
     }
 
-    public void setDateResupply(Date dateResupply) {
+    public void setDateResupply(LocalDate dateResupply) {
         this.dateResupply = dateResupply;
     }
 
