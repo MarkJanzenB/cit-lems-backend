@@ -1,8 +1,9 @@
 package com.capstone.LEMS.Entity;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -30,6 +31,7 @@ public class BatchResupplyEntity {
     @JoinColumn(name = "added_by", nullable = false)
     private UserEntity addedBy;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "batchResupply", cascade = CascadeType.ALL)
     private List<ItemEntity> items;
 
@@ -37,12 +39,11 @@ public class BatchResupplyEntity {
         super();
     }
 
-    public BatchResupplyEntity(int resupplyId, LocalDate dateResupply, UserEntity addedBy, List<ItemEntity> items) {
+    public BatchResupplyEntity(int resupplyId, LocalDate dateResupply, UserEntity addedBy) {
         super();
         this.resupplyId = resupplyId;
         this.dateResupply = dateResupply;
         this.addedBy = addedBy;
-        this.items = items;
     }
 
     @JsonProperty("resupply_id")
@@ -70,14 +71,5 @@ public class BatchResupplyEntity {
 
     public void setAddedBy(UserEntity addedBy) {
         this.addedBy = addedBy;
-    }
-
-    @JsonProperty("items")
-    public List<ItemEntity> getItems() {
-        return items;
-    }
-
-    public void setItems(List<ItemEntity> items) {
-        this.items = items;
     }
 }

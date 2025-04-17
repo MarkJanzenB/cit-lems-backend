@@ -1,5 +1,6 @@
 package com.capstone.LEMS.Controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -64,5 +65,10 @@ public class ItemController {
     @PutMapping("/proceedtoborrow/{itemName}/{borrowCartID}/{borrowItemsID}")
     public ResponseEntity<?> proceedToBorrowItem(@PathVariable String itemName, @PathVariable int borrowCartID, @PathVariable int borrowItemsID){
     	return itemserv.proceedToBorrowItems(itemName, borrowCartID, borrowItemsID);
+    }
+    
+    @GetMapping("/resupplyhistory")
+    public ResponseEntity<?> getResupplyHistory(@RequestParam LocalDate dateResupply, @RequestParam int uid){
+    	return itemserv.getResupplyHistory(dateResupply, uid);
     }
 }

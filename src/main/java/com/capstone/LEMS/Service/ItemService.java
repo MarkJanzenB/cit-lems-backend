@@ -22,7 +22,7 @@ import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.ManufacturerEntity;
 import com.capstone.LEMS.Entity.UserEntity;
-import com.capstone.LEMS.Entity.BorrowItemEntity;
+import com.capstone.LEMS.Repository.BatchResupplyRepository;
 import com.capstone.LEMS.Repository.BorrowCartRepository;
 import com.capstone.LEMS.Repository.BorrowItemRepository;
 import com.capstone.LEMS.Repository.InventoryRepository;
@@ -53,6 +53,9 @@ public class ItemService {
 
     @Autowired
     ManufacturerRepository mrepo;
+    
+    @Autowired
+    BatchResupplyRepository brrepo;
 
     @SuppressWarnings("unchecked")
 	@Transactional
@@ -344,5 +347,20 @@ public class ItemService {
     	return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(items);
+    }
+    
+    public ResponseEntity<?> getResupplyHistory(LocalDate resupplyDate, int uid){
+    	UserEntity user = userrepo.findById(uid).orElse(null);
+    	List<BatchResupplyEntity> batches = brrepo.findByDateResupplyAndAddedBy(resupplyDate, user);
+    	List<ItemEntity> itemToSend = new ArrayList<>();
+    	
+    	for(int i = 0; i < batches.size(); i++) {
+    		List<ItemEntity> items = itemrepo.findByBatchResupply(batches.get(i));
+    		itemToSend.addAll(items);
+    	}
+    	
+    	return ResponseEntity
+    			.status(HttpStatus.OK)
+    			.body(itemToSend);
     }
 }
