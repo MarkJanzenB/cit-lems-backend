@@ -56,8 +56,11 @@ public class ItemService {
     
     @Autowired
     BatchResupplyRepository brrepo;
+    
+    @Autowired
+    BatchResupplyService brserv;
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "null" })
 	@Transactional
     public ResponseEntity<?> AddItem(Map<String, Object> itemsToAdd, int bulkSize) {
     	String itemName = (String) itemsToAdd.get("item_name");
@@ -71,6 +74,16 @@ public class ItemService {
     	String variant = (String) itemsToAdd.get("variant");
     	Integer manufacturerId = (Integer) itemsToAdd.get("manufacturer_id");
     	ManufacturerEntity manufacturer = null;
+    	UserEntity user = userrepo.findById((int) itemsToAdd.get("uid")).orElse(null);
+    	
+    	BatchResupplyEntity batchResupply = new BatchResupplyEntity();
+    	
+    	batchResupply.setDateResupply(LocalDate.now());
+    	batchResupply.setAddedBy(user);
+    	
+    	batchResupply = brserv.addBatchResupply(batchResupply);
+    	
+    	
     	if(manufacturerId != null) {
     		manufacturer = mrepo.findById(manufacturerId).orElse(null);
     	}
@@ -103,6 +116,7 @@ public class ItemService {
     		newItem.setQuantity(quantity);
     		newItem.setExpiryDate(expiryDate);
     		newItem.setVariant(variant);
+    		newItem.setBatchResupply(batchResupply);
     		if(manufacturer != null) {
     			newItem.setManufacturer(manufacturer);
     		}
@@ -131,6 +145,7 @@ public class ItemService {
         		newItem.setStatus("Available");
         		newItem.setVariant(variant);
         		newItem.setQuantity(1);
+        		newItem.setBatchResupply(batchResupply);
         		if(manufacturer != null) {
         			newItem.setManufacturer(manufacturer);
         		}
@@ -359,8 +374,34 @@ public class ItemService {
     		itemToSend.addAll(items);
     	}
     	
+    	Map<String, List<ItemEntity>> groupedItems = itemToSend.stream()
+    			.collect(Collectors.groupingBy(ItemEntity::getItemName));
+    	
+    	List<Map<String, Object>> response = new ArrayList<>();
+    	int index = 1;
+    	for(Map.Entry<String, List<ItemEntity>> entry : groupedItems.entrySet()) {
+    		String itemName = entry.getKey();
+    		List<ItemEntity> itemList = entry.getValue();
+    		
+    		Map<String, Object> itemSummary = new HashMap<>();
+    		itemSummary.put("id", index++);
+    		itemSummary.put("name", itemName);
+    		itemSummary.put("quantity", itemList.size());
+    		
+    		List<Map<String, Object>> variants = itemList.stream().map(item -> {
+    			Map<String, Object> variant = new HashMap<>();
+    			variant.put("id", item.getItemId());
+    			variant.put("name", item.getItemName());
+    			variant.put("serialNumber", item.getUniqueId());
+    			return variant;
+    		}).collect(Collectors.toList());
+    		
+    		itemSummary.put("variants", variants);
+    		response.add(itemSummary);
+    	}
+    	
     	return ResponseEntity
     			.status(HttpStatus.OK)
-    			.body(itemToSend);
+    			.body(response);
     }
 }
