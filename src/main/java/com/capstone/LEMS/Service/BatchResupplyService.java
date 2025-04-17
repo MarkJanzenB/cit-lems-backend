@@ -38,4 +38,10 @@ public class BatchResupplyService {
     			.status(HttpStatus.OK)
     			.body(batchResupplyRepository.findByDateResupplyAndAddedBy(dateResupply, user));
     }
+    
+    public ResponseEntity<?> getAllDisctinct(){
+    	return ResponseEntity
+    			.status(HttpStatus.OK)
+    			.body(batchResupplyRepository.findDistinctByDateResupplyAndAddedBy());
+    }
 }

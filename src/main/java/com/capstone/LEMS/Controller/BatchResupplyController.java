@@ -31,4 +31,9 @@ public class BatchResupplyController {
     public ResponseEntity<?> getByLocalDateAndAddedBy(@RequestParam LocalDate dateResupply, @RequestParam int userID){
     	return batchResupplyService.getByLocalDateAndAddedBy(dateResupply, userID);
     }
+    
+    @GetMapping("/getalldistinct")
+    public ResponseEntity<?> getAllDisctinct(){
+    	return batchResupplyService.getAllDisctinct();
+    }
 }
