@@ -124,6 +124,14 @@ public class PreparingItemService {
                 .collect(Collectors.toList());
     }
 
+    // ✅ NEW SERVICE METHOD TO FETCH UNIQUE IDs BY ITEM NAME
+    public List<String> getUniqueItemIdsByItemName(String itemName) {
+        return itemRepository.findByItemName(itemName).stream()
+                .map(ItemEntity::getUniqueId)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
 
 
     // Create a new preparing item

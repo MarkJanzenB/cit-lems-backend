@@ -62,4 +62,11 @@ public class PreparingItemController {
         return preparingItemService.getAllUniqueItemIds();
     }
 
+
+    // ✅ NEW ENDPOINT TO FETCH UNIQUE IDs BY ITEM NAME
+    @GetMapping("/unique-ids/{itemName}")
+    public List<String> getUniqueItemIdsByItemName(@PathVariable String itemName) {
+        return preparingItemService.getUniqueItemIdsByItemName(itemName);
+    }
+
 }
