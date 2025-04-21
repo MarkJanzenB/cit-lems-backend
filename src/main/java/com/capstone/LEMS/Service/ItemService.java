@@ -404,4 +404,23 @@ public class ItemService {
     			.status(HttpStatus.OK)
     			.body(response);
     }
+
+    public ResponseEntity<?> getListOfUniqueIDs(String itemName, String category){
+    	
+    	/*
+    	 * Get the items by their item name,
+    	 * Only Extract the unique IDs to a List if the unique ID
+    	 * is not auto generated
+    	 * */
+    	List<ItemEntity> items = itemrepo.findByItemName(itemName);
+    	List<String> uniqueIds = items.stream()
+    									.filter(item -> !item.isAutoUid())
+    									.map(ItemEntity::getUniqueId)
+    									.collect(Collectors.toList());
+    	
+    	return ResponseEntity
+    			.status(HttpStatus.OK)
+    			.body(uniqueIds);
+    }
+
 }

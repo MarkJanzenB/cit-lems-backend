@@ -71,4 +71,9 @@ public class ItemController {
     public ResponseEntity<?> getResupplyHistory(@RequestParam LocalDate dateResupply, @RequestParam int uid){
     	return itemserv.getResupplyHistory(dateResupply, uid);
     }
+    
+    @GetMapping("/getuniqueids")
+    public ResponseEntity<?> getListOfUniqueIDs(@RequestParam String itemName, @RequestParam(required = false) String category){
+    	return itemserv.getListOfUniqueIDs(itemName, category);
+    }
 }
