@@ -408,21 +408,25 @@ public class ItemService {
     public ResponseEntity<?> getListOfUniqueIDs(String itemName, String category){
     	/*
     	 * Get the items by their item name
+    	 * Only get the items that are available
     	 * */
     	List<ItemEntity> items = itemrepo.findByItemName(itemName);
+    	List<ItemEntity> availableItems = items.stream()
+    			.filter(item -> "Available".equals(item.getStatus()))
+    			.collect(Collectors.toList());
     	/*
 		 * For consumables only return the whole entity
 		 * */
     	if(category != null && !category.isBlank() && !category.isEmpty() && category.equalsIgnoreCase("Consumables")) {
     		return ResponseEntity
         			.status(HttpStatus.OK)
-        			.body(items);
+        			.body(availableItems);
     	}else {
     		/*
     		 * Only Extract the unique IDs to a List if the unique ID
     		 * is not auto generated
     		 * */
-    		List<String> uniqueIds = items.stream()
+    		List<String> uniqueIds = availableItems.stream()
 					.filter(item -> !item.isAutoUid())
 					.map(ItemEntity::getUniqueId)
 					.collect(Collectors.toList());
