@@ -1,7 +1,6 @@
 package com.capstone.LEMS.Service;
 
 import com.capstone.LEMS.Entity.PreparingItemEntity;
-import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Repository.PreparingItemRepository;
@@ -87,17 +86,6 @@ public class PreparingItemService {
     		String itemName = prepItem.getItemName();
     		prepItem.setStatus("Borrowed");
     		preparingItemRepository.save(prepItem);
-    		
-    		/*
-    		 * Reduces the quantity in inventory
-    		 * */
-    		InventoryEntity inventory = invrepo.findByNameIgnoreCase(itemName);
-			int currentQty = inventory.getQuantity();
-			if(currentQty < quantity) {
-				throw new RuntimeException("Not enough inventory for item: " + itemName);
-			}
-			inventory.setQuantity(currentQty - quantity);
-			invrepo.save(inventory);
 			
     		if(categoryName == null || !categoryName.equalsIgnoreCase("Consumables")) {
     			/*
