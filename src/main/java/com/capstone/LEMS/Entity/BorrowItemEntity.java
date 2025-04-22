@@ -23,14 +23,21 @@ public class BorrowItemEntity {
     @JoinColumn(name = "uid", nullable = false)
     private UserEntity user;
 
+    /*
+     * itemId & uniqueId Currently not being used
+     * Delete if it has no purpose
+     * */
     private Long itemId; // Unique Item ID from PreparingItemEntity
-
-    @Column(name = "unique_id", nullable = false)
+    @Column(name = "unique_id", nullable = true)
     private String uniqueId; // Unique ID manually assigned by lab in-charge
 
     private String itemName;
     private String categoryName;
     private int quantity;
+    
+    /*
+     * 
+     * */
     private String status;
 
     @Temporal(TemporalType.TIMESTAMP)

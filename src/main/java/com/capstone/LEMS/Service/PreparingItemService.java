@@ -10,9 +10,13 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -72,10 +76,6 @@ public class PreparingItemService {
         if (optionalItem.isPresent()) {
             PreparingItemEntity preparingItem = optionalItem.get();
 
-            // Set dateCreated here, outside the if (item != null) block
-            logger.info("Setting dateCreated: {}", LocalDateTime.now());
-            preparingItem.setDateCreated(LocalDateTime.now());
-
             ItemEntity item = preparingItem.getItem();
 
             if (item != null) {
@@ -100,6 +100,10 @@ public class PreparingItemService {
     }
 
     // Checkout preparing item and mark it as Borrowed
+    /*
+     * Front end is using proceedToCheckOut for checking out
+     * Please Ignore this method unless needed
+     * */
     public void checkoutPreparingItem(int id) {
         Optional<PreparingItemEntity> optionalItem = preparingItemRepository.findById(id);
         if (optionalItem.isPresent()) {
@@ -151,6 +155,62 @@ public class PreparingItemService {
 
     public List<PreparingItemEntity> getAllPreparingItems() {
         return preparingItemRepository.findAll();
+    }
+    
+    @Transactional
+    public void proceedToCheckOut(Map<Integer, Integer> itemQuantities, Map<Integer, Map<String, String>> uniqueIdsMap){
+
+    	/*
+    	 * Loop through all the PreparingItem record
+    	 * based on its ID gathered from the key in itemQuantities
+    	 * */
+    	for(Map.Entry<Integer, Integer> entry: itemQuantities.entrySet()) {
+    		Integer prepItemId = entry.getKey(); 
+    		int quantity = entry.getValue(); 
+    		PreparingItemEntity prepItem = preparingItemRepository.findById(prepItemId).orElseThrow();
+    		UserEntity user = prepItem.getUser(); 
+    		prepItem.setStatus("Borrowed");
+    		preparingItemRepository.save(prepItem);
+    		
+    		
+    		/*
+    		 * Finds the item base on unique id
+    		 * and if the status is available
+    		 * */
+    		String itemName = prepItem.getItemName();
+    		Map<String, String> uniqueIdMap = uniqueIdsMap.get(prepItemId);
+    		int handled = 0;
+    		if(uniqueIdMap != null) {
+    			for(String key: uniqueIdMap.keySet()) {
+    				String uid = uniqueIdMap.get(key);
+    				if (uid != null && !uid.isEmpty()) {
+    					ItemEntity item = itemRepository.findByUniqueId(uid);
+    					if(item != null && item.getStatus().equals("Available")) {
+    						item.setStatus("Borrowed");
+    						item.setUser(user);
+    						itemRepository.save(item);
+    						handled++;
+    					}
+    				}
+    			}
+    		}
+    		
+    		/*
+    		 * Finds the item with a auto generated unique id
+    		 * this will run if the number of quantity is greater than the
+    		 * number of unique ids
+    		 * */
+    		int remaining = quantity - handled;
+    		if(remaining > 0) {
+    			List<ItemEntity> autoItems = itemRepository.findByItemNameAndIsAutoUidTrueAndStatus(
+    					itemName, "Available", PageRequest.of(0, remaining));
+    			for(ItemEntity item: autoItems) {
+    				item.setStatus("Borrowed");
+    				item.setUser(user);
+    				itemRepository.save(item);
+    			}
+    		}
+    	}
     }
 
 }

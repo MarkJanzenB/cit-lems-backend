@@ -1,5 +1,6 @@
 package com.capstone.LEMS.Controller;
 
+import com.capstone.LEMS.DTO.CheckoutRequestDTO;
 import com.capstone.LEMS.Entity.PreparingItemEntity;
 import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Service.PreparingItemService;
@@ -69,4 +70,9 @@ public class PreparingItemController {
         return preparingItemService.getUniqueItemIdsByItemName(itemName);
     }
 
+    @PutMapping("/proceedtocheckout")
+    public void proceedToCheckOut(@RequestBody CheckoutRequestDTO checkoutRequest) {
+    	preparingItemService.proceedToCheckOut(checkoutRequest.getItemQuantities(), checkoutRequest.getUniqueIdsMap());
+    }
+    
 }

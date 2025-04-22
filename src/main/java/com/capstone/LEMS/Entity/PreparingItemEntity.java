@@ -1,6 +1,8 @@
 package com.capstone.LEMS.Entity;
 
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime; // Import LocalDateTime
 
 @Entity
@@ -37,7 +39,7 @@ public class PreparingItemEntity {
     private String status;
 
     @Column(name = "date_created") // Added date_created field
-    private LocalDateTime dateCreated;
+    private LocalDate dateCreated;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id")
@@ -48,7 +50,7 @@ public class PreparingItemEntity {
     public PreparingItemEntity() {}
 
     // Parameterized constructor (excluding id and uniqueId)
-    public PreparingItemEntity(String referenceCode, String instiId, String itemName, String categoryName, int quantity, String status, LocalDateTime dateCreated, ItemEntity item) {
+    public PreparingItemEntity(String referenceCode, String instiId, String itemName, String categoryName, int quantity, String status, LocalDate dateCreated, ItemEntity item) {
         this.referenceCode = referenceCode;
         this.instiId = instiId;
         this.itemName = itemName;
@@ -134,11 +136,11 @@ public class PreparingItemEntity {
         this.status = status;
     }
 
-    public LocalDateTime getDateCreated() {
+    public LocalDate getDateCreated() {
         return dateCreated;
     }
 
-    public void setDateCreated(LocalDateTime dateCreated) {
+    public void setDateCreated(LocalDate dateCreated) {
         this.dateCreated = dateCreated;
     }
 

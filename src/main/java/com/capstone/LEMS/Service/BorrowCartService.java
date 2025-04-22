@@ -5,8 +5,11 @@ import com.capstone.LEMS.Entity.BorrowCartEntity;
 import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.PreparingItemEntity;
+import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Repository.InventoryRepository;
 import com.capstone.LEMS.Repository.PreparingItemRepository;
+import com.capstone.LEMS.Repository.UserRepository;
+
 import jakarta.transaction.Transactional;
 import com.capstone.LEMS.Repository.BorrowCartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +17,7 @@ import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
@@ -33,6 +36,9 @@ public class BorrowCartService {
 
     @Autowired
     private PreparingItemService preparingItemService; // Autowire PreparingItemService
+    
+    @Autowired
+    UserRepository userrepo;
 
 
     private static final Logger log = LoggerFactory.getLogger(BorrowCartService.class);
@@ -95,6 +101,8 @@ public class BorrowCartService {
         for (BorrowCartEntity cartItem : carts) {
             log.info("Processing item: {} for instiId: {}", cartItem.getItemName(), instiId);
             System.out.println("Processing item: " + cartItem.getItemName() + " for instiId: " + instiId);
+            
+            UserEntity user = userrepo.findByInstiId(instiId);
 
             PreparingItemEntity preparingItem = new PreparingItemEntity();
             preparingItem.setInstiId(instiId);
@@ -102,9 +110,8 @@ public class BorrowCartService {
             preparingItem.setCategoryName(cartItem.getCategoryName());
             preparingItem.setQuantity(cartItem.getQuantity());
             preparingItem.setStatus("Preparing");
-
-            // Set the dateCreated field when moving from borrow cart to preparing item.
-            preparingItem.setDateCreated(LocalDateTime.now()); // Update line
+            preparingItem.setUser(user);
+            preparingItem.setDateCreated(LocalDate.now());
 
             InventoryEntity inventoryItem = inventoryRepository.findByNameIgnoreCase(cartItem.getItemName());
             if (inventoryItem == null) {
