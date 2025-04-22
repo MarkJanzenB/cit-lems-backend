@@ -3,7 +3,6 @@ package com.capstone.LEMS.Entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime; // Import LocalDateTime
 
 @Entity
 @Table(name = "preparing_item")
@@ -17,40 +16,18 @@ public class PreparingItemEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
-    @Column(nullable = false, length = 255) // Added length constraint
     private String referenceCode;
-
-    @Column(name = "unique_id", length = 255) // Added length constraint
-    private String uniqueId;
-
-    @Column(nullable = false, length = 255) // Added length constraint
     private String instiId;
-
-    @Column(nullable = false, length = 255) // Added length constraint
     private String itemName;
-
-    @Column(nullable = false, length = 255) // Added length constraint
     private String categoryName;
-
-    @Column(nullable = false)
     private int quantity;
-
-    @Column(nullable = false, length = 255) // Added length constraint
     private String status;
-
-    @Column(name = "date_created") // Added date_created field
+    @Column(name = "date_created")
     private LocalDate dateCreated;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id")
-    private ItemEntity item;
-
-
-    // Default constructor
     public PreparingItemEntity() {}
 
-    // Parameterized constructor (excluding id and uniqueId)
-    public PreparingItemEntity(String referenceCode, String instiId, String itemName, String categoryName, int quantity, String status, LocalDate dateCreated, ItemEntity item) {
+    public PreparingItemEntity(String referenceCode, String instiId, String itemName, String categoryName, int quantity, String status, LocalDate dateCreated) {
         this.referenceCode = referenceCode;
         this.instiId = instiId;
         this.itemName = itemName;
@@ -58,7 +35,6 @@ public class PreparingItemEntity {
         this.quantity = quantity;
         this.status = status;
         this.dateCreated = dateCreated;
-        this.item = item;
 
     }
 
@@ -70,8 +46,6 @@ public class PreparingItemEntity {
         this.user = user;
     }
 
-
-    // Getters and setters
     public int getId() {
         return id;
     }
@@ -86,14 +60,6 @@ public class PreparingItemEntity {
 
     public void setReferenceCode(String referenceCode) {
         this.referenceCode = referenceCode;
-    }
-
-    public String getUniqueId() {
-        return uniqueId;
-    }
-
-    public void setUniqueId(String uniqueId) {
-        this.uniqueId = uniqueId;
     }
 
     public String getInstiId() {
@@ -142,13 +108,5 @@ public class PreparingItemEntity {
 
     public void setDateCreated(LocalDate dateCreated) {
         this.dateCreated = dateCreated;
-    }
-
-    public ItemEntity getItem() {
-        return item;
-    }
-
-    public void setItem(ItemEntity item) {
-        this.item = item;
     }
 }

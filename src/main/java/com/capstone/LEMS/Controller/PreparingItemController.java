@@ -2,7 +2,6 @@ package com.capstone.LEMS.Controller;
 
 import com.capstone.LEMS.DTO.CheckoutRequestDTO;
 import com.capstone.LEMS.Entity.PreparingItemEntity;
-import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Service.PreparingItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,9 @@ public class PreparingItemController {
     @Autowired
     private PreparingItemService preparingItemService;
 
-    // ✅ ADD THIS: To accept item from borrow cart and move to preparing_item table
+    /*
+     *REFACTOR: params is too long and looks unclean, use DTO instead.
+     * */
     @PostMapping("/addToPreparingItem")
     public PreparingItemEntity addToPreparingItem(
             @RequestParam String uid,
@@ -28,34 +29,24 @@ public class PreparingItemController {
         return preparingItemService.addToPreparingItem(uid, itemName, categoryName, quantity, status);
     }
 
-    // Finalize preparing item and validate unique_id
-    @PutMapping("/finalize/{id}")
-    public void finalizePreparingItem(@PathVariable int id, @RequestParam String uniqueId) {
-        preparingItemService.finalizePreparingItem(id, uniqueId);
-    }
-
-    // Checkout preparing item and mark it as Borrowed
-    @PutMapping("/checkout/{id}")
-    public void checkoutPreparingItem(@PathVariable int id) {
-        preparingItemService.checkoutPreparingItem(id);
-    }
-
+    /*
+     * REFACTOR: change naming convention for the url
+     * currently its misleading
+     * */
     // Fetch preparing items by institution UID
     @GetMapping("/uid/{uid}")
     public List<PreparingItemEntity> getPreparingItemsByUid(@PathVariable String uid) {
         return preparingItemService.getPreparingItemsByUid(uid);
     }
 
+    /*
+     * REFACTOR: change naming convention for the url
+     * currently its misleading
+     * */
     // Fetch all preparing items
     @GetMapping("/all")
     public List<PreparingItemEntity> getAllPreparingItems() {
         return preparingItemService.getAllPreparingItems();
-    }
-
-    // ✅ NEW ENDPOINT TO FETCH UNIQUE IDs BY ITEM NAME
-    @GetMapping("/unique-ids/{itemName}")
-    public List<String> getUniqueItemIdsByItemName(@PathVariable String itemName) {
-        return preparingItemService.getUniqueItemIdsByItemName(itemName);
     }
 
     @PutMapping("/proceedtocheckout")
