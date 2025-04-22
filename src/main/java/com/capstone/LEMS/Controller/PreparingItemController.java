@@ -52,18 +52,6 @@ public class PreparingItemController {
         return preparingItemService.getAllPreparingItems();
     }
 
-    // Fetch preparing items with teacher name by institution ID
-    @GetMapping("/with-teacher/{instiId}")
-    public List<Object[]> getPreparingItemsWithTeacherName(@PathVariable String instiId) {
-        return preparingItemService.getPreparingItemsWithTeacherName(instiId);
-    }
-
-    @GetMapping("/unique-ids")
-    public List<String> getUniqueItemIds() {
-        return preparingItemService.getAllUniqueItemIds();
-    }
-
-
     // ✅ NEW ENDPOINT TO FETCH UNIQUE IDs BY ITEM NAME
     @GetMapping("/unique-ids/{itemName}")
     public List<String> getUniqueItemIdsByItemName(@PathVariable String itemName) {

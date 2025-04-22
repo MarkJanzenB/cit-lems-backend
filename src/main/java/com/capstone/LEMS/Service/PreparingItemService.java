@@ -59,18 +59,6 @@ public class PreparingItemService {
         return preparingItemRepository.save(item);
     }
 
-
-
-    // Fetch preparing items along with the teacher's name based on instiId
-    public List<Object[]> getPreparingItemsWithTeacherName(String instiId) {
-        return preparingItemRepository.findPreparingItemsWithTeacherName(instiId);
-    }
-
-    // Fetch all preparing items by institution ID (removes duplicate method)
-    public List<PreparingItemEntity> getPreparingItemsByInstiId(String instiId) {
-        return preparingItemRepository.findByInstiId(instiId);
-    }
-
     // Finalize preparing item and validate unique_id
     @Transactional
     public void finalizePreparingItem(int id, String uniqueId) {
@@ -123,14 +111,7 @@ public class PreparingItemService {
         }
     }
 
-    public List<String> getAllUniqueItemIds() {
-        return itemRepository.findAll().stream()
-                .map(ItemEntity::getUniqueId)
-                .distinct()
-                .collect(Collectors.toList());
-    }
 
-    // ✅ NEW SERVICE METHOD TO FETCH UNIQUE IDs BY ITEM NAME
     public List<String> getUniqueItemIdsByItemName(String itemName) {
         return itemRepository.findByItemName(itemName).stream()
                 .map(ItemEntity::getUniqueId)
@@ -138,25 +119,21 @@ public class PreparingItemService {
                 .collect(Collectors.toList());
     }
 
-
-
-    // Create a new preparing item
     public PreparingItemEntity createPreparingItem(PreparingItemEntity preparingItemEntity) {
         return preparingItemRepository.save(preparingItemEntity);
     }
 
-    // Delete preparing item
     public void deletePreparingItem(int id) {
         preparingItemRepository.deleteById(id);
     }
 
 
     public List<PreparingItemEntity> getPreparingItemsByUid(String uid) {
-        return preparingItemRepository.findByInstiId(uid);
+        return preparingItemRepository.findByInstiIdAndStatus(uid, "Preparing");
     }
 
     public List<PreparingItemEntity> getAllPreparingItems() {
-        return preparingItemRepository.findAll();
+        return preparingItemRepository.findByStatus("Preparing");
     }
     
     @Transactional
