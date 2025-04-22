@@ -1,9 +1,11 @@
 package com.capstone.LEMS.Service;
 
 import com.capstone.LEMS.Entity.PreparingItemEntity;
+import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Repository.PreparingItemRepository;
+import com.capstone.LEMS.Repository.InventoryRepository;
 import com.capstone.LEMS.Repository.ItemRepository;
 import com.capstone.LEMS.Repository.UserRepository; // Make sure you import the UserRepository
 import jakarta.transaction.Transactional;
@@ -31,13 +33,13 @@ public class PreparingItemService {
     private ItemRepository itemRepository;
 
     @Autowired
-    private UserRepository userRepository; // Add a UserRepository to fetch user details by instiId
+    private UserRepository userRepository;
+    
+    @Autowired
+    InventoryRepository invrepo;
 
     private static final Logger logger = LoggerFactory.getLogger(PreparingItemService.class); // Initialize logger
-
-
-
-
+    
     public PreparingItemEntity addToPreparingItem(String instiId, String itemName, String categoryName, int quantity, String status) {
         PreparingItemEntity item = new PreparingItemEntity();
         item.setInstiId(instiId); // still good to save
@@ -163,52 +165,67 @@ public class PreparingItemService {
     	/*
     	 * Loop through all the PreparingItem record
     	 * based on its ID gathered from the key in itemQuantities
+    	 * Then update their status
     	 * */
     	for(Map.Entry<Integer, Integer> entry: itemQuantities.entrySet()) {
     		Integer prepItemId = entry.getKey(); 
     		int quantity = entry.getValue(); 
     		PreparingItemEntity prepItem = preparingItemRepository.findById(prepItemId).orElseThrow();
     		UserEntity user = prepItem.getUser(); 
+    		String categoryName = prepItem.getCategoryName();
+    		String itemName = prepItem.getItemName();
     		prepItem.setStatus("Borrowed");
     		preparingItemRepository.save(prepItem);
     		
-    		
     		/*
-    		 * Finds the item base on unique id
-    		 * and if the status is available
+    		 * Reduces the quantity in inventory
     		 * */
-    		String itemName = prepItem.getItemName();
-    		Map<String, String> uniqueIdMap = uniqueIdsMap.get(prepItemId);
-    		int handled = 0;
-    		if(uniqueIdMap != null) {
-    			for(String key: uniqueIdMap.keySet()) {
-    				String uid = uniqueIdMap.get(key);
-    				if (uid != null && !uid.isEmpty()) {
-    					ItemEntity item = itemRepository.findByUniqueId(uid);
-    					if(item != null && item.getStatus().equals("Available")) {
-    						item.setStatus("Borrowed");
-    						item.setUser(user);
-    						itemRepository.save(item);
-    						handled++;
-    					}
-    				}
-    			}
-    		}
-    		
-    		/*
-    		 * Finds the item with a auto generated unique id
-    		 * this will run if the number of quantity is greater than the
-    		 * number of unique ids
-    		 * */
-    		int remaining = quantity - handled;
-    		if(remaining > 0) {
-    			List<ItemEntity> autoItems = itemRepository.findByItemNameAndIsAutoUidTrueAndStatus(
-    					itemName, "Available", PageRequest.of(0, remaining));
-    			for(ItemEntity item: autoItems) {
-    				item.setStatus("Borrowed");
-    				item.setUser(user);
-    				itemRepository.save(item);
-    			}
+    		InventoryEntity inventory = invrepo.findByNameIgnoreCase(itemName);
+			int currentQty = inventory.getQuantity();
+			if(currentQty < quantity) {
+				throw new RuntimeException("Not enough inventory for item: " + itemName);
+			}
+			inventory.setQuantity(currentQty - quantity);
+			invrepo.save(inventory);
+			
+    		if(categoryName == null || !categoryName.equalsIgnoreCase("Consumables")) {
+    			/*
+        		 * Finds the item base on unique id
+        		 * and if the status is available
+        		 * then update their status and user
+        		 * */
+        		Map<String, String> uniqueIdMap = uniqueIdsMap.get(prepItemId);
+        		int handled = 0;
+        		if(uniqueIdMap != null) {
+        			for(String key: uniqueIdMap.keySet()) {
+        				String uid = uniqueIdMap.get(key);
+        				if (uid != null && !uid.isEmpty()) {
+        					ItemEntity item = itemRepository.findByUniqueId(uid);
+        					if(item != null && item.getStatus().equals("Available")) {
+        						item.setStatus("Borrowed");
+        						item.setUser(user);
+        						itemRepository.save(item);
+        						handled++;
+        					}
+        				}
+        			}
+        		}
+        		
+        		/*
+        		 * Finds the item with a auto generated unique id
+        		 * this will run if the number of quantity is greater than the
+        		 * number of unique ids
+        		 * */
+        		int remaining = quantity - handled;
+        		if(remaining > 0) {
+        			List<ItemEntity> autoItems = itemRepository.findByItemNameAndIsAutoUidTrueAndStatus(
+        					itemName, "Available", PageRequest.of(0, remaining));
+        			for(ItemEntity item: autoItems) {
+        				item.setStatus("Borrowed");
+        				item.setUser(user);
+        				itemRepository.save(item);
+        			}
+        		}
     		}
     	}
     }
