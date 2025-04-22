@@ -25,7 +25,7 @@ public class InventoryEntity {
     @Column(name = "inventory_id")
     private int inventoryId;
     @Column(name = "quantity")
-    private float quantity;
+    private int quantity;
     @Column(name = "unit")
     private String unit;
     private String name;
@@ -44,7 +44,7 @@ public class InventoryEntity {
 
     }
 
-    public InventoryEntity(int inventoryId, float quantity, String unit, ItemCategoryEntity item_category, String name, String status, String description) {
+    public InventoryEntity(int inventoryId, int quantity, String unit, ItemCategoryEntity item_category, String name, String status, String description) {
 		super();
 		this.inventoryId = inventoryId;
 		this.quantity = quantity;
@@ -65,11 +65,11 @@ public class InventoryEntity {
     }
 
     @JsonProperty("quantity")
-    public float getQuantity() {
+    public int getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(float quantity) {this.quantity = quantity; }
+    public void setQuantity(int quantity) {this.quantity = quantity; }
 
     @JsonProperty("unit")
     public String  getUnit() {
