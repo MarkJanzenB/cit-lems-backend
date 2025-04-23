@@ -15,7 +15,7 @@ import com.capstone.LEMS.Service.ItemCategoryService;
 
 @RestController
 @RequestMapping("/itemcategory")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 
 public class ItemCategoryController {
     @Autowired

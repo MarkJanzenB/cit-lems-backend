@@ -15,7 +15,7 @@ import com.capstone.LEMS.Service.ReservationService;
 
 @RestController
 @RequestMapping("/reservation")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class ReservationController {
 	@Autowired
 	ReservationService resserv;

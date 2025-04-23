@@ -22,7 +22,7 @@ import com.capstone.LEMS.Service.ItemService;
 
 @RestController
 @RequestMapping("/item")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class ItemController {
     @Autowired
     ItemService itemserv;

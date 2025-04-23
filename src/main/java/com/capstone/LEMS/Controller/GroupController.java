@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/group")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class GroupController {
 
     @Autowired

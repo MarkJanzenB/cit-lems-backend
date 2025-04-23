@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/batchreturn")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class BatchReturnController {
 
     @Autowired

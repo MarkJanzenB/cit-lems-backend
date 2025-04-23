@@ -10,7 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/preparing-items")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class PreparingItemController {
 
     @Autowired

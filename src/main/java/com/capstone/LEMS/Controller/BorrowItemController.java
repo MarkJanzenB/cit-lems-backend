@@ -18,7 +18,7 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/api/borrowitem")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class BorrowItemController {
 
     @Autowired

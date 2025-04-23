@@ -15,7 +15,7 @@ import com.capstone.LEMS.Service.RoleService;
 
 @RestController
 @RequestMapping("/role")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class RoleController {
 	@Autowired
 	RoleService roleserv;

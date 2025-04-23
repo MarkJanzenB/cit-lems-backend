@@ -17,7 +17,7 @@ import com.capstone.LEMS.Service.RequestService;
 
 @RestController
 @RequestMapping("/request")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class RequestController {
 	@Autowired
 	RequestService reqserv;

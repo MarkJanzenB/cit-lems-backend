@@ -11,7 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/batchresupply")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class BatchResupplyController {
 
     @Autowired

@@ -9,7 +9,7 @@ import com.capstone.LEMS.Service.TeacherScheduleService;
 
 @RestController
 @RequestMapping("/teacherschedule")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class TeacherScheduleController {
     @Autowired
     TeacherScheduleService tcherschedserv;

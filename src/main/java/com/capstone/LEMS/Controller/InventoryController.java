@@ -18,7 +18,7 @@ import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Service.InventoryService;
 @RestController
 @RequestMapping("/inventory")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 
 public class InventoryController {
     @Autowired

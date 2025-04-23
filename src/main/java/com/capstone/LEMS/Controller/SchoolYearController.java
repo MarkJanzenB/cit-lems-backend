@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/schoolyear")
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class SchoolYearController {
 
     @Autowired

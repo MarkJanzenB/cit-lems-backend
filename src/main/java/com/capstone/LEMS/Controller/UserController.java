@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Service.UserService;
 
-@CrossOrigin
+@CrossOrigin(origins = "https://cit-lems.vercel.app")
 @RestController
 @RequestMapping("/user")
 public class UserController {
