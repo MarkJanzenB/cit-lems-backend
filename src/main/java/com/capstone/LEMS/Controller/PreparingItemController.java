@@ -34,19 +34,9 @@ public class PreparingItemController {
      * currently its misleading
      * */
     // Fetch preparing items by institution UID
-    @GetMapping("/uid/{uid}")
-    public List<PreparingItemEntity> getPreparingItemsByUid(@PathVariable String uid) {
-        return preparingItemService.getPreparingItemsByUid(uid);
-    }
-
-    /*
-     * REFACTOR: change naming convention for the url
-     * currently its misleading
-     * */
-    // Fetch all preparing items
-    @GetMapping("/all")
-    public List<PreparingItemEntity> getAllPreparingItems() {
-        return preparingItemService.getAllPreparingItems();
+    @GetMapping("/getpreparingitems")
+    public List<PreparingItemEntity> getPreparingItems(@RequestParam(required = false) String instiId, @RequestParam String status) {
+        return preparingItemService.getPreparingItems(instiId, status);
     }
 
     @PutMapping("/proceedtocheckout")

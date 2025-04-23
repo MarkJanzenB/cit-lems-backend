@@ -61,12 +61,11 @@ public class PreparingItemService {
      * for maintainablity
      * */
 
-    public List<PreparingItemEntity> getPreparingItemsByUid(String uid) {
-        return preparingItemRepository.findByInstiIdAndStatus(uid, "Preparing");
-    }
-
-    public List<PreparingItemEntity> getAllPreparingItems() {
-        return preparingItemRepository.findByStatus("Preparing");
+    public List<PreparingItemEntity> getPreparingItems(String instiId, String status) {
+    	if(instiId == null) {
+    		return preparingItemRepository.findByStatus(status);
+    	}
+    	return preparingItemRepository.findByInstiIdAndStatus(instiId, status);
     }
     
     @Transactional
@@ -84,7 +83,7 @@ public class PreparingItemService {
     		UserEntity user = prepItem.getUser(); 
     		String categoryName = prepItem.getCategoryName();
     		String itemName = prepItem.getItemName();
-    		prepItem.setStatus("Borrowed");
+    		prepItem.setStatus("In-use");
     		preparingItemRepository.save(prepItem);
 			
     		if(categoryName == null || !categoryName.equalsIgnoreCase("Consumables")) {
@@ -101,7 +100,7 @@ public class PreparingItemService {
         				if (uid != null && !uid.isEmpty()) {
         					ItemEntity item = itemRepository.findByUniqueId(uid);
         					if(item != null && item.getStatus().equals("Available")) {
-        						item.setStatus("Borrowed");
+        						item.setStatus("In-use");
         						item.setUser(user);
         						itemRepository.save(item);
         						handled++;
@@ -120,7 +119,7 @@ public class PreparingItemService {
         			List<ItemEntity> autoItems = itemRepository.findByItemNameAndIsAutoUidTrueAndStatus(
         					itemName, "Available", PageRequest.of(0, remaining));
         			for(ItemEntity item: autoItems) {
-        				item.setStatus("Borrowed");
+        				item.setStatus("In-use");
         				item.setUser(user);
         				itemRepository.save(item);
         			}
