@@ -411,4 +411,10 @@ public class ItemService {
     	}
     }
 
+    public ResponseEntity<?> findByPreparingItemIds(List<Integer> preparingItemIds){
+    	return ResponseEntity
+    			.status(HttpStatus.OK)
+    			.body(itemrepo.findByPreparingItem_IdIn(preparingItemIds));
+    }
+    
 }

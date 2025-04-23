@@ -71,4 +71,9 @@ public class ItemController {
     public ResponseEntity<?> getListOfUniqueIDs(@RequestParam String itemName, @RequestParam(required = false) String category){
     	return itemserv.getListOfUniqueIDs(itemName, category);
     }
+    
+    @PostMapping("/getbypreparingids")
+    public ResponseEntity<?> findByPreparingItemIds(@RequestBody List<Integer> preparingItemIds){
+    	return itemserv.findByPreparingItemIds(preparingItemIds);
+    }
 }
