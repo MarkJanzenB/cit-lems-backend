@@ -128,6 +128,7 @@ public class PreparingItemService {
         			for(ItemEntity item: autoItems) {
         				item.setStatus("In-use");
         				item.setUser(user);
+        				item.setPreparingItem(prepItem);
         				itemRepository.save(item);
         				autoHandled++;
         			}
@@ -143,6 +144,7 @@ public class PreparingItemService {
         				for(ItemEntity item: manualItems) {
         					item.setStatus("In-use");
             				item.setUser(user);
+            				item.setPreparingItem(prepItem);
             				itemRepository.save(item);
         				}
         			}

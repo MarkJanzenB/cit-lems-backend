@@ -337,32 +337,6 @@ public class ItemService {
                 .status(HttpStatus.OK)
                 .body(itemsToUpdate);
     }
-
-    @Transactional
-    public ResponseEntity<?> proceedToBorrowItems(String itemName, int borrowCartID, int borrowItemsID){
-    	List<ItemEntity> items = itemrepo.findByItemNameAndBorrowCart_Id(itemName, borrowCartID);
-    	BorrowItemEntity borrowItemEntity = borrowitemrepo.findById(borrowItemsID).orElse(null);
-    	
-    	if (items.isEmpty()) {
-            return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Items with name " + itemName + "or with id " +borrowCartID + " could not be found.");
-        }else if(borrowItemEntity == null) {
-        	return ResponseEntity
-                    .status(HttpStatus.NOT_FOUND)
-                    .body("Borrow Item with id " +borrowItemsID + " could not be found.");
-        }
-    	
-    	items.forEach(item -> {
-            item.setBorrowCart(null);
-            item.setBorrowItemEntity(borrowItemEntity);
-        });
-    	itemrepo.saveAll(items);
-    	
-    	return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(items);
-    }
     
     public ResponseEntity<?> getResupplyHistory(LocalDate resupplyDate, int uid){
     	UserEntity user = userrepo.findById(uid).orElse(null);

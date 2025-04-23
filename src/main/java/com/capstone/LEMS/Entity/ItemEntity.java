@@ -57,8 +57,8 @@ public class ItemEntity {
 	private BorrowCartEntity borrowCart;
 
 	@ManyToOne
-	@JoinColumn(name = "BorrowItemEntity_id", nullable = true)
-	private BorrowItemEntity BorrowItemEntity;
+	@JoinColumn(name = "preparing_item_id", nullable = true)
+	private PreparingItemEntity preparingItem;
 
 	@ManyToOne
 	@JoinColumn(name = "manufacturer_id", nullable = true)
@@ -72,7 +72,7 @@ public class ItemEntity {
 		super();
 	}
 
-	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCartEntity borrowCart, BorrowItemEntity BorrowItemEntity, int quantity, LocalDate expiryDate, String variant, ManufacturerEntity manufacturer, BatchResupplyEntity batchResupply) {
+	public ItemEntity(int itemId, String itemName, String uniqueId, InventoryEntity inventory, UserEntity user, String status, BorrowCartEntity borrowCart, PreparingItemEntity preparingItem, int quantity, LocalDate expiryDate, String variant, ManufacturerEntity manufacturer, BatchResupplyEntity batchResupply) {
 		super();
 		this.itemId = itemId;
 		this.itemName = itemName;
@@ -82,7 +82,7 @@ public class ItemEntity {
 		this.user = user;
 		this.status = status;
 		this.borrowCart = borrowCart;
-		this.BorrowItemEntity = BorrowItemEntity;
+		this.preparingItem = preparingItem;
 		this.quantity = quantity;
 		this.expiryDate = expiryDate;
 		this.variant = variant;
@@ -194,13 +194,13 @@ public class ItemEntity {
 	public void setBorrowCart(BorrowCartEntity borrowCart) {
 		this.borrowCart = borrowCart;
 	}
-
-	public BorrowItemEntity getBorrowItemEntity() {
-		return BorrowItemEntity;
+	
+	public PreparingItemEntity getPreparingItem() {
+		return preparingItem;
 	}
 
-	public void setBorrowItemEntity(BorrowItemEntity BorrowItemEntity) {
-		this.BorrowItemEntity = BorrowItemEntity;
+	public void setPreparingItem(PreparingItemEntity preparingItem) {
+		this.preparingItem = preparingItem;
 	}
 
 	public ManufacturerEntity getManufacturer() {

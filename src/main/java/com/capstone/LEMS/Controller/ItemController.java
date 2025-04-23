@@ -61,12 +61,7 @@ public class ItemController {
     public ResponseEntity<?> returnItem(@RequestBody List<Map<String, Object>> itemsRequest) {
         return itemserv.returnItem(itemsRequest);
     }
-    
-    @PutMapping("/proceedtoborrow/{itemName}/{borrowCartID}/{borrowItemsID}")
-    public ResponseEntity<?> proceedToBorrowItem(@PathVariable String itemName, @PathVariable int borrowCartID, @PathVariable int borrowItemsID){
-    	return itemserv.proceedToBorrowItems(itemName, borrowCartID, borrowItemsID);
-    }
-    
+   
     @GetMapping("/resupplyhistory")
     public ResponseEntity<?> getResupplyHistory(@RequestParam LocalDate dateResupply, @RequestParam int uid){
     	return itemserv.getResupplyHistory(dateResupply, uid);

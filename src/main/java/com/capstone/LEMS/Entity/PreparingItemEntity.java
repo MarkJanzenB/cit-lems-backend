@@ -3,6 +3,10 @@ package com.capstone.LEMS.Entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 @Table(name = "preparing_item")
@@ -24,6 +28,10 @@ public class PreparingItemEntity {
     private String status;
     @Column(name = "date_created")
     private LocalDate dateCreated;
+    
+    @OneToMany(mappedBy = "preparingItem", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
+    @JsonIgnore
+    private List<ItemEntity> items = new ArrayList<>();
 
     public PreparingItemEntity() {}
 
