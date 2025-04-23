@@ -102,6 +102,7 @@ public class PreparingItemService {
         					if(item != null && item.getStatus().equals("Available")) {
         						item.setStatus("In-use");
         						item.setUser(user);
+        						item.setPreparingItem(prepItem);
         						itemRepository.save(item);
         						handled++;
         					}
