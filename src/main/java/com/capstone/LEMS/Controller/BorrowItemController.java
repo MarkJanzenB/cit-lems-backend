@@ -18,7 +18,7 @@ import java.util.Date;
 
 @RestController
 @RequestMapping("/api/borrowitem")
-@CrossOrigin(origins = "http://localhost:5173") // Allow frontend access
+@CrossOrigin
 public class BorrowItemController {
 
     @Autowired

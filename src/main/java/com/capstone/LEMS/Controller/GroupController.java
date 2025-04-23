@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/group")
+@CrossOrigin
 public class GroupController {
 
     @Autowired

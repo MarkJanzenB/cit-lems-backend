@@ -10,6 +10,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/preparing-items")
+@CrossOrigin
 public class PreparingItemController {
 
     @Autowired

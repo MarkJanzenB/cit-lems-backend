@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/borrowcart")
-@CrossOrigin(origins = "http://localhost:3000") // Adjust the origin to match your React app URL
+@CrossOrigin
 public class BorrowCartController {
 
     @Autowired
