@@ -20,4 +20,5 @@ public interface ItemRepository  extends JpaRepository<ItemEntity, Integer>{
 	List<ItemEntity> findByUniqueIdIn(List<String> uniqueIds);
 	List<ItemEntity> findByBatchResupply(BatchResupplyEntity batchResupply);
 	List<ItemEntity> findByItemNameAndIsAutoUidTrueAndStatus(String itemName, String status, Pageable pageable);
+	List<ItemEntity> findByItemNameAndIsAutoUidFalseAndStatus(String itemName, String status, Pageable pageable);
 }

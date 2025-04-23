@@ -118,10 +118,33 @@ public class PreparingItemService {
         		if(remaining > 0) {
         			List<ItemEntity> autoItems = itemRepository.findByItemNameAndIsAutoUidTrueAndStatus(
         					itemName, "Available", PageRequest.of(0, remaining));
+        			
+        			/*
+        			 * Auto assign items
+        			 * Prioritizing the items
+        			 * with auto generated unique id
+        			 * */
+        			int autoHandled = 0;
         			for(ItemEntity item: autoItems) {
         				item.setStatus("In-use");
         				item.setUser(user);
         				itemRepository.save(item);
+        				autoHandled++;
+        			}
+        			
+        			/*
+        			 * If items with auto generated unique id runs out
+        			 * it will auto assign to the manual
+        			 * */
+        			int fallbackRemaining = remaining - autoHandled;
+        			if(fallbackRemaining > 0) {
+        				List<ItemEntity> manualItems = itemRepository.findByItemNameAndIsAutoUidFalseAndStatus(
+        						itemName, "Available", PageRequest.of(0, fallbackRemaining));
+        				for(ItemEntity item: manualItems) {
+        					item.setStatus("In-use");
+            				item.setUser(user);
+            				itemRepository.save(item);
+        				}
         			}
         		}
     		}
