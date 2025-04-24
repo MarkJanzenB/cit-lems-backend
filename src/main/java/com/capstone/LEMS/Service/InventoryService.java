@@ -80,6 +80,7 @@ public class InventoryService {
 		}
 	}
 
+	@Transactional
 	public ResponseEntity<?> updateInventory(int id, InventoryEntity inventoryToUpdate) {
 		Optional<InventoryEntity> inventoryOptional = inventoryRepository.findById(id);
 		if (inventoryOptional.isPresent()) {
@@ -87,6 +88,10 @@ public class InventoryService {
 
 			if (inventoryToUpdate.getName() != null && !inventoryToUpdate.getName().isEmpty()) {
 				InventoryEntity inventoryFromDb = inventoryRepository.findByNameIgnoreCase(inventoryToUpdate.getName());
+				/*
+				 * Cancels the udpate
+				 * if the new name already exists
+				 * */
 				if (inventoryFromDb != null && inventoryFromDb.getInventoryId() != id) {
 					return ResponseEntity
 							.status(HttpStatus.CONFLICT) // 409
@@ -101,6 +106,11 @@ public class InventoryService {
 
 			if (!Float.isNaN(inventoryToUpdate.getQuantity())) {
 				inventory.setQuantity(inventoryToUpdate.getQuantity());
+				if(inventoryToUpdate.getQuantity() > 0) {
+					inventory.setStatus("Available");
+				}else {
+					inventory.setStatus("Out of stock");
+				}
 			}
 
 			return ResponseEntity
