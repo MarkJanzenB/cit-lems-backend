@@ -2,6 +2,7 @@ package com.capstone.LEMS.Service;
 
 import com.capstone.LEMS.DTO.ItemStatusDTO;
 import com.capstone.LEMS.Entity.BatchReturnEntity;
+import com.capstone.LEMS.Entity.InventoryEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.PreparingItemEntity;
 import com.capstone.LEMS.Entity.UserEntity;
@@ -57,6 +58,10 @@ public class BatchReturnService {
     		String status = entry.getValue();
     		
     		ItemEntity item = itemrepo.findById(itemId).orElseThrow();
+    		if("Available".equals(status)) {
+    			InventoryEntity inventory = item.getInventory();
+    			inventory.setQuantity(inventory.getQuantity() + 1);
+    		}
     		item.setStatus(status);
     		itemrepo.save(item);
     	}
