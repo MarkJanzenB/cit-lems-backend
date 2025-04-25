@@ -2,17 +2,18 @@ package com.capstone.LEMS.Service;
 
 import com.capstone.LEMS.Entity.PreparingItemEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
+import com.capstone.LEMS.Entity.TeacherScheduleEntity;
 import com.capstone.LEMS.Entity.UserEntity;
-import com.capstone.LEMS.Repository.PreparingItemRepository;
-import com.capstone.LEMS.Repository.InventoryRepository;
-import com.capstone.LEMS.Repository.ItemRepository;
-import com.capstone.LEMS.Repository.UserRepository; // Make sure you import the UserRepository
+import com.capstone.LEMS.Repository.*;
 import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,7 +28,10 @@ public class PreparingItemService {
 
     @Autowired
     private UserRepository userRepository;
-    
+
+	@Autowired
+	private TeacherScheduleRepository teacherScheduleRepository;
+
     @Autowired
     InventoryRepository invrepo;
 
@@ -37,6 +41,8 @@ public class PreparingItemService {
      * due to many request made by different users
      * */
     private static final Logger logger = LoggerFactory.getLogger(PreparingItemService.class); // Initialize logger
+
+	private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
     
     public PreparingItemEntity addToPreparingItem(String instiId, String itemName, String categoryName, int quantity, String status) {
         PreparingItemEntity item = new PreparingItemEntity();
@@ -111,7 +117,7 @@ public class PreparingItemService {
         		}
         		
         		/*
-        		 * Finds the item with a auto generated unique id
+        		 * Finds the item with an auto generated unique id
         		 * this will run if the number of quantity is greater than the
         		 * number of unique ids
         		 * */
@@ -153,5 +159,23 @@ public class PreparingItemService {
     		}
     	}
     }
+
+	public Map<String, Object> getTeacherScheduleByPreparingItemId(int preparingItemId) {
+		PreparingItemEntity preparingItem = preparingItemRepository.findById(preparingItemId)
+				.orElseThrow(() -> new RuntimeException("Preparing item not found with ID: " + preparingItemId));
+		TeacherScheduleEntity teacherSchedule = preparingItem.getTeacherSchedule();
+
+		if (teacherSchedule != null) {
+			Map<String, Object> scheduleData = new HashMap<>();
+			scheduleData.put("date", teacherSchedule.getDate());
+			scheduleData.put("startTime", teacherSchedule.getStartTime() != null ? teacherSchedule.getStartTime().format(TIME_FORMATTER) : null);
+			scheduleData.put("endTime", teacherSchedule.getEndTime() != null ? teacherSchedule.getEndTime().format(TIME_FORMATTER) : null);
+			scheduleData.put("labNum", teacherSchedule.getLabNum());
+//			scheduleData.put("location", teacherSchedule.getLocation()); // Assuming getLocation() returns labNum
+			return scheduleData;
+		} else {
+			return null; // Or handle the case where there's no schedule
+		}
+	}
 
 }
