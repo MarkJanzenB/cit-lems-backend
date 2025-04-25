@@ -10,4 +10,5 @@ import java.util.List;
 public interface PreparingItemRepository extends JpaRepository<PreparingItemEntity, Integer> {
     List<PreparingItemEntity> findByInstiIdAndStatus(String instiId, String status);
     List<PreparingItemEntity> findByStatus(String status);
+    List<PreparingItemEntity> findByReferenceCode(String referenceCode);
 }
