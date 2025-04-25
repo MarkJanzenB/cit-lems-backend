@@ -28,14 +28,18 @@ public class PreparingItemEntity {
     private String status;
     @Column(name = "date_created")
     private LocalDate dateCreated;
-    
+
+    @ManyToOne
+    @JoinColumn(name = "teacher_schedule_id")
+    private TeacherScheduleEntity teacherSchedule;
+
     @OneToMany(mappedBy = "preparingItem", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
     @JsonIgnore
     private List<ItemEntity> items = new ArrayList<>();
 
     public PreparingItemEntity() {}
 
-    public PreparingItemEntity(String referenceCode, String instiId, String itemName, String categoryName, int quantity, String status, LocalDate dateCreated) {
+    public PreparingItemEntity(String referenceCode, String instiId, String itemName, String categoryName, int quantity, String status, LocalDate dateCreated, TeacherScheduleEntity teacherSchedule) {
         this.referenceCode = referenceCode;
         this.instiId = instiId;
         this.itemName = itemName;
@@ -43,6 +47,7 @@ public class PreparingItemEntity {
         this.quantity = quantity;
         this.status = status;
         this.dateCreated = dateCreated;
+        this.teacherSchedule = teacherSchedule;
 
     }
 
@@ -117,4 +122,13 @@ public class PreparingItemEntity {
     public void setDateCreated(LocalDate dateCreated) {
         this.dateCreated = dateCreated;
     }
+
+    public TeacherScheduleEntity getTeacherSchedule() {
+        return teacherSchedule;
+    }
+
+    public void setTeacherSchedule(TeacherScheduleEntity teacherSchedule) {
+        this.teacherSchedule = teacherSchedule;
+    }
+
 }

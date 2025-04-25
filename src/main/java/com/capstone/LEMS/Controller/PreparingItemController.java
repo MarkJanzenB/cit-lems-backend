@@ -2,11 +2,15 @@ package com.capstone.LEMS.Controller;
 
 import com.capstone.LEMS.DTO.CheckoutRequestDTO;
 import com.capstone.LEMS.Entity.PreparingItemEntity;
+import com.capstone.LEMS.Entity.TeacherScheduleEntity;
 import com.capstone.LEMS.Service.PreparingItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/preparing-items")
@@ -44,5 +48,18 @@ public class PreparingItemController {
     public void proceedToCheckOut(@RequestBody CheckoutRequestDTO checkoutRequest) {
     	preparingItemService.proceedToCheckOut(checkoutRequest.getItemQuantities(), checkoutRequest.getUniqueIdsMap());
     }
-    
+
+    @GetMapping("/teacherSchedule/{preparingItemId}")
+    public ResponseEntity<Map<String, Object>> getTeacherScheduleByPreparingItemId(@PathVariable int preparingItemId) {
+        try {
+            Map<String, Object> schedule = preparingItemService.getTeacherScheduleByPreparingItemId(preparingItemId);
+            if (schedule != null) {
+                return new ResponseEntity<>(schedule, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND); // Or another appropriate status
+            }
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
 }
