@@ -2,6 +2,8 @@
 package com.capstone.LEMS.Controller;
 
 import com.capstone.LEMS.Entity.BorrowCartEntity;
+import com.capstone.LEMS.Entity.TeacherScheduleEntity;
+import com.capstone.LEMS.Entity.UserEntity;
 import com.capstone.LEMS.Repository.PreparingItemRepository;
 import com.capstone.LEMS.Service.BorrowCartService;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/borrowcart")
@@ -101,18 +104,35 @@ public class BorrowCartController {
 
 
     @PostMapping("/finalize/{instiId}")
-    public ResponseEntity<String> finalizeBorrowCart(@PathVariable String instiId) {
+    public ResponseEntity<String> finalizeBorrowCart(@PathVariable String instiId,
+                                                     @RequestBody Map<String, Integer> requestBody) { // Expecting teacherScheduleId in the request body
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null || !authentication.isAuthenticated()){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
         }
 
+        Integer teacherScheduleId = requestBody.get("teacherScheduleId");
+        if (teacherScheduleId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: teacherScheduleId is required.");
+        }
+
         try {
-            borrowCartService.moveToPreparingItem(instiId);
+            borrowCartService.moveToPreparingItem(instiId, teacherScheduleId); // Pass teacherScheduleId to the service
             return ResponseEntity.ok("Items moved to 'preparing_item' successfully.");
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
+
+    @GetMapping("/teacherSchedule/{instiId}")
+    public ResponseEntity<List<TeacherScheduleEntity>> getTeacherSchedules(@PathVariable String instiId) {
+        try {
+            List<TeacherScheduleEntity> schedules = borrowCartService.getTeacherScheduleByInstiId(instiId);
+            return new ResponseEntity<>(schedules, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(java.util.Collections.emptyList(), HttpStatus.NOT_FOUND);
+        }
+    }
+
 
 }

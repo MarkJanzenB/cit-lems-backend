@@ -1,16 +1,10 @@
 // File: src/main/java/com/capstone/LEMS/Service/BorrowCartService.java
 package com.capstone.LEMS.Service;
 
-import com.capstone.LEMS.Entity.BorrowCartEntity;
-import com.capstone.LEMS.Entity.InventoryEntity;
-import com.capstone.LEMS.Entity.PreparingItemEntity;
-import com.capstone.LEMS.Entity.UserEntity;
-import com.capstone.LEMS.Repository.InventoryRepository;
-import com.capstone.LEMS.Repository.PreparingItemRepository;
-import com.capstone.LEMS.Repository.UserRepository;
+import com.capstone.LEMS.Entity.*;
+import com.capstone.LEMS.Repository.*;
 
 import jakarta.transaction.Transactional;
-import com.capstone.LEMS.Repository.BorrowCartRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -31,7 +25,11 @@ public class BorrowCartService {
 
     @Autowired
     private InventoryRepository inventoryRepository;
-    
+
+    @Autowired
+    private TeacherScheduleRepository teacherScheduleRepository; // Autowire TeacherScheduleRepository
+
+
     @Autowired
     UserRepository userrepo;
 
@@ -77,30 +75,32 @@ public class BorrowCartService {
         borrowCartRepository.delete(borrowCart);
     }
 
+    //    @Transactional
+//    public void moveToPreparingItem(String instiId) {
+//        moveToPreparingItem(instiId, null); // Overloaded method to handle cases where no schedule is selected initially
+//    }
 
 
     @Transactional
-    public void moveToPreparingItem(String instiId) {
+    public void moveToPreparingItem(String instiId, Integer teacherScheduleId) { // Receive teacherScheduleId
 
         List<BorrowCartEntity> carts = borrowCartRepository.findByInstiId(instiId);
         if (carts.isEmpty()) {
             throw new IllegalStateException("No items to move for instiId: " + instiId);
         }
 
-        // Generate a single reference ID for all items from the borrow cart.
-        /*
-         * REFACTOR: referenceId should not be randomized
-         * to avoid potential duplicate to older referenceIds
-         * */
+        TeacherScheduleEntity teacherSchedule = null;
+        if (teacherScheduleId != null) {
+            teacherSchedule = teacherScheduleRepository.findById(teacherScheduleId)
+                    .orElseThrow(() -> new RuntimeException("Teacher schedule not found with ID: " + teacherScheduleId));
+        }
+
         String referenceId = "PI-" + instiId + "-" + ThreadLocalRandom.current().nextInt(1000, 10000);
 
         for (BorrowCartEntity cartItem : carts) {
             UserEntity user = userrepo.findByInstiId(instiId);
             PreparingItemEntity preparingItem = new PreparingItemEntity();
-            
-            /*
-        	 * Transfer details to a new preparingItem
-        	 * */
+
             preparingItem.setInstiId(instiId);
             preparingItem.setItemName(cartItem.getItemName());
             preparingItem.setCategoryName(cartItem.getCategoryName());
@@ -108,12 +108,8 @@ public class BorrowCartService {
             preparingItem.setStatus("Preparing");
             preparingItem.setUser(user);
             preparingItem.setDateCreated(LocalDate.now());
+            preparingItem.setTeacherSchedule(teacherSchedule); // Set the teacher schedule
 
-            /*
-             * Cancels the whole operation when
-             * there inventory cannot be found
-             * and quantity is negative
-             * */
             InventoryEntity inventoryItem = inventoryRepository.findByNameIgnoreCase(cartItem.getItemName());
             if (inventoryItem == null) {
                 throw new RuntimeException("Item not found in inventory: " + cartItem.getItemName());
@@ -123,24 +119,27 @@ public class BorrowCartService {
                 throw new RuntimeException("Not enough stock available in inventory for item: " + cartItem.getItemName() + ". Requested: " + cartItem.getQuantity() + ", Available: " + inventoryItem.getQuantity());
             }
 
-            /*
-             * Reduce inventory quantity
-             * and udpate status if needed
-             * */
             int reducedQuantity = inventoryItem.getQuantity() - cartItem.getQuantity();
             inventoryItem.setQuantity(reducedQuantity);
             if(reducedQuantity == 0) {
-            	inventoryItem.setStatus("Out of stock");
+                inventoryItem.setStatus("Out of stock");
             }
-            
+
             inventoryRepository.save(inventoryItem);
-
-            // Set the generated reference ID.
             preparingItem.setReferenceCode(referenceId);
-
             preparingItemRepository.save(preparingItem);
         }
 
         borrowCartRepository.deleteByInstiId(instiId);
     }
+
+
+    public List<TeacherScheduleEntity> getTeacherScheduleByInstiId(String instiId) {
+        UserEntity teacher = userrepo.findByInstiId(instiId);
+        if (teacher == null) {
+            throw new RuntimeException("User not found with instiId: " + instiId);
+        }
+        return teacherScheduleRepository.findByTeacher(teacher);
+    }
+
 }
