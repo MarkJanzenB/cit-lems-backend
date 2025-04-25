@@ -135,4 +135,27 @@ public class BorrowCartController {
     }
 
 
+    @PutMapping("/{id}")
+    public ResponseEntity<String> updateBorrowCartQuantity(@PathVariable int id,
+                                                           @RequestBody Map<String, Integer> requestBody,
+                                                           @RequestHeader(value = "Authorization", required = false) String authorizationHeader) {
+        if (authorizationHeader == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("No Authorization header received.");
+        }
+
+        Integer newQuantity = requestBody.get("quantity");
+        if (newQuantity == null || newQuantity < 1) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: Invalid quantity provided.");
+        }
+
+        try {
+            borrowCartService.updateItemQuantity(id, newQuantity);
+            return ResponseEntity.ok("Borrow cart item quantity updated successfully.");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Error: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error updating quantity: " + e.getMessage());
+        }
+    }
+
 }

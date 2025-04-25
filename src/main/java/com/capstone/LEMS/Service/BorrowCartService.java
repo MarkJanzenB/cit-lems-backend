@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Service
@@ -140,6 +141,17 @@ public class BorrowCartService {
             throw new RuntimeException("User not found with instiId: " + instiId);
         }
         return teacherScheduleRepository.findByTeacher(teacher);
+    }
+
+    public void updateItemQuantity(int id, int newQuantity) {
+        Optional<BorrowCartEntity> borrowCartEntityOptional = borrowCartRepository.findById(id);
+        if (borrowCartEntityOptional.isPresent()) {
+            BorrowCartEntity borrowCartEntity = borrowCartEntityOptional.get();
+            borrowCartEntity.setQuantity(newQuantity);
+            borrowCartRepository.save(borrowCartEntity);
+        } else {
+            throw new RuntimeException("Borrow cart item not found with ID: " + id);
+        }
     }
 
 }
