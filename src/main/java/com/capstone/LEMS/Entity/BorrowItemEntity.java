@@ -34,9 +34,9 @@ public class BorrowItemEntity {
     private String itemName;
     private String categoryName;
     private int quantity;
-    
+
     /*
-     * 
+     *
      * */
     private String status;
 
@@ -155,5 +155,12 @@ public class BorrowItemEntity {
 
     public void setUser(UserEntity user) {
         this.user = user;
+    }
+
+    public void setTeacherSchedule(TeacherScheduleEntity teacherScheduleEntity) {
+    }
+
+    public TeacherScheduleEntity getTeacherSchedule() {
+        return teacherSchedule;
     }
 }

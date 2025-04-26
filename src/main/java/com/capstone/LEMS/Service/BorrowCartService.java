@@ -11,6 +11,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
@@ -30,6 +32,8 @@ public class BorrowCartService {
     @Autowired
     private TeacherScheduleRepository teacherScheduleRepository; // Autowire TeacherScheduleRepository
 
+    @Autowired
+    private ItemRepository itemRepository;
 
     @Autowired
     UserRepository userrepo;
@@ -153,5 +157,21 @@ public class BorrowCartService {
             throw new RuntimeException("Borrow cart item not found with ID: " + id);
         }
     }
+
+    public List<String> getAvailableVariants(String itemName) {
+        // Fetch a single ItemEntity by itemName
+        ItemEntity item = itemRepository.findByItemNameIgnoreCase(itemName);
+
+        // Check if item is found and has variants
+        if (item != null && item.getVariant() != null) {
+            // Split the variant string into a list if variants are available
+            return Arrays.asList(item.getVariant().split(","));
+        }
+
+        // If no item is found or no variant exists, return an empty list
+        return Collections.emptyList();
+    }
+
+
 
 }

@@ -28,6 +28,7 @@ public class PreparingItemEntity {
     private String status;
     @Column(name = "date_created")
     private LocalDate dateCreated;
+    private String variant;
 
     @ManyToOne
     @JoinColumn(name = "teacher_schedule_id")
@@ -129,6 +130,14 @@ public class PreparingItemEntity {
 
     public void setTeacherSchedule(TeacherScheduleEntity teacherSchedule) {
         this.teacherSchedule = teacherSchedule;
+    }
+
+    public String getVariant() {
+        return variant;
+    }
+
+    public void setVariant(String variant) {
+        this.variant = variant;
     }
 
 }

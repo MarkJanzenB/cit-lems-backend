@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.capstone.LEMS.Entity.BatchResupplyEntity;
@@ -22,4 +23,11 @@ public interface ItemRepository  extends JpaRepository<ItemEntity, Integer>{
 	List<ItemEntity> findByItemNameAndIsAutoUidTrueAndStatus(String itemName, String status, Pageable pageable);
 	List<ItemEntity> findByItemNameAndIsAutoUidFalseAndStatus(String itemName, String status, Pageable pageable);
 	List<ItemEntity> findByPreparingItem_IdIn(List<Integer> preparingItemIds);
+	List<ItemEntity> findByItemId(int itemId); // Add this method
+
+	ItemEntity findByItemNameIgnoreCase(String itemName);
+
+	// Add this method to the ItemRepository interface:
+	@Query("SELECT DISTINCT i.variant FROM ItemEntity i WHERE i.itemName = ?1 AND i.status = 'Available'")
+	List<String> findVariantsByItemName(String itemName);
 }

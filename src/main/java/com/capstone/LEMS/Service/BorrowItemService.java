@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class BorrowItemService {
@@ -70,6 +71,14 @@ public class BorrowItemService {
             borrowItemRepository.save(item);
         }
     }
+
+
+    // Add this method to fetch a BorrowItemEntity by its ID
+    public BorrowItemEntity getBorrowItemById(Long id) {
+        Optional<BorrowItemEntity> optionalBorrowItem = borrowItemRepository.findById(Math.toIntExact(id));
+        return optionalBorrowItem.orElse(null); // Returns the BorrowItemEntity if found, otherwise null
+    }
+
 
 
 }
