@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.capstone.LEMS.Entity.TransactionHistory; // Import TransactionHistory
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,7 +24,24 @@ public class BatchResupplyEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "resupply_id")
     private int resupplyId;
+    private int itemId; // Add this field
+    private String itemName; // Add this field
 
+    public int getItemId() { // Add this method
+        return itemId;
+    }
+
+    public void setItemId(int itemId) { // Optional setter if needed
+        this.itemId = itemId;
+    }
+
+    public String getItemName() { // Add this method
+        return itemName;
+    }
+
+    public void setItemName(String itemName) { // Optional setter if needed
+        this.itemName = itemName;
+    }
     @Column(name = "date_resupply")
     private LocalDate dateResupply;
 
@@ -34,6 +52,9 @@ public class BatchResupplyEntity {
     @JsonIgnore
     @OneToMany(mappedBy = "batchResupply", cascade = CascadeType.ALL)
     private List<ItemEntity> items;
+
+    @OneToMany(mappedBy = "batchResupply", cascade = CascadeType.ALL)
+    private List<TransactionHistory> transactionHistories; // Link to transaction history
 
     public BatchResupplyEntity() {
         super();

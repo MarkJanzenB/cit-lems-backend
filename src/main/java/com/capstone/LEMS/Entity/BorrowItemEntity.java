@@ -1,13 +1,10 @@
 package com.capstone.LEMS.Entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Entity
 @Table(name = "borrow_items")
@@ -27,7 +24,7 @@ public class BorrowItemEntity {
      * itemId & uniqueId Currently not being used
      * Delete if it has no purpose
      * */
-    private Long itemId; // Unique Item ID from PreparingItemEntity
+    private int itemId; // Unique Item ID from PreparingItemEntity
     @Column(name = "unique_id", nullable = true)
     private String uniqueId; // Unique ID manually assigned by lab in-charge
 
@@ -50,9 +47,12 @@ public class BorrowItemEntity {
     // Static atomic counter for auto increment number (per month/year)
     private static final AtomicInteger autoIncrement = new AtomicInteger(1);
 
+    @OneToMany(mappedBy = "borrowItem", cascade = CascadeType.ALL)
+    private List<TransactionHistory> transactionHistories; // Link to transaction history
+
     public BorrowItemEntity() {}
 
-    public BorrowItemEntity(UserEntity user, Long itemId, String uniqueId, String itemName, String categoryName, int quantity, String status, Date borrowedDate) {
+    public BorrowItemEntity(UserEntity user, int itemId, String uniqueId, String itemName, String categoryName, int quantity, String status, Date borrowedDate) {
         this.user = user;
         this.itemId = itemId;
         this.uniqueId = uniqueId;
@@ -93,11 +93,11 @@ public class BorrowItemEntity {
         this.id = id;
     }
 
-    public Long getItemId() {
+    public int getItemId() {
         return itemId;
     }
 
-    public void setItemId(Long itemId) {
+    public void setItemId(int itemId) {
         this.itemId = itemId;
     }
 

@@ -26,7 +26,7 @@ public class BorrowItemController {
     @Autowired
     private UserRepository userRepository;
     @Autowired
-    private TeacherScheduleRepository tsrepo;
+    private TeacherScheduleRepository teacherScheduleRepository;
 
     @GetMapping("/all")
     public List<BorrowItemEntity> getAllBorrowItems() {
@@ -43,7 +43,7 @@ public class BorrowItemController {
     public ResponseEntity<?> addBorrowItems(
             @RequestParam String uid,
             @RequestParam String borrowedId,
-            @RequestParam Long itemId,
+            @RequestParam Integer itemId,
             @RequestParam String itemName,
             @RequestParam String categoryName,
             @RequestParam Integer quantity,
@@ -67,7 +67,7 @@ public class BorrowItemController {
             borrowItemEntity.setBorrowedDate(new Date());
 
             if (teacherScheduleId != null) {
-                Optional<TeacherScheduleEntity> teacherScheduleOptional = tsrepo.findById(teacherScheduleId);
+                Optional<TeacherScheduleEntity> teacherScheduleOptional = teacherScheduleRepository.findById(teacherScheduleId);
                 if (teacherScheduleOptional.isPresent()) {
                     borrowItemEntity.setTeacherSchedule(teacherScheduleOptional.get());
                 } else {
@@ -109,4 +109,3 @@ public class BorrowItemController {
         }
     }
 }
-
