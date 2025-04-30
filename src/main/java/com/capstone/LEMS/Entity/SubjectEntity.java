@@ -21,6 +21,10 @@ public class SubjectEntity {
     @OneToMany(mappedBy = "subject", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<RequestEntity> requests = new ArrayList<>();
+	@OneToMany(mappedBy = "subject")
+	@JsonIgnore
+	private List<TeacherScheduleEntity> teacherSchedules = new ArrayList<>();
+
 
 	public SubjectEntity() {
 		super();
@@ -50,4 +54,12 @@ public class SubjectEntity {
 	public void setSubjectName(String subjectName) {
 		this.subjectName = subjectName;
 	}
+	public List<TeacherScheduleEntity> getTeacherSchedules() {
+		return teacherSchedules;
+	}
+
+	public void setTeacherSchedules(List<TeacherScheduleEntity> teacherSchedules) {
+		this.teacherSchedules = teacherSchedules;
+	}
+
 }
