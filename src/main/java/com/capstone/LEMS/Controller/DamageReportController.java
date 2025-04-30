@@ -31,7 +31,7 @@ public class DamageReportController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/add")
     public DamageReportEntity createDamageReport(@RequestBody DamageReportEntity damageReport) {
         return damageReportService.createDamageReport(damageReport);
     }
