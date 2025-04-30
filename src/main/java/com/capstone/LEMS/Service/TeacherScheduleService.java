@@ -135,16 +135,16 @@ public class TeacherScheduleService {
                 schedule.setTeacher(newSchedule.getTeacher());
             }
 
-            if(newSchedule.getYearSection() != null && newSchedule.getYearSection().getYearId() != 0) {
-                log.info("Updating year section with ID: {}", newSchedule.getYearSection().getYearId());
-                Optional<YearSectionEntity> yearSectionOptional = yearSectionRepository.findById(newSchedule.getYearSection().getYearId());
+            if(newSchedule.getYearSection() != null && newSchedule.getYearSection().getYrsecId() != 0) {
+                log.info("Updating year section with ID: {}", newSchedule.getYearSection().getYrsecId());
+                Optional<YearSectionEntity> yearSectionOptional = yearSectionRepository.findById(newSchedule.getYearSection().getYrsecId());
 
                 if(yearSectionOptional.isPresent()) {
                     schedule.setYearSection(yearSectionOptional.get());
                 } else {
                     return ResponseEntity
                             .status(HttpStatus.NOT_FOUND)
-                            .body("Year Section with ID " + newSchedule.getYearSection().getYearId() + " not found");
+                            .body("Year Section with ID " + newSchedule.getYearSection().getYrsecId() + " not found");
                 }
             }
 

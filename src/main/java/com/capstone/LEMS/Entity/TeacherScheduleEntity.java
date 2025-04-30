@@ -27,7 +27,7 @@ public class TeacherScheduleEntity {
     @JoinColumn(name = "teacher_id", nullable = true)
     private UserEntity teacher;
     @ManyToOne
-    @JoinColumn(name = "year_id", nullable = true)
+    @JoinColumn(name = "yrsec_id",referencedColumnName = "yrsec_id" ,nullable = true)
     private YearSectionEntity yearSection;
     @ManyToOne
     @JoinColumn(name = "createdby_id", nullable = true)
