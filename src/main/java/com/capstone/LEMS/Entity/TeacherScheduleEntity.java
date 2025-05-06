@@ -34,10 +34,10 @@ public class TeacherScheduleEntity {
     private UserEntity createdBy;
 
     @ManyToOne
-    @JoinColumn(name = "sy_id", nullable = false)  // Not nullable since it's required
+    @JoinColumn(name = "sy_id", nullable = true)  // Not nullable since it's required
     private SchoolYearEntity schoolYear;
     @ManyToOne
-    @JoinColumn(name = "subject_id", nullable = false) // Not nullable since it's required
+    @JoinColumn(name = "subject_id", nullable = true) // Not nullable since it's required
     private SubjectEntity subject;
 
 

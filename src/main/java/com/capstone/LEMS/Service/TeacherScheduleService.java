@@ -37,9 +37,13 @@ public class TeacherScheduleService {
     }
 
     public TeacherScheduleEntity AddTeacherSchedule(TeacherScheduleEntity teachsched, int teacherId, int createdby) {
+    	System.out.println(teachsched.toString());
         // Get the teacher user entity
         UserEntity teacher = userrepo.findById(teacherId).orElse(null);
         teachsched.setTeacher(teacher);
+        
+        YearSectionEntity yearSec = yearSectionRepository.findById(teachsched.getYearSection().getYrsecId()).orElseThrow();
+        teachsched.setYearSection(yearSec);
 
         // Set the created by user
         UserEntity user = userrepo.findById(createdby).orElse(null);
