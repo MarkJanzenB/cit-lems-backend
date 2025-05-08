@@ -159,14 +159,17 @@ public class ItemService {
 					newItem.setUniqueId(uniqueId);
 					newItem.setAutoUid(true);
 				}
-				
-				//Transaction history: Type Resupply
 
 				itemsToSave.add(newItem);
+				
 			}
 		}
 
 		List<ItemEntity> savedItems = itemrepo.saveAll(itemsToSave);
+		//TODO: Marks
+		//get the item entity returned by savedItems
+		//Transaction history: Type Resupply
+		
 		return ResponseEntity
 				.status(HttpStatus.CREATED) // 201
 				.body(savedItems);
@@ -323,7 +326,6 @@ public class ItemService {
 
 			List<ItemEntity> itemsToReturn = items.subList(0, quantity);
 
-			// TODO: Marks
 			// Implement in the future: for items with specific status, users should allow which item was damage/missing through unique id
 
 			itemsToReturn.forEach(item -> {
