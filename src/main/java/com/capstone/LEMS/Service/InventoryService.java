@@ -40,6 +40,7 @@ public class InventoryService {
 						.body(inventory.getName() + " Inventory already exists");
 			}
 			inventory.setItemCategory(itemCategory);
+			inventory.setStatus("Out of stock");
 			
 			inventoryToAdd.add(inventory);
 		}
