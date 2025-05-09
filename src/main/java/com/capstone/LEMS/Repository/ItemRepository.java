@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.capstone.LEMS.Entity.BatchResupplyEntity;
@@ -30,4 +31,9 @@ public interface ItemRepository  extends JpaRepository<ItemEntity, Integer>{
 	// Add this method to the ItemRepository interface:
 	@Query("SELECT DISTINCT i.variant FROM ItemEntity i WHERE i.itemName = ?1 AND i.status = 'Available'")
 	List<String> findVariantsByItemName(String itemName);
+
+	@Query("SELECT DISTINCT i.variant FROM ItemEntity i WHERE i.inventory.inventoryId = :inventoryId AND i.variant IS NOT NULL AND i.variant <> ''")
+	List<String> findVariantsByInventoryId(@Param("inventoryId") Integer inventoryId);
+
+
 }

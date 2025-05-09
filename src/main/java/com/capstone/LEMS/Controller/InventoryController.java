@@ -3,6 +3,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.capstone.LEMS.Entity.ItemEntity;
+import com.capstone.LEMS.Repository.InventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -26,6 +27,9 @@ import com.capstone.LEMS.Service.InventoryService;
 public class InventoryController {
     @Autowired
     InventoryService inventoryService;
+
+    @Autowired
+    InventoryRepository inventoryRepository;
 
     @Autowired
     private ItemRepository itemRepository;
@@ -80,24 +84,11 @@ public class InventoryController {
         return ResponseEntity.ok(inventoryItem);
     }
 
-
-    @GetMapping("/item/{itemId}/variants")
-    public ResponseEntity<List<String>> getItemVariants(@PathVariable Integer itemId) {
-        return itemRepository.findById(itemId)
-                .map(item -> {
-                    // Fetch variants for the specific item ID
-                    List<String> variants = itemRepository.findByItemId(item.getItemId())
-                            .stream()
-                            .map(ItemEntity::getVariant)
-                            .filter(variant -> variant != null && !variant.isEmpty())
-                            .distinct()
-                            .collect(Collectors.toList());
-                    return ResponseEntity.ok(variants);
-                })
-                .orElse(ResponseEntity.notFound().build());
+    @GetMapping("/{inventoryId}/variants")
+    public ResponseEntity<List<String>> getItemVariants(@PathVariable Integer inventoryId) {
+        List<String> variants = itemRepository.findVariantsByInventoryId(inventoryId);
+        return ResponseEntity.ok(variants);
     }
-
-
 
 
 }
