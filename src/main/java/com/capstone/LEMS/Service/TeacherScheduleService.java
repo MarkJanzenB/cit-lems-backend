@@ -48,6 +48,8 @@ public class TeacherScheduleService {
         // Set the created by user
         UserEntity user = userrepo.findById(createdby).orElse(null);
         teachsched.setCreatedBy(user);
+        
+        teachsched.setSyId(null);
 
         log.info("Adding new teacher schedule for teacher ID: {}", teacherId);
         return teacherScheduleRepository.save(teachsched);
