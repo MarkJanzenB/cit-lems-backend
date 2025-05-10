@@ -1,0 +1,39 @@
+package com.capstone.LEMS.Repository;
+
+import java.util.List;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.capstone.LEMS.Entity.BatchResupplyEntity;
+import com.capstone.LEMS.Entity.ItemEntity;
+
+@Repository
+public interface ItemRepository  extends JpaRepository<ItemEntity, Integer>{
+	ItemEntity findByUniqueId (String uniqueId);
+	ItemEntity findTopByIsAutoUidTrueOrderByItemIdDesc();
+	List<ItemEntity> findByItemName(String itemName);
+	List<ItemEntity> findByItemNameAndUserIsNullOrderByItemIdDesc(String itemName);
+	List<ItemEntity> findByItemNameAndStatus(String itemName, String status);
+	List<ItemEntity> findByItemNameAndBorrowCart_Id(String itemName, int borrowCartId);
+	List<ItemEntity> findByUniqueIdIn(List<String> uniqueIds);
+	List<ItemEntity> findByBatchResupply(BatchResupplyEntity batchResupply);
+	List<ItemEntity> findByItemNameAndIsAutoUidTrueAndStatus(String itemName, String status, Pageable pageable);
+	List<ItemEntity> findByItemNameAndIsAutoUidFalseAndStatus(String itemName, String status, Pageable pageable);
+	List<ItemEntity> findByPreparingItem_IdIn(List<Integer> preparingItemIds);
+	List<ItemEntity> findByItemId(int itemId); // Add this method
+
+	ItemEntity findByItemNameIgnoreCase(String itemName);
+
+	// Add this method to the ItemRepository interface:
+	@Query("SELECT DISTINCT i.variant FROM ItemEntity i WHERE i.itemName = ?1 AND i.status = 'Available'")
+	List<String> findVariantsByItemName(String itemName);
+
+	@Query("SELECT DISTINCT i.variant FROM ItemEntity i WHERE i.inventory.inventoryId = :inventoryId AND i.variant IS NOT NULL AND i.variant <> ''")
+	List<String> findVariantsByInventoryId(@Param("inventoryId") Integer inventoryId);
+
+
+}

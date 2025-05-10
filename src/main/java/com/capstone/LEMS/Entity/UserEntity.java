@@ -1,80 +1,122 @@
 package com.capstone.LEMS.Entity;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name="tblusers")
+@Table(name="Users")
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class UserEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private int uid;
+	@Column(name = "user_id")
+	private int userId;
 	
-	private String fname;
-	private String lname;
+	@Column(name = "first_name")
+	private String firstName;
+	@Column(name = "last_name")
+	private String lastName;
 	private String password;
-	private String idnum;
+	@Column(name = "insti_id")
+	private String instiId;
 	private String email;
-	private String acctype;
+	@Column(nullable = false, name = "is_new")
+	private boolean isNew;
+	private String pfp;
+	
+	@ManyToOne
+	@JoinColumn(name = "role_id")
+	private RoleEntity role;
+	
+	@OneToMany(mappedBy = "teacher", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<RequestEntity> requests = new ArrayList<>();
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	@JsonIgnore
+	private List<BorrowItemEntity> borrowedItems = new ArrayList<>();
+	
+	@OneToMany(mappedBy = "user", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH}, orphanRemoval = false)
+	@JsonIgnore
+	private List<ItemEntity> items = new ArrayList<>();
 	
 	public UserEntity() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-	
-	public UserEntity(int uid, String fname, String lname, String password, String idnum, String email, String acctype) {
+
+	public UserEntity(int userId, String firstName, String lastName, String password, String instiId, String email, boolean isNew, RoleEntity role, String pfp) {
 		super();
-		this.uid = uid;
-		this.fname = fname;
-		this.lname = lname;
+		this.userId = userId;
+		this.firstName = firstName;
+		this.lastName = lastName;
 		this.password = password;
-		this.idnum = idnum;
+		this.instiId = instiId;
 		this.email = email;
-		this.acctype = acctype;
+		this.isNew = isNew;
+		this.role = role;
+		this.pfp = pfp;
 	}
 
-
+	@JsonProperty("user_id")
 	public int getUid() {
-		return uid;
+		return userId;
 	}
 
-	public void setUid(int uid) {
-		this.uid = uid;
+	public void setUid(int userId) {
+		this.userId = userId;
 	}
 
+	@JsonProperty("first_name")
 	public String getFname() {
-		return fname;
+		return firstName;
 	}
 
-	public void setFname(String fname) {
-		this.fname = fname;
+	public void setFname(String firstName) {
+		this.firstName = firstName;
 	}
 
+	@JsonProperty("last_name")
 	public String getLname() {
-		return lname;
+		return lastName;
 	}
 
-	public void setLname(String lname) {
-		this.lname = lname;
+	public void setLname(String lastName) {
+		this.lastName = lastName;
 	}
 
+	@JsonIgnore
 	public String getPassword() {
 		return password;
 	}
 
+	@JsonProperty
 	public void setPassword(String password) {
 		this.password = password;
 	}
 
-	public String getIdnum() {
-		return idnum;
+	@JsonProperty("insti_id")
+	public String getInstiId() {
+		return instiId;
 	}
 
-	public void setIdnum(String idnum) {
-		this.idnum = idnum;
+	public void setInstiId(String instiId) {
+		this.instiId = instiId;
 	}
 
 	public String getEmail() {
@@ -85,13 +127,36 @@ public class UserEntity {
 		this.email = email;
 	}
 
-	public String getAcctype() {
-		return acctype;
+	public RoleEntity getRole() {
+		return role;
 	}
 
-	public void setAcctype(String acctype) {
-		this.acctype = acctype;
+	public void setRole(RoleEntity role) {
+		this.role = role;
 	}
-	
-	
+
+	@JsonProperty("is_new")
+	public boolean isNew() {
+		return isNew;
+	}
+
+	public void setNew(boolean isNew) {
+		this.isNew = isNew;
+	}
+
+	public List<RequestEntity> getRequests() {
+		return requests;
+	}
+
+	public void setRequests(List<RequestEntity> requests) {
+		this.requests = requests;
+	}
+
+	public String getPfp() {
+		return pfp;
+	}
+
+	public void setPfp(String pfp) {
+		this.pfp = pfp;
+	}
 }
