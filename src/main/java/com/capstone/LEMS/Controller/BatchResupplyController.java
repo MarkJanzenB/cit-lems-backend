@@ -23,6 +23,10 @@ public class BatchResupplyController {
     @Autowired
     private TransactionHistoryService transactionHistoryService;
 
+    @GetMapping("/combinedresupplyhistory")
+    public ResponseEntity<?> getCombinedResupplyHistory() {
+        return batchResupplyService.getCombinedResupplyHistory();
+    }
     @PostMapping("/add")
     public BatchResupplyEntity addBatchResupply(@RequestBody BatchResupplyEntity batchResupply) {
         BatchResupplyEntity savedResupply = batchResupplyService.addBatchResupply(batchResupply);
