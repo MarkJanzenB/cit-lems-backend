@@ -37,7 +37,7 @@ public class TeacherScheduleEntity {
     @JoinColumn(name = "sy_id", nullable = true)  // Not nullable since it's required
     private SchoolYearEntity schoolYear;
     @ManyToOne
-    @JoinColumn(name = "subject_id", nullable = true) // Not nullable since it's required
+    @JoinColumn(name = "subject_id", referencedColumnName = "subject_id", nullable = true) // Not nullable since it's required
     private SubjectEntity subject;
 
 

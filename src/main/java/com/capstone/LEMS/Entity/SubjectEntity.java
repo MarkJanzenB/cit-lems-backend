@@ -14,7 +14,8 @@ import jakarta.persistence.*;
 public class SubjectEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int subjectId;
+	@Column(name = "subject_id")
+	private int subject_id;
     @Column(name = "subject_name")
     private String subjectName;
     
@@ -31,19 +32,19 @@ public class SubjectEntity {
 		// TODO Auto-generated constructor stub
 	}
 
-	public SubjectEntity(int subjectId, String subjectName) {
+	public SubjectEntity(int subject_id, String subjectName) {
 		super();
-		this.subjectId = subjectId;
+		this.subject_id = subject_id;
 		this.subjectName = subjectName;
 	}
 
 	public int getSubjectId() {
-		return subjectId;
+		return subject_id;
 	}
 
 	@JsonProperty("subject_id")
-	public void setSubjectId(int subjectId) {
-		this.subjectId = subjectId;
+	public void setSubjectId(int subject_id) {
+		this.subject_id = subject_id;
 	}
 
 	@JsonProperty("subject_name")
