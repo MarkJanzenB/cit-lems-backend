@@ -30,8 +30,7 @@ public class BatchResupplyController {
     @PostMapping("/add")
     public BatchResupplyEntity addBatchResupply(@RequestBody BatchResupplyEntity batchResupply) {
         BatchResupplyEntity savedResupply = batchResupplyService.addBatchResupply(batchResupply);
-
-        // Log resupply transaction
+       // Log resupply transaction
         TransactionHistory transaction = new TransactionHistory();
         transaction.setItemId(savedResupply.getItemId());
         transaction.setUserId(batchResupply.getAddedBy().getUid());
@@ -39,7 +38,6 @@ public class BatchResupplyController {
         transaction.setTransactionDate(new Date());
         transaction.setDetails("Resupplied item: " + savedResupply.getItemName());
         transactionHistoryService.saveTransactionHistory(transaction);
-
         return savedResupply;
     }
 
