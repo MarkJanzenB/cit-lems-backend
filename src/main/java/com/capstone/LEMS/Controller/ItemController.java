@@ -24,8 +24,10 @@ import com.capstone.LEMS.Service.ItemService;
 @RequestMapping("/item")
 @CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class ItemController {
+
     @Autowired
     ItemService itemserv;
+
 
     @GetMapping("/message")
     public String testMessage() {
@@ -77,5 +79,14 @@ public class ItemController {
         return itemserv.findByPreparingItemIds(preparingItemIds);
     }
 
+    @GetMapping("/getVariantsWithQuantities")
+    public ResponseEntity<List<Map<String, Object>>> getVariantsWithQuantities(@RequestParam String itemName, @RequestParam String categoryName) {
+        try {
+            List<Map<String, Object>> variants = itemserv.getAvailableVariantsWithQuantities(itemName, categoryName);
+            return ResponseEntity.ok(variants);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body(null);
+        }
+    }
 
 }
