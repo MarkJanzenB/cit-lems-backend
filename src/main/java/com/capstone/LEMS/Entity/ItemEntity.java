@@ -25,7 +25,9 @@ public class ItemEntity {
 	@Column(name = "item_name")
 	private String itemName;
 
-	@Column(name = "unique_id")
+	// Make sure this column has a UNIQUE constraint in the database
+	// UUIDs are typically 36 characters long (e.g., "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx")
+	@Column(name = "unique_id", unique = true, nullable = true, length = 36)
 	private String uniqueId;
 
 	@Column(name = "is_auto_uid")

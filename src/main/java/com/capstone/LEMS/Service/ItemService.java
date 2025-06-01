@@ -5,19 +5,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional; // IMPORTANT: Ensure Optional is imported for findById and findBy... methods
+import java.util.Optional;
 import java.util.stream.Collectors;
+// import java.util.UUID; // <--- REMOVE THIS IMPORT as we are no longer using UUIDs for unique_id
 
-import com.capstone.LEMS.Entity.*; // Ensure all necessary entities are imported (e.g., InventoryEntity, UserEntity, etc.)
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-// Ensure all repository imports are correct
+import com.capstone.LEMS.Entity.*;
 import com.capstone.LEMS.Repository.BatchResupplyRepository;
 import com.capstone.LEMS.Repository.BorrowCartRepository;
 import com.capstone.LEMS.Repository.BorrowItemRepository;
@@ -26,15 +18,23 @@ import com.capstone.LEMS.Repository.ItemRepository;
 import com.capstone.LEMS.Repository.ManufacturerRepository;
 import com.capstone.LEMS.Repository.UserRepository;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 @Service
 public class ItemService {
 	private static final Logger log = LoggerFactory.getLogger(ItemService.class);
 
 	@Autowired
-	ItemRepository itemrepo; // This is where the new methods are!
+	ItemRepository itemrepo;
 
-	@Autowired
-	IdCounterService idcountserv;
+//  @Autowired
+//  IdCounterService idcountserv; // This is correctly commented out and won't be used for Item unique_ids
 
 	@Autowired
 	UserRepository userrepo;
@@ -58,16 +58,17 @@ public class ItemService {
 	BatchResupplyService brserv;
 
 	@SuppressWarnings({ "unchecked", "null" })
-	@Transactional // Ensures atomicity: all DB operations in this method succeed or fail together
+	@Transactional
 	public ResponseEntity<?> AddItem(Map<String, Object> itemsToAdd, int bulkSize) {
 		// 1. Extracting data from the request Map
 		String itemName = (String) itemsToAdd.get("item_name");
 		int inventoryId = (int) itemsToAdd.get("inventory_id");
 		String category = (String) itemsToAdd.get("category");
 		List<String> uniqueIds = (List<String>) itemsToAdd.get("unique_ids"); // Will be null for consumables
-		List<ItemEntity> itemsToSave = new ArrayList<>(); // List to hold items to be saved/updated
+		// List<ItemEntity> itemsToSave = new ArrayList<>(); // <--- OLD: Renamed for clarity
+		List<ItemEntity> itemsToProcess = new ArrayList<>(); // <--- NEW: List to hold items before initial save
 
-		int quantity = (int) itemsToAdd.get("quantity"); // For consumables, this is the amount to add
+		int quantityFromFrontend = (int) itemsToAdd.get("quantity"); // This is the 'quantity' from frontend payload
 		String expiryDateStr = (String) itemsToAdd.get("expiry_date");
 		LocalDate expiryDate = (expiryDateStr != null && !expiryDateStr.isEmpty()) ? LocalDate.parse(expiryDateStr) : null;
 		String variant = (String) itemsToAdd.get("variant");
@@ -80,108 +81,91 @@ public class ItemService {
 		}
 
 		UserEntity user = userrepo.findById((int) itemsToAdd.get("uid")).orElse(null);
-		// IMPORTANT: Validation check for user
 		if (user == null) {
 			log.error("AddItem failed: User not found for UID {}", itemsToAdd.get("uid"));
-			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST)
-					.body("User not found for provided UID.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found for provided UID.");
 		}
 
 		InventoryEntity inventory = invrepo.findById(inventoryId).orElse(null);
-		// IMPORTANT: Validation check for inventory
 		if (inventory == null) {
 			log.error("AddItem failed: Inventory ID {} does not exist.", inventoryId);
-			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST)
-					.body("Inventory ID: " + inventoryId + " does not exist.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Inventory ID: " + inventoryId + " does not exist.");
 		}
 
-		// Create a new BatchResupply record for this transaction
 		BatchResupplyEntity batchResupply = new BatchResupplyEntity();
 		batchResupply.setDateResupply(LocalDate.now());
 		batchResupply.setAddedBy(user);
-		// Ensure this method saves the batch and returns the persisted entity
 		batchResupply = brserv.addBatchResupply(batchResupply);
 
-
 		// 2. Initial Validations
-		// IMPORTANT: Validation check for variant
 		if (variant == null || variant.trim().isEmpty()) {
 			log.error("AddItem failed: Variant field is blank or null.");
-			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST)
-					.body("Variant field should not be blank.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Variant field should not be blank.");
 		}
 
 		// 3. Conditional Logic based on Item Category
 		if (category != null && category.equalsIgnoreCase("Consumables")) {
-			// Consumable Item Logic: "Find or Create" a batch
-			// IMPORTANT: Validation for consumable quantity
-			if (quantity <= 0) {
+			if (quantityFromFrontend <= 0) { // For consumables, quantityFromFrontend is amountToAdd
 				log.error("AddItem failed (Consumable): Quantity to add must be greater than 0.");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Quantity to add for consumables must be greater than 0.");
 			}
 
-			// Attempt to find an existing ItemEntity (batch) for this consumable variant and expiry
-			// Uses the new ItemRepository method: findByInventory_InventoryIdAndVariantAndExpiryDate
 			Optional<ItemEntity> existingConsumableItemOptional = itemrepo.findByInventory_InventoryIdAndVariantAndExpiryDate(
 					inventoryId, variant, expiryDate
 			);
 
 			if (existingConsumableItemOptional.isPresent()) {
-				// Scenario A: An existing batch is found. Update its quantity.
 				log.info("Found existing consumable batch for inventoryId: {}, variant: {}, expiry: {}. Increasing quantity.",
 						inventoryId, variant, expiryDate);
 				ItemEntity existingItem = existingConsumableItemOptional.get();
-				existingItem.setQuantity(existingItem.getQuantity() + quantity);
-				// Optionally: If you want to link the existing item's last resupply to the new batch, do it here.
-				 existingItem.setBatchResupply(batchResupply); // Uncomment if you want to update resupply batch
-				itemsToSave.add(existingItem); // Add to the list to be saved/updated
+				existingItem.setQuantity(existingItem.getQuantity() + quantityFromFrontend);
+				existingItem.setBatchResupply(batchResupply);
+				itemsToProcess.add(existingItem); // Add to list for final save
 			} else {
-				// Scenario B: No existing batch found. Create a new ItemEntity for this unique variant/expiry.
 				log.info("Creating new consumable batch for inventoryId: {}, variant: {}, expiry: {}.",
 						inventoryId, variant, expiryDate);
 				ItemEntity newItem = new ItemEntity();
 				newItem.setItemName(itemName);
 				newItem.setInventory(inventory);
 				newItem.setStatus("Available");
-				newItem.setAutoUid(false); // Consumables typically don't have unique IDs
-				newItem.setQuantity(quantity);
+				newItem.setAutoUid(true); // Consumables are auto-UID (no individual serial)
+				newItem.setUniqueId(null); // Consumables typically don't have individual unique IDs
+				newItem.setQuantity(quantityFromFrontend);
 				newItem.setExpiryDate(expiryDate);
-				newItem.setVariant(variant); // The new variant is explicitly set here
-				newItem.setBatchResupply(batchResupply); // Link to the current resupply batch
+				newItem.setVariant(variant);
+				newItem.setBatchResupply(batchResupply);
 				if (manufacturer != null) {
 					newItem.setManufacturer(manufacturer);
 				}
-				itemsToSave.add(newItem); // Add to the list to be saved
+				itemsToProcess.add(newItem); // Add to list for final save
 			}
 		} else {
 			// Non-Consumable Item Logic: Create individual ItemEntities for each unit
-			// bulkSize here represents the number of individual items to add.
-			// IMPORTANT: Validation for non-consumable bulkSize
-			if (bulkSize <= 0) {
+			if (bulkSize <= 0) { // bulkSize from frontend is amountToAdd for non-consumables
 				log.error("AddItem failed (Non-Consumable): Invalid bulk size {}. It must be greater than zero.", bulkSize);
-				return ResponseEntity
-						.status(HttpStatus.BAD_REQUEST)
-						.body("Invalid bulk size for non-consumables. It must be greater than zero.");
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid bulk size for non-consumables. It must be greater than zero.");
 			}
 
-			// Check for existing unique IDs to prevent duplicates
+			// Check for existing custom unique IDs to prevent duplicates BEFORE creating new items
+			List<String> providedUniqueIds = new ArrayList<>();
 			if (uniqueIds != null && !uniqueIds.isEmpty()) {
-				List<ItemEntity> foundItems = itemrepo.findByUniqueIdIn(uniqueIds);
+				providedUniqueIds = uniqueIds.stream()
+						.filter(id -> id != null && !id.trim().isEmpty())
+						.map(String::trim)
+						.collect(Collectors.toList());
+			}
+
+			if (!providedUniqueIds.isEmpty()) {
+				List<ItemEntity> foundItems = itemrepo.findByUniqueIdIn(providedUniqueIds);
 				if (!foundItems.isEmpty()) {
 					List<String> foundUniqueIds = foundItems.stream()
 							.map(ItemEntity::getUniqueId)
 							.collect(Collectors.toList());
-
 					Map<String, Object> response = new HashMap<>();
 					response.put("message", "The following Unique IDs already exist:");
 					response.put("unique_ids", foundUniqueIds);
 					log.error("AddItem failed (Non-Consumable): Duplicate unique IDs found: {}", foundUniqueIds);
-					return ResponseEntity
-							.status(HttpStatus.CONFLICT)
-							.body(response);
+					return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
 				}
 			}
 
@@ -191,59 +175,74 @@ public class ItemService {
 				newItem.setItemName(itemName);
 				newItem.setInventory(inventory);
 				newItem.setStatus("Available");
-				newItem.setVariant(variant); // The new variant is explicitly set here for non-consumables too
+				newItem.setVariant(variant);
 				newItem.setQuantity(1); // Each non-consumable ItemEntity represents one unit
 				newItem.setBatchResupply(batchResupply);
 				if (manufacturer != null) {
 					newItem.setManufacturer(manufacturer);
 				}
 
-				// Assign unique ID: either custom or auto-generated
-				if (uniqueIds != null && i < uniqueIds.size()) { // Check bounds for uniqueIds list
-					newItem.setUniqueId(uniqueIds.get(i));
+				// Assign unique ID: either custom or flag for auto-generation (will be populated AFTER first save)
+				if (i < providedUniqueIds.size()) {
+					newItem.setUniqueId(providedUniqueIds.get(i));
 					newItem.setAutoUid(false); // Manually provided UID
 				} else {
-					// Auto-generate UID based on item name and ID counter
-					String prefix = itemName.length() >= 2 ? itemName.substring(0, 2).toUpperCase() : itemName.toUpperCase();
-					if (itemName.length() > 0) { // Add last char if name is long enough
-						prefix += itemName.substring(itemName.length() - 1).toUpperCase();
-					} else {
-						prefix = "XX"; // Fallback for very short or empty names to ensure a prefix
-					}
-
-					// Get the next ID from your counter service and format it
-					int nextCounterId = idcountserv.getNextId(); // This method should ideally return and increment a global counter per call
-					String uniqueId = prefix + String.format("%04d", nextCounterId); // Format to 4 digits (e.g., 0001, 0002)
-					newItem.setUniqueId(uniqueId);
-					newItem.setAutoUid(true);
+					newItem.setAutoUid(true); // <--- NEW: Flag for auto-generation after save
+					newItem.setUniqueId(null); // <--- NEW: Temporarily null, will be set after getting itemId
 				}
-				itemsToSave.add(newItem);
+				itemsToProcess.add(newItem); // <--- Add to `itemsToProcess` list
 			}
 		}
 
 		// 4. Save all prepared ItemEntities to the database
-		// This will either insert new records or update existing ones (for consumables)
-		List<ItemEntity> savedItems = itemrepo.saveAll(itemsToSave);
-		log.info("Successfully saved/updated {} items.", savedItems.size());
+		// This first save will assign itemIds to new entities due to GenerationType.IDENTITY
+		List<ItemEntity> savedItems = itemrepo.saveAll(itemsToProcess);
+		log.info("Successfully performed initial save/update for {} items.", savedItems.size());
 
-		// 5. Update the overall InventoryEntity quantity (CRUCIAL for accurate stock count)
-		// Uses the new ItemRepository method: sumQuantityByInventoryId
+		// 5. Post-save processing for auto-generated unique_ids (NON-CONSUMABLES ONLY)
+		// This loop only runs for items that were just inserted AND needed auto-UIDs
+		List<ItemEntity> itemsToUpdateWithGeneratedUID = new ArrayList<>();
+		for (ItemEntity item : savedItems) {
+			// Check if it's an auto-UID item and its uniqueId is still null (meaning it was just inserted)
+			if (item.isAutoUid() && item.getUniqueId() == null && item.getItemId() != 0) { // item.getItemId() != 0 checks if it got an ID
+				// Generate the prefix based on item name (as per your existing logic)
+				String prefix = item.getItemName().length() >= 2 ? item.getItemName().substring(0, 2).toUpperCase() : item.getItemName().toUpperCase();
+				if (item.getItemName().length() > 0) {
+					prefix += item.getItemName().substring(item.getItemName().length() - 1).toUpperCase();
+				} else {
+					prefix = "XX";
+				}
+
+				// <--- CRUCIAL CHANGE: Use the newly assigned itemId as the sequential number
+				String uniqueId = prefix + String.format("%04d", item.getItemId()); // Format to 4 digits
+				item.setUniqueId(uniqueId);
+				itemsToUpdateWithGeneratedUID.add(item);
+			}
+		}
+
+		// <--- NEW: Perform a second saveAll to update items with their generated unique_ids
+		if (!itemsToUpdateWithGeneratedUID.isEmpty()) {
+			itemrepo.saveAll(itemsToUpdateWithGeneratedUID);
+			log.info("Successfully updated {} items with auto-generated unique IDs.", itemsToUpdateWithGeneratedUID.size());
+		}
+
+		// 6. Update the overall InventoryEntity quantity (CRUCIAL for accurate stock count)
 		Integer totalQuantityInInventory = itemrepo.sumQuantityByInventoryId(inventoryId);
-		if (totalQuantityInInventory == null) totalQuantityInInventory = 0; // Handle case where no items are found for inventory
+		if (totalQuantityInInventory == null) totalQuantityInInventory = 0;
 
 		inventory.setQuantity(totalQuantityInInventory);
 		inventory.setStatus(totalQuantityInInventory > 0 ? "Available" : "Out of stock");
-		invrepo.save(inventory); // Save the updated InventoryEntity
+		invrepo.save(inventory);
 		log.info("Inventory '{}' (ID: {}) quantity updated to: {}. Status set to: {}",
 				inventory.getName(), inventory.getInventoryId(), inventory.getQuantity(), inventory.getStatus());
 
-		// 6. Return response
-		return ResponseEntity
-				.status(HttpStatus.CREATED) // 201 Created
-				.body(savedItems); // Return the list of saved/updated ItemEntities
+		// 7. Return response
+		// The `savedItems` list will now contain the fully updated items (with unique_id set for auto-generated ones)
+		return ResponseEntity.status(HttpStatus.CREATED).body(savedItems);
 	}
 
-	// --- Other methods of ItemService follow below ---
+
+	// --- Other methods of ItemService follow below (no changes needed) ---
 
 	public ResponseEntity<?> updateItems(String itemToEdit, ItemEntity newItemDetails){
 		log.info("Starting updateItems for itemToEdit: {}", itemToEdit);
@@ -461,7 +460,7 @@ public class ItemService {
 				variant.put("id", item.getItemId());
 				variant.put("name", item.getItemName());
 				variant.put("variant", item.getVariant()); // Include variant here
-				variant.put("serialNumber", item.getUniqueId());
+				variant.put("serialNumber", item.getUniqueId()); // This will now reflect the generated ID
 				variant.put("quantity", item.getQuantity()); // Include quantity for consumables
 				variant.put("expiryDate", item.getExpiryDate() != null ? item.getExpiryDate().toString() : null); // Include expiry date
 				return variant;
@@ -499,9 +498,11 @@ public class ItemService {
 					.status(HttpStatus.OK)
 					.body(consumableBatches);
 		}else {
+			// For non-consumables, return auto-UIDs as well
+			// This previously filtered by !item.isAutoUid(), now it will include them
 			List<String> uniqueIds = availableItems.stream()
-					.filter(item -> !item.isAutoUid())
-					.map(ItemEntity::getUniqueId)
+					.map(ItemEntity::getUniqueId) // <--- Modified: now maps all unique_ids, whether custom or auto-generated
+					.filter(id -> id != null && !id.trim().isEmpty()) // <--- Ensure non-null/empty UIDs are returned
 					.collect(Collectors.toList());
 			return ResponseEntity
 					.status(HttpStatus.OK)
