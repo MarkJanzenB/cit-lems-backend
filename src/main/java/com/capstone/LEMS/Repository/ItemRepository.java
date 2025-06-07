@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 import com.capstone.LEMS.Entity.BatchResupplyEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.BorrowCartEntity; // Make sure this is imported if used in findByItemNameAndVariantAndBorrowCart
+												  // PS: this import is never used
 
 
 @Repository
