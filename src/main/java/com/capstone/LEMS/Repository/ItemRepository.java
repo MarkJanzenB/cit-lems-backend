@@ -32,6 +32,13 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Integer> {
 	ItemEntity findByItemNameIgnoreCase(String itemName);
 
 
+	// AI slop
+	// also try to not to use query annotations as much as possible next time (Rule #4)
+	/*
+	 * TODO: Baclayon
+	 * -Remove these obvious AI comments
+	 * -If applicable: Do not use query annotations
+	 * */
 	// Existing custom queries you provided:
 	@Query("SELECT DISTINCT i.variant FROM ItemEntity i WHERE i.itemName = :itemName AND i.status = :status AND i.variant IS NOT NULL AND i.variant <> ''")
 	List<String> findVariantsByItemNameAndStatus(@Param("itemName") String itemName, @Param("status") String status);

@@ -243,6 +243,7 @@ public class ItemService {
 
 
 	// --- Other methods of ItemService follow below (no changes needed) ---
+	// OwO what is this comment for?
 
 	public ResponseEntity<?> updateItems(String itemToEdit, ItemEntity newItemDetails){
 		log.info("Starting updateItems for itemToEdit: {}", itemToEdit);
@@ -565,4 +566,10 @@ public class ItemService {
 		}
 	}
 
+	public ResponseEntity<?> getItemsByName(String itemName, String status){
+		List<ItemEntity> availableItems = itemrepo.findByItemNameAndStatus(itemName, status);
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(availableItems);
+	}
 }

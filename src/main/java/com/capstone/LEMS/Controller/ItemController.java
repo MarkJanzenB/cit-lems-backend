@@ -89,4 +89,8 @@ public class ItemController {
         }
     }
 
+    @GetMapping("/getitemsbyname/{status}/{itemName}")
+    public ResponseEntity<?> getItemsByName(@PathVariable("itemName") String itemName, @PathVariable("status") String status){
+    	return itemserv.getItemsByName(itemName, status);
+    }
 }
