@@ -270,6 +270,10 @@ public class ItemService {
 				.body(updatedItems);
 	}
 
+	/*
+	 * Deletes items only based on bulk size
+	 * not specifically
+	 * */
 	public ResponseEntity<?> deleteItems(int bulkSize, ItemEntity itemsToDelete){
 		if(itemsToDelete.getItemName() == null || itemsToDelete.getItemName().trim().isEmpty()) {
 			log.warn("Validation failed: itemsToDelete.getItemName() is blank or null");
@@ -571,5 +575,27 @@ public class ItemService {
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body(availableItems);
+	}
+	
+	public ResponseEntity<?> deleteSpecificItems(List<ItemEntity> itemsToDel){
+		itemrepo.deleteAll(itemsToDel);
+		
+		/**
+		 *  After deletion, update the overall InventoryEntity quantity
+		 * */
+		if (!itemsToDel.isEmpty()) {
+			int inventoryId = itemsToDel.get(0).getInventory().getInventoryId();
+			InventoryEntity inventory = invrepo.findById(inventoryId).orElse(null);
+			if (inventory != null) {
+				int quantity = inventory.getQuantity() - itemsToDel.size();
+				inventory.setQuantity(quantity);
+				inventory.setStatus(quantity > 0 ? "Available" : "Out of stock");
+				invrepo.save(inventory);
+			}
+		}
+		
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body(itemsToDel);
 	}
 }

@@ -93,4 +93,9 @@ public class ItemController {
     public ResponseEntity<?> getItemsByName(@PathVariable("itemName") String itemName, @PathVariable("status") String status){
     	return itemserv.getItemsByName(itemName, status);
     }
+    
+    @DeleteMapping("/deletespecificitems")
+    public ResponseEntity<?> deleteSpecificItems(@RequestBody List<ItemEntity> itemsToDel){
+    	return itemserv.deleteSpecificItems(itemsToDel);
+    }
 }
