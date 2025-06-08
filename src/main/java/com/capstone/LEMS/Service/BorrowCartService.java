@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.Arrays; // This import might become unused but keeping it for now
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -140,23 +140,25 @@ public class BorrowCartService {
         return teacherScheduleRepository.findByTeacher(teacher);
     }
 
-    public void updateItemVariant(int id, String newVariant) {
-        Optional<BorrowCartEntity> borrowCartEntityOptional = borrowCartRepository.findById(id);
-        if (borrowCartEntityOptional.isPresent()) {
-            BorrowCartEntity borrowCartEntity = borrowCartEntityOptional.get();
-            borrowCartEntity.setSelectedVariant(newVariant);
-            borrowCartRepository.save(borrowCartEntity);
-        } else {
-            throw new RuntimeException("Borrow cart item not found with ID: " + id);
-        }
+    @Transactional // Ensure the operation is atomic
+    public void updateItemVariant(int borrowCartId, String newVariant) {
+        BorrowCartEntity cartItem = borrowCartRepository.findById(borrowCartId)
+                .orElseThrow(() -> new RuntimeException("Borrow cart item not found with ID: " + borrowCartId));
+
+        cartItem.setSelectedVariant(newVariant); // Assuming your BorrowCartEntity has a setSelectedVariant method
+        borrowCartRepository.save(cartItem);
     }
 
+    /**
+     * Fetches all distinct available variants for a given item name.
+     * This method now correctly uses the ItemRepository's query
+     * to get all distinct variants marked as 'Available'.
+     * @param itemName The name of the item.
+     * @return A list of distinct variant strings.
+     */
     public List<String> getAvailableVariants(String itemName) {
-        ItemEntity item = itemRepository.findByItemNameIgnoreCase(itemName);
-        if (item != null && item.getVariant() != null) {
-            return Arrays.asList(item.getVariant().split(","));
-        }
-        return Collections.emptyList();
+        // Correctly use the ItemRepository's query to get all distinct 'Available' variants
+        return itemRepository.findVariantsByItemNameAndStatus(itemName, "Available");
     }
 
     public void updateItemQuantity(int id, int newQuantity) {
@@ -169,5 +171,4 @@ public class BorrowCartService {
             throw new RuntimeException("Borrow cart item not found with ID: " + id);
         }
     }
-
 }
