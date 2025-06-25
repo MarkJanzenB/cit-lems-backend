@@ -2,8 +2,6 @@ package com.capstone.LEMS.Service;
 
 import com.capstone.LEMS.Entity.BorrowItemEntity;
 import com.capstone.LEMS.Repository.BorrowItemRepository;
-import com.capstone.LEMS.Service.TransactionHistoryService; // Import the new service
-import com.capstone.LEMS.Entity.TransactionHistory; // Import the TransactionHistory entity
 import java.util.Date; // Import Date for transaction date
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +17,6 @@ public class BorrowItemService {
 
     @Autowired
     private BorrowItemRepository borrowItemRepository;
-
-    @Autowired
-    private TransactionHistoryService transactionHistoryService; // Inject the transaction history service
 
     public List<BorrowItemEntity> getBorrowItemsByUid(int uid) {
         List<BorrowItemEntity> items = borrowItemRepository.findByUser_UserId(uid);
@@ -70,16 +65,6 @@ public class BorrowItemService {
         for (BorrowItemEntity item : borrowItemEntities) {
             item.setStatus(status);
             borrowItemRepository.save(item);
-            
-            // Create a transaction record
-            TransactionHistory transaction = new TransactionHistory();
-            transaction.setItemId(item.getItemId());
-            transaction.setUserId(item.getUser().getUid());
-            transaction.setTransactionType("borrow"); // or "return" based on your logic
-            transaction.setTransactionDate(new Date());
-            transaction.setBorrowItem(item); // Link to the BorrowItemEntity
-            transaction.setBatchResupply(null); // Set to null or link to a BatchResupplyEntity if applicable
-            transactionHistoryService.saveTransactionHistory(transaction); // Save the transaction history
         }
     }
 
