@@ -110,7 +110,7 @@ public class ItemService {
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Quantity to add for consumables must be greater than 0.");
 			}
 
-			Optional<ItemEntity> existingConsumableItemOptional = itemrepo.findByInventory_InventoryIdAndVariantAndExpiryDate(
+			Optional<ItemEntity> existingConsumableItemOptional = itemrepo.findByInventory_InventoryIdAndVariantAndExpiryDateAndIsDeletedFalse(
 					inventoryId, variant, expiryDate
 			);
 
@@ -137,6 +137,7 @@ public class ItemService {
 				if (manufacturer != null) {
 					newItem.setManufacturer(manufacturer);
 				}
+				newItem.setIsDeleted(false); // Ensure new items are not deleted
 				itemsToProcess.add(newItem); // Add to list for final save
 			}
 		} else {
@@ -156,7 +157,7 @@ public class ItemService {
 			}
 
 			if (!providedUniqueIds.isEmpty()) {
-				List<ItemEntity> foundItems = itemrepo.findByUniqueIdIn(providedUniqueIds);
+				List<ItemEntity> foundItems = itemrepo.findByUniqueIdInAndIsDeletedFalse(providedUniqueIds);
 				if (!foundItems.isEmpty()) {
 					List<String> foundUniqueIds = foundItems.stream()
 							.map(ItemEntity::getUniqueId)
@@ -181,6 +182,7 @@ public class ItemService {
 				if (manufacturer != null) {
 					newItem.setManufacturer(manufacturer);
 				}
+				newItem.setIsDeleted(false); // Ensure new items are not deleted
 
 				// Assign unique ID: either custom or flag for auto-generation (will be populated AFTER first save)
 				if (i < providedUniqueIds.size()) {
@@ -256,7 +258,8 @@ public class ItemService {
 		}
 
 		log.info("Fetching items with name: {}", itemToEdit);
-		List<ItemEntity> items = itemrepo.findByItemName(itemToEdit);
+		// Use findByItemNameAndIsDeletedFalse
+		List<ItemEntity> items = itemrepo.findByItemNameAndIsDeletedFalse(itemToEdit);
 
 		log.info("Updating items with new name: {}", newItemDetails.getItemName());
 		items.forEach(item -> {
@@ -283,7 +286,8 @@ public class ItemService {
 		}
 
 		log.info("Fetching items with name: {}", itemsToDelete.getItemName());
-		List<ItemEntity> items = itemrepo.findByItemNameAndUserIsNullOrderByItemIdDesc(itemsToDelete.getItemName());
+		// Use findByItemNameAndUserIsNullAndIsDeletedFalseOrderByItemIdDesc
+		List<ItemEntity> items = itemrepo.findByItemNameAndUserIsNullAndIsDeletedFalseOrderByItemIdDesc(itemsToDelete.getItemName());
 
 		if(items.isEmpty()) {
 			log.warn("No items found with name: {}", itemsToDelete.getItemName());
@@ -300,9 +304,11 @@ public class ItemService {
 		}
 
 		List<ItemEntity> itemsToDeleteList = items.subList(0, bulkSize);
-		log.info("Deleting {} items with name: {}", itemsToDeleteList.size(), itemsToDelete.getItemName());
-		itemrepo.deleteAll(itemsToDeleteList);
-		log.info("Successfully deleted {} items", itemsToDeleteList.size());
+		log.info("Soft deleting {} items with name: {}", itemsToDeleteList.size(), itemsToDelete.getItemName());
+		// Instead of deleteAll, iterate and set isDeleted to true
+		itemsToDeleteList.forEach(item -> item.setIsDeleted(true));
+		itemrepo.saveAll(itemsToDeleteList); // Save the updated status
+		log.info("Successfully soft-deleted {} items", itemsToDeleteList.size());
 
 		// After deletion, update the overall InventoryEntity quantity
 		// Get the inventory entity associated with these items
@@ -316,18 +322,19 @@ public class ItemService {
 				inventory.setQuantity(totalQuantityInInventory);
 				inventory.setStatus(totalQuantityInInventory > 0 ? "Available" : "Out of stock");
 				invrepo.save(inventory);
-				log.info("Inventory {} quantity updated after deletion to: {}", inventory.getName(), inventory.getQuantity());
+				log.info("Inventory {} quantity updated after soft deletion to: {}", inventory.getName(), inventory.getQuantity());
 			}
 		}
 
 
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body("Successfully deleted " + itemsToDeleteList.size() + " items.");
+				.body("Successfully soft-deleted " + itemsToDeleteList.size() + " items.");
 	}
 
 	public List<ItemEntity> getAllItems(){
-		return itemrepo.findAll();
+		// Use findByIsDeletedFalse() to only retrieve non-deleted items
+		return itemrepo.findByIsDeletedFalse();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -349,7 +356,8 @@ public class ItemService {
 		for(Map<String, Object> itemReq: itemsRequest) {
 			String itemName = (String) itemReq.get("itemName");
 			int quantity = (int) itemReq.get("quantity");
-			List<ItemEntity> availableItems = itemrepo.findByItemNameAndStatus(itemName, "Available");
+			// Use findByItemNameAndStatusAndIsDeletedFalse
+			List<ItemEntity> availableItems = itemrepo.findByItemNameAndStatusAndIsDeletedFalse(itemName, "Available");
 
 			if (availableItems.size() < quantity) {
 				return ResponseEntity
@@ -381,7 +389,8 @@ public class ItemService {
 			String status = (String) itemReq.get("status");
 			int quantity = (int) itemReq.get("quantity");
 
-			List<ItemEntity> items = itemrepo.findByItemNameAndBorrowCart_Id(itemName, borrowCartID);
+			// Use findByItemNameAndBorrowCart_IdAndIsDeletedFalse
+			List<ItemEntity> items = itemrepo.findByItemNameAndBorrowCart_IdAndIsDeletedFalse(itemName, borrowCartID);
 
 			if (items.isEmpty()) {
 				return ResponseEntity
@@ -435,6 +444,7 @@ public class ItemService {
 		List<ItemEntity> itemToSend = new ArrayList<>();
 
 		for(int i = 0; i < batches.size(); i++) {
+			// Changed to findByBatchResupply to include all items regardless of isDeleted status
 			List<ItemEntity> items = itemrepo.findByBatchResupply(batches.get(i));
 			itemToSend.addAll(items);
 		}
@@ -464,10 +474,10 @@ public class ItemService {
 				Map<String, Object> variant = new HashMap<>();
 				variant.put("id", item.getItemId());
 				variant.put("name", item.getItemName());
-				variant.put("variant", item.getVariant()); // Include variant here
 				variant.put("serialNumber", item.getUniqueId()); // This will now reflect the generated ID
 				variant.put("quantity", item.getQuantity()); // Include quantity for consumables
-				variant.put("expiryDate", item.getExpiryDate() != null ? item.getExpiryDate().toString() : null); // Include expiry date
+				// Add isDeleted status to the variant details for history purposes
+				variant.put("isDeleted", item.getIsDeleted());
 				return variant;
 			}).collect(Collectors.toList());
 
@@ -481,7 +491,8 @@ public class ItemService {
 	}
 
 	public ResponseEntity<?> getListOfUniqueIDs(String itemName, String category){
-		List<ItemEntity> items = itemrepo.findByItemName(itemName);
+		// Use findByItemNameAndIsDeletedFalse
+		List<ItemEntity> items = itemrepo.findByItemNameAndIsDeletedFalse(itemName);
 		List<ItemEntity> availableItems = items.stream()
 				.filter(item -> "Available".equals(item.getStatus()))
 				.collect(Collectors.toList());
@@ -517,12 +528,14 @@ public class ItemService {
 	}
 
 	public ResponseEntity<?> findByPreparingItemIds(List<Integer> preparingItemIds){
+		// Use findByPreparingItem_IdInAndIsDeletedFalse
 		return ResponseEntity
 				.status(HttpStatus.OK)
-				.body(itemrepo.findByPreparingItem_IdIn(preparingItemIds));
+				.body(itemrepo.findByPreparingItem_IdInAndIsDeletedFalse(preparingItemIds));
 	}
 
 	public List<String> getAvailableVariants(String itemName) {
+		// Ensure the query only fetches non-deleted items
 		return itemrepo.findVariantsByItemNameAndStatus(itemName, "Available").stream()
 				.filter(variant -> variant != null && !variant.isEmpty()) // Filter out null or empty variants
 				.collect(Collectors.toList());
@@ -532,6 +545,7 @@ public class ItemService {
 		log.info("Fetching variants for item: {}, category: {}", itemName, categoryName);
 
 		if (categoryName != null && categoryName.equalsIgnoreCase("Consumables")) {
+			// Ensure the query only fetches non-deleted items
 			List<Object[]> results = itemrepo.findConsumableVariantQuantities(itemName, "Available");
 			log.info("Consumable variants found: {}", results.size());
 			return results.stream()
@@ -544,6 +558,7 @@ public class ItemService {
 					.collect(Collectors.toList());
 		} else {
 			// Logic for Non-Consumables
+			// Ensure the query only fetches non-deleted items
 			List<String> distinctVariants = itemrepo.findVariantsByItemNameAndStatus(itemName, "Available");
 			log.info("Non-consumable distinct variants found: {}", distinctVariants.size());
 
@@ -555,10 +570,10 @@ public class ItemService {
 						// --- THIS IS THE CRITICAL PART FOR NON-CONSUMABLES' QUANTITY ---
 						// We need to count individual ItemEntity records that match the itemName,
 						// are 'Available', and have this specific 'variant'.
-						// The `findByItemNameAndStatus` returns a List<ItemEntity>.
+						// The `findByItemNameAndStatusAndIsDeletedFalse` returns a List<ItemEntity>.
 						// We then filter that list by variant. This is the correct approach.
 
-						List<ItemEntity> availableItemsForVariant = itemrepo.findByItemNameAndStatus(itemName, "Available")
+						List<ItemEntity> availableItemsForVariant = itemrepo.findByItemNameAndStatusAndIsDeletedFalse(itemName, "Available")
 								.stream()
 								.filter(item -> variant.equals(item.getVariant())) // Ensure variant is not null on item
 								.collect(Collectors.toList());
@@ -571,29 +586,34 @@ public class ItemService {
 	}
 
 	public ResponseEntity<?> getItemsByName(String itemName, String status){
-		List<ItemEntity> availableItems = itemrepo.findByItemNameAndStatus(itemName, status);
+		// Use findByItemNameAndStatusAndIsDeletedFalse
+		List<ItemEntity> availableItems = itemrepo.findByItemNameAndStatusAndIsDeletedFalse(itemName, status);
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body(availableItems);
 	}
-	
+
 	public ResponseEntity<?> deleteSpecificItems(List<ItemEntity> itemsToDel){
-		itemrepo.deleteAll(itemsToDel);
-		
+		// Instead of deleteAll, iterate and set isDeleted to true
+		itemsToDel.forEach(item -> item.setIsDeleted(true));
+		itemrepo.saveAll(itemsToDel); // Save the updated status
+
 		/**
-		 *  After deletion, update the overall InventoryEntity quantity
+		 * After soft deletion, update the overall InventoryEntity quantity
 		 * */
 		if (!itemsToDel.isEmpty()) {
 			int inventoryId = itemsToDel.get(0).getInventory().getInventoryId();
 			InventoryEntity inventory = invrepo.findById(inventoryId).orElse(null);
 			if (inventory != null) {
-				int quantity = inventory.getQuantity() - itemsToDel.size();
-				inventory.setQuantity(quantity);
-				inventory.setStatus(quantity > 0 ? "Available" : "Out of stock");
+				// Recalculate total quantity from non-deleted items only
+				Integer totalQuantityInInventory = itemrepo.sumQuantityByInventoryId(inventoryId);
+				if (totalQuantityInInventory == null) totalQuantityInInventory = 0;
+				inventory.setQuantity(totalQuantityInInventory);
+				inventory.setStatus(totalQuantityInInventory > 0 ? "Available" : "Out of stock");
 				invrepo.save(inventory);
 			}
 		}
-		
+
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body(itemsToDel);

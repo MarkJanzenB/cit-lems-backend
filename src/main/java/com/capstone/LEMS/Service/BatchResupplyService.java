@@ -21,10 +21,10 @@ public class BatchResupplyService {
 
     @Autowired
     private BatchResupplyRepository batchResupplyRepository;
-    
+
     @Autowired
     UserRepository userrepo;
-    
+
     @Autowired
     private ItemRepository itemRepository;
 
@@ -37,10 +37,11 @@ public class BatchResupplyService {
             UserEntity user = (UserEntity) entry[1];
 
             // Fetch items for the given date and user
+            // Changed to findByBatchResupplyAndIsDeletedFalse
             List<BatchResupplyEntity> batches = batchResupplyRepository.findByDateResupplyAndAddedBy(date, user);
             List<ItemEntity> items = new ArrayList<>();
             for (BatchResupplyEntity batch : batches) {
-                items.addAll(itemRepository.findByBatchResupply(batch));
+                items.addAll(itemRepository.findByBatchResupplyAndIsDeletedFalse(batch));
             }
 
             // Group items by name
@@ -87,14 +88,14 @@ public class BatchResupplyService {
     public List<BatchResupplyEntity> getAllBatchResupplies() {
         return batchResupplyRepository.findAll();
     }
-    
+
     public ResponseEntity<?> getByLocalDateAndAddedBy(LocalDate dateResupply, int userID){
         UserEntity user = userrepo.findById(userID).orElse(null);
         return ResponseEntity
                 .status(HttpStatus.OK)
                 .body(batchResupplyRepository.findByDateResupplyAndAddedBy(dateResupply, user));
     }
-    
+
     public ResponseEntity<?> getAllDisctinct(){
         return ResponseEntity
                 .status(HttpStatus.OK)
