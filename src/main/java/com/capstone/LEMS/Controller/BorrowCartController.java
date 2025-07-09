@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/borrowcart")
+@RequestMapping("/borrowcart")
 @CrossOrigin(origins = "https://cit-lems.vercel.app")
 public class BorrowCartController {
 
