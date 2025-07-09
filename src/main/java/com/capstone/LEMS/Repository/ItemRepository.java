@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.capstone.LEMS.Entity.PreparingItemEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -41,6 +42,10 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Integer> {
 	// Instead of findAll, provide a method to get all non-deleted items
 	List<ItemEntity> findByIsDeletedFalse();
 
+	long countByItemNameAndStatus(String itemName, String status);
+
+	List<ItemEntity> findByPreparingItem(PreparingItemEntity prep);
+
 
 	// Existing custom queries updated to include i.isDeleted = false
 	@Query("SELECT DISTINCT i.variant FROM ItemEntity i WHERE i.itemName = :itemName AND i.status = :status AND i.variant IS NOT NULL AND i.variant <> '' AND i.isDeleted = false")
@@ -64,4 +69,10 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Integer> {
 	@Query("SELECT i.variant, i.quantity FROM ItemEntity i WHERE i.itemName = :itemName AND i.status = :status AND i.inventory.itemCategory.categoryName = 'Consumables' AND i.isDeleted = false")
 	List<Object[]> findConsumableVariantQuantities(@Param("itemName") String itemName, @Param("status") String status);
 
+
+	long countByInventory_InventoryIdAndStatusAndIsDeletedFalse(
+			Integer inventoryId,
+			String status
+	);
 }
+

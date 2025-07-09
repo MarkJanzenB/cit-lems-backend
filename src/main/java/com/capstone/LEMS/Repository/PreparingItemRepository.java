@@ -1,5 +1,6 @@
 package com.capstone.LEMS.Repository;
 
+import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.PreparingItemEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -11,4 +12,5 @@ public interface PreparingItemRepository extends JpaRepository<PreparingItemEnti
     List<PreparingItemEntity> findByInstiIdAndStatus(String instiId, String status);
     List<PreparingItemEntity> findByStatus(String status);
     List<PreparingItemEntity> findByReferenceCode(String referenceCode);
+
 }

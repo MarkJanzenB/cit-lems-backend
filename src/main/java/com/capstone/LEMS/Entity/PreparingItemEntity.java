@@ -38,6 +38,10 @@ public class PreparingItemEntity {
     @JsonIgnore
     private List<ItemEntity> items = new ArrayList<>();
 
+    @ManyToOne
+    @JoinColumn(name = "inventory_id")
+    private InventoryEntity inventory;
+
     public PreparingItemEntity() {}
 
     public PreparingItemEntity(String referenceCode, String instiId, String itemName, String categoryName, int quantity, String status, LocalDate dateCreated, TeacherScheduleEntity teacherSchedule) {
@@ -139,5 +143,14 @@ public class PreparingItemEntity {
     public void setVariant(String variant) {
         this.variant = variant;
     }
+
+    public InventoryEntity getInventory() {
+        return inventory;
+    }
+
+    public void setInventory(InventoryEntity inventory) {
+        this.inventory = inventory;
+    }
+
 
 }
