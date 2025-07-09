@@ -1,3 +1,4 @@
+// capstone/cit-lems-backend/src/main/java/com/capstone/LEMS/Service/ItemService.java
 package com.capstone.LEMS.Service;
 
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ import com.capstone.LEMS.Repository.InventoryRepository;
 import com.capstone.LEMS.Repository.ItemRepository;
 import com.capstone.LEMS.Repository.ManufacturerRepository;
 import com.capstone.LEMS.Repository.UserRepository;
+import com.capstone.LEMS.Repository.BatchPulloutRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +34,6 @@ public class ItemService {
 
 	@Autowired
 	ItemRepository itemrepo;
-
-//  @Autowired
-//  IdCounterService idcountserv; // This is correctly commented out and won't be used for Item unique_ids
 
 	@Autowired
 	UserRepository userrepo;
@@ -57,24 +56,25 @@ public class ItemService {
 	@Autowired
 	BatchResupplyService brserv;
 
+	@Autowired
+	BatchPulloutRepository batchPulloutRepo;
+
+
 	@SuppressWarnings({ "unchecked", "null" })
 	@Transactional
 	public ResponseEntity<?> AddItem(Map<String, Object> itemsToAdd, int bulkSize) {
-		// 1. Extracting data from the request Map
 		String itemName = (String) itemsToAdd.get("item_name");
 		int inventoryId = (int) itemsToAdd.get("inventory_id");
 		String category = (String) itemsToAdd.get("category");
-		List<String> uniqueIds = (List<String>) itemsToAdd.get("unique_ids"); // Will be null for consumables
-		// List<ItemEntity> itemsToSave = new ArrayList<>(); // <--- OLD: Renamed for clarity
-		List<ItemEntity> itemsToProcess = new ArrayList<>(); // <--- NEW: List to hold items before initial save
+		List<String> uniqueIds = (List<String>) itemsToAdd.get("unique_ids");
+		List<ItemEntity> itemsToProcess = new ArrayList<>();
 
-		int quantityFromFrontend = (int) itemsToAdd.get("quantity"); // This is the 'quantity' from frontend payload
+		int quantityFromFrontend = (int) itemsToAdd.get("quantity");
 		String expiryDateStr = (String) itemsToAdd.get("expiry_date");
 		LocalDate expiryDate = (expiryDateStr != null && !expiryDateStr.isEmpty()) ? LocalDate.parse(expiryDateStr) : null;
 		String variant = (String) itemsToAdd.get("variant");
 		Integer manufacturerId = (Integer) itemsToAdd.get("manufacturer_id");
 
-		// Fetch related entities
 		ManufacturerEntity manufacturer = null;
 		if (manufacturerId != null) {
 			manufacturer = mrepo.findById(manufacturerId).orElse(null);
@@ -97,15 +97,13 @@ public class ItemService {
 		batchResupply.setAddedBy(user);
 		batchResupply = brserv.addBatchResupply(batchResupply);
 
-		// 2. Initial Validations
 		if (variant == null || variant.trim().isEmpty()) {
 			log.error("AddItem failed: Variant field is blank or null.");
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Variant field should not be blank.");
 		}
 
-		// 3. Conditional Logic based on Item Category
 		if (category != null && category.equalsIgnoreCase("Consumables")) {
-			if (quantityFromFrontend <= 0) { // For consumables, quantityFromFrontend is amountToAdd
+			if (quantityFromFrontend <= 0) {
 				log.error("AddItem failed (Consumable): Quantity to add must be greater than 0.");
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Quantity to add for consumables must be greater than 0.");
 			}
@@ -120,7 +118,7 @@ public class ItemService {
 				ItemEntity existingItem = existingConsumableItemOptional.get();
 				existingItem.setQuantity(existingItem.getQuantity() + quantityFromFrontend);
 				existingItem.setBatchResupply(batchResupply);
-				itemsToProcess.add(existingItem); // Add to list for final save
+				itemsToProcess.add(existingItem);
 			} else {
 				log.info("Creating new consumable batch for inventoryId: {}, variant: {}, expiry: {}.",
 						inventoryId, variant, expiryDate);
@@ -128,8 +126,8 @@ public class ItemService {
 				newItem.setItemName(itemName);
 				newItem.setInventory(inventory);
 				newItem.setStatus("Available");
-				newItem.setAutoUid(true); // Consumables are auto-UID (no individual serial)
-				newItem.setUniqueId(null); // Consumables typically don't have individual unique IDs
+				newItem.setAutoUid(true);
+				newItem.setUniqueId(null);
 				newItem.setQuantity(quantityFromFrontend);
 				newItem.setExpiryDate(expiryDate);
 				newItem.setVariant(variant);
@@ -137,19 +135,17 @@ public class ItemService {
 				if (manufacturer != null) {
 					newItem.setManufacturer(manufacturer);
 				}
-				newItem.setIsDeleted(false); // Ensure new items are not deleted
-				itemsToProcess.add(newItem); // Add to list for final save
+				newItem.setIsDeleted(false);
+				itemsToProcess.add(newItem);
 			}
 		} else {
-			// Non-Consumable Item Logic: Create individual ItemEntities for each unit
-			if (bulkSize <= 0) { // bulkSize from frontend is amountToAdd for non-consumables
+			if (bulkSize <= 0) {
 				log.error("AddItem failed (Non-Consumable): Invalid bulk size {}. It must be greater than zero.", bulkSize);
 				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid bulk size for non-consumables. It must be greater than zero.");
 			}
 
-			// Check for existing custom unique IDs to prevent duplicates BEFORE creating new items
 			List<String> providedUniqueIds = new ArrayList<>();
-			if (uniqueIds != null && !uniqueIds.isEmpty()) {
+			if (uniqueIds != null && uniqueIds.isEmpty()) {
 				providedUniqueIds = uniqueIds.stream()
 						.filter(id -> id != null && !id.trim().isEmpty())
 						.map(String::trim)
@@ -170,44 +166,36 @@ public class ItemService {
 				}
 			}
 
-			// Create new ItemEntities for each non-consumable unit
 			for (int i = 0; i < bulkSize; i++) {
 				ItemEntity newItem = new ItemEntity();
 				newItem.setItemName(itemName);
 				newItem.setInventory(inventory);
 				newItem.setStatus("Available");
 				newItem.setVariant(variant);
-				newItem.setQuantity(1); // Each non-consumable ItemEntity represents one unit
+				newItem.setQuantity(1);
 				newItem.setBatchResupply(batchResupply);
 				if (manufacturer != null) {
 					newItem.setManufacturer(manufacturer);
 				}
-				newItem.setIsDeleted(false); // Ensure new items are not deleted
+				newItem.setIsDeleted(false);
 
-				// Assign unique ID: either custom or flag for auto-generation (will be populated AFTER first save)
 				if (i < providedUniqueIds.size()) {
 					newItem.setUniqueId(providedUniqueIds.get(i));
-					newItem.setAutoUid(false); // Manually provided UID
+					newItem.setAutoUid(false);
 				} else {
-					newItem.setAutoUid(true); // <--- NEW: Flag for auto-generation after save
-					newItem.setUniqueId(null); // <--- NEW: Temporarily null, will be set after getting itemId
+					newItem.setAutoUid(true);
+					newItem.setUniqueId(null);
 				}
-				itemsToProcess.add(newItem); // <--- Add to `itemsToProcess` list
+				itemsToProcess.add(newItem);
 			}
 		}
 
-		// 4. Save all prepared ItemEntities to the database
-		// This first save will assign itemIds to new entities due to GenerationType.IDENTITY
 		List<ItemEntity> savedItems = itemrepo.saveAll(itemsToProcess);
 		log.info("Successfully performed initial save/update for {} items.", savedItems.size());
 
-		// 5. Post-save processing for auto-generated unique_ids (NON-CONSUMABLES ONLY)
-		// This loop only runs for items that were just inserted AND needed auto-UIDs
 		List<ItemEntity> itemsToUpdateWithGeneratedUID = new ArrayList<>();
 		for (ItemEntity item : savedItems) {
-			// Check if it's an auto-UID item and its uniqueId is still null (meaning it was just inserted)
-			if (item.isAutoUid() && item.getUniqueId() == null && item.getItemId() != 0) { // item.getItemId() != 0 checks if it got an ID
-				// Generate the prefix based on item name (as per your existing logic)
+			if (item.isAutoUid() && item.getUniqueId() == null && item.getItemId() != 0) {
 				String prefix = item.getItemName().length() >= 2 ? item.getItemName().substring(0, 2).toUpperCase() : item.getItemName().toUpperCase();
 				if (item.getItemName().length() > 0) {
 					prefix += item.getItemName().substring(item.getItemName().length() - 1).toUpperCase();
@@ -215,20 +203,17 @@ public class ItemService {
 					prefix = "XX";
 				}
 
-				// <--- CRUCIAL CHANGE: Use the newly assigned itemId as the sequential number
-				String uniqueId = prefix + String.format("%04d", item.getItemId()); // Format to 4 digits
+				String uniqueId = prefix + String.format("%04d", item.getItemId());
 				item.setUniqueId(uniqueId);
 				itemsToUpdateWithGeneratedUID.add(item);
 			}
 		}
 
-		// <--- NEW: Perform a second saveAll to update items with their generated unique_ids
 		if (!itemsToUpdateWithGeneratedUID.isEmpty()) {
 			itemrepo.saveAll(itemsToUpdateWithGeneratedUID);
 			log.info("Successfully updated {} items with auto-generated unique IDs.", itemsToUpdateWithGeneratedUID.size());
 		}
 
-		// 6. Update the overall InventoryEntity quantity (CRUCIAL for accurate stock count)
 		Integer totalQuantityInInventory = itemrepo.sumQuantityByInventoryId(inventoryId);
 		if (totalQuantityInInventory == null) totalQuantityInInventory = 0;
 
@@ -238,14 +223,9 @@ public class ItemService {
 		log.info("Inventory '{}' (ID: {}) quantity updated to: {}. Status set to: {}",
 				inventory.getName(), inventory.getInventoryId(), inventory.getQuantity(), inventory.getStatus());
 
-		// 7. Return response
-		// The `savedItems` list will now contain the fully updated items (with unique_id set for auto-generated ones)
 		return ResponseEntity.status(HttpStatus.CREATED).body(savedItems);
 	}
 
-
-	// --- Other methods of ItemService follow below (no changes needed) ---
-	// OwO what is this comment for?
 
 	public ResponseEntity<?> updateItems(String itemToEdit, ItemEntity newItemDetails){
 		log.info("Starting updateItems for itemToEdit: {}", itemToEdit);
@@ -253,12 +233,11 @@ public class ItemService {
 		if(newItemDetails.getItemName() == null || newItemDetails.getItemName().trim().isEmpty()) {
 			log.warn("Validation failed: newItemDetails.getItemName() is blank or null");
 			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST) // 400
+					.status(HttpStatus.BAD_REQUEST)
 					.body("Blank item name is not allowed.");
 		}
 
 		log.info("Fetching items with name: {}", itemToEdit);
-		// Use findByItemNameAndIsDeletedFalse
 		List<ItemEntity> items = itemrepo.findByItemNameAndIsDeletedFalse(itemToEdit);
 
 		log.info("Updating items with new name: {}", newItemDetails.getItemName());
@@ -269,50 +248,46 @@ public class ItemService {
 		List<ItemEntity> updatedItems = itemrepo.saveAll(items);
 		log.info("Successfully updated {} items", updatedItems.size());
 		return ResponseEntity
-				.status(HttpStatus.OK) // 200
+				.status(HttpStatus.OK)
 				.body(updatedItems);
 	}
 
 	/*
-	 * Deletes items only based on bulk size
-	 * not specifically
-	 * */
-	public ResponseEntity<?> deleteItems(int bulkSize, ItemEntity itemsToDelete){
+	 * This method is for deleting items based on a bulk size and item name.
+	 * It restores the original functionality for the /deleteitems endpoint.
+	 */
+	@Transactional
+	public ResponseEntity<?> deleteItems(int bulkSize, ItemEntity itemsToDelete, int userId){
 		if(itemsToDelete.getItemName() == null || itemsToDelete.getItemName().trim().isEmpty()) {
 			log.warn("Validation failed: itemsToDelete.getItemName() is blank or null");
 			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST) // 400
+					.status(HttpStatus.BAD_REQUEST)
 					.body("Blank item name is not allowed.");
 		}
 
 		log.info("Fetching items with name: {}", itemsToDelete.getItemName());
-		// Use findByItemNameAndUserIsNullAndIsDeletedFalseOrderByItemIdDesc
 		List<ItemEntity> items = itemrepo.findByItemNameAndUserIsNullAndIsDeletedFalseOrderByItemIdDesc(itemsToDelete.getItemName());
 
 		if(items.isEmpty()) {
 			log.warn("No items found with name: {}", itemsToDelete.getItemName());
 			return ResponseEntity
-					.status(HttpStatus.NOT_FOUND) // 404
+					.status(HttpStatus.NOT_FOUND)
 					.body("No items found with name: " + itemsToDelete.getItemName());
 		}
 
 		if(items.size() < bulkSize) {
 			log.warn("Attempting to delete more items than available or attempting to delete items that are used by a group");
 			return ResponseEntity
-					.status(HttpStatus.BAD_REQUEST) // 400
+					.status(HttpStatus.BAD_REQUEST)
 					.body("Cannot delete items more than the available or that some items are currently in used by a group");
 		}
 
 		List<ItemEntity> itemsToDeleteList = items.subList(0, bulkSize);
 		log.info("Soft deleting {} items with name: {}", itemsToDeleteList.size(), itemsToDelete.getItemName());
-		// Instead of deleteAll, iterate and set isDeleted to true
 		itemsToDeleteList.forEach(item -> item.setIsDeleted(true));
-		itemrepo.saveAll(itemsToDeleteList); // Save the updated status
+		itemrepo.saveAll(itemsToDeleteList);
 		log.info("Successfully soft-deleted {} items", itemsToDeleteList.size());
 
-		// After deletion, update the overall InventoryEntity quantity
-		// Get the inventory entity associated with these items
-		// Assuming all items in itemsToDeleteList belong to the same inventory (which they should)
 		if (!itemsToDeleteList.isEmpty()) {
 			int inventoryId = itemsToDeleteList.get(0).getInventory().getInventoryId();
 			InventoryEntity inventory = invrepo.findById(inventoryId).orElse(null);
@@ -326,15 +301,98 @@ public class ItemService {
 			}
 		}
 
-
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body("Successfully soft-deleted " + itemsToDeleteList.size() + " items.");
 	}
 
+	/*
+	 * This method is specifically for soft-deleting a list of individual ItemEntity objects
+	 * and linking them to a BatchPulloutEntity. This is used by the /deletespecificitems endpoint.
+	 */
+	@Transactional
+	public ResponseEntity<?> deleteSpecificItems(List<ItemEntity> itemsToDel, int userId){
+		if(itemsToDel == null || itemsToDel.isEmpty()) {
+			log.warn("Validation failed: itemsToDel list is null or empty");
+			return ResponseEntity
+					.status(HttpStatus.BAD_REQUEST)
+					.body("Items to delete list cannot be empty.");
+		}
+
+		String itemName = itemsToDel.get(0).getItemName();
+		int bulkSize = itemsToDel.size();
+
+		log.info("Attempting to soft delete {} specific items with name: {} by userId: {}", bulkSize, itemName, userId);
+
+		List<Integer> itemIdsToProcess = itemsToDel.stream()
+				.map(ItemEntity::getItemId)
+				.collect(Collectors.toList());
+		List<ItemEntity> managedItemsToUpdate = itemrepo.findAllById(itemIdsToProcess);
+
+		if (managedItemsToUpdate.size() != itemsToDel.size()) {
+			log.warn("Mismatch between requested items and found items for deletion.");
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Some items to delete were not found in the database.");
+		}
+
+		for (int i = 0; i < managedItemsToUpdate.size(); i++) {
+			ItemEntity managedItem = managedItemsToUpdate.get(i);
+			if (!"Available".equals(managedItem.getStatus()) || managedItem.getUser() != null) {
+				log.warn("Attempt to delete item {} which is not available or is currently in use. Status: {}, User: {}", managedItem.getItemId(), managedItem.getStatus(), managedItem.getUser() != null ? managedItem.getUser().getUid() : "none");
+				return ResponseEntity
+						.status(HttpStatus.BAD_REQUEST)
+						.body("Cannot delete items that are not available or are currently in use by a borrower. Item ID: " + managedItem.getItemId());
+			}
+		}
+
+
+		UserEntity pulledBy = userrepo.findById(userId).orElse(null);
+		if (pulledBy == null) {
+			log.error("deleteSpecificItems failed: User not found for userId {}", userId);
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User not found for provided userId.");
+		}
+
+		BatchPulloutEntity batchPullout = new BatchPulloutEntity();
+		batchPullout.setDatePullout(LocalDate.now());
+		batchPullout.setPulledBy(pulledBy);
+		batchPullout = batchPulloutRepo.save(batchPullout); // Save the new batch pullout here
+
+		// NEW: Establish the relationship from the owning side (BatchPulloutEntity)
+		// This should ensure the pullout_id is correctly set in the Item table
+		for (ItemEntity item : managedItemsToUpdate) {
+			item.setIsDeleted(true); // Mark as deleted
+			batchPullout.addItem(item); // Add to the collection and set the back-reference (pullout_id)
+		}
+		// Saving the batchPullout again will persist the changes to its 'items' collection
+		// due to CascadeType.ALL on BatchPulloutEntity's @OneToMany
+		batchPulloutRepo.save(batchPullout); // Re-save the BatchPullout to cascade item updates
+
+		log.info("Successfully soft-deleted {} items and linked to BatchPullout ID: {}", managedItemsToUpdate.size(), batchPullout.getPulloutId());
+
+		if (!managedItemsToUpdate.isEmpty()) {
+			int inventoryId = managedItemsToUpdate.get(0).getInventory().getInventoryId();
+			InventoryEntity inventory = invrepo.findById(inventoryId).orElse(null);
+			if (inventory != null) {
+				Integer totalQuantityInInventory = itemrepo.sumQuantityByInventoryId(inventoryId);
+				if (totalQuantityInInventory == null) totalQuantityInInventory = 0;
+				inventory.setQuantity(totalQuantityInInventory);
+				inventory.setStatus(totalQuantityInInventory > 0 ? "Available" : "Out of stock");
+				invrepo.save(inventory);
+				log.info("Inventory {} quantity updated after soft deletion to: {}", inventory.getName(), inventory.getQuantity());
+			}
+		}
+
+		return ResponseEntity
+				.status(HttpStatus.OK)
+				.body("Successfully soft-deleted " + managedItemsToUpdate.size() + " items.");
+	}
+
+
 	public List<ItemEntity> getAllItems(){
-		// Use findByIsDeletedFalse() to only retrieve non-deleted items
 		return itemrepo.findByIsDeletedFalse();
+	}
+
+	public List<ItemEntity> getDeletedItems(){
+		return itemrepo.findByIsDeletedTrue();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -356,7 +414,6 @@ public class ItemService {
 		for(Map<String, Object> itemReq: itemsRequest) {
 			String itemName = (String) itemReq.get("itemName");
 			int quantity = (int) itemReq.get("quantity");
-			// Use findByItemNameAndStatusAndIsDeletedFalse
 			List<ItemEntity> availableItems = itemrepo.findByItemNameAndStatusAndIsDeletedFalse(itemName, "Available");
 
 			if (availableItems.size() < quantity) {
@@ -389,7 +446,6 @@ public class ItemService {
 			String status = (String) itemReq.get("status");
 			int quantity = (int) itemReq.get("quantity");
 
-			// Use findByItemNameAndBorrowCart_IdAndIsDeletedFalse
 			List<ItemEntity> items = itemrepo.findByItemNameAndBorrowCart_IdAndIsDeletedFalse(itemName, borrowCartID);
 
 			if (items.isEmpty()) {
@@ -414,8 +470,6 @@ public class ItemService {
 
 		itemrepo.saveAll(itemsToUpdate);
 
-		// After returning items, update the overall InventoryEntity quantity for affected inventories
-		// Group items by inventory ID to update each inventory's quantity correctly
 		Map<Integer, List<ItemEntity>> itemsByInventory = itemsToUpdate.stream()
 				.collect(Collectors.groupingBy(item -> item.getInventory().getInventoryId()));
 
@@ -444,7 +498,6 @@ public class ItemService {
 		List<ItemEntity> itemToSend = new ArrayList<>();
 
 		for(int i = 0; i < batches.size(); i++) {
-			// Changed to findByBatchResupply to include all items regardless of isDeleted status
 			List<ItemEntity> items = itemrepo.findByBatchResupply(batches.get(i));
 			itemToSend.addAll(items);
 		}
@@ -461,8 +514,6 @@ public class ItemService {
 			Map<String, Object> itemSummary = new HashMap<>();
 			itemSummary.put("id", index++);
 			itemSummary.put("name", itemName);
-			// For consumables, sum the quantities within the group
-			// For non-consumables, count the items (each has quantity 1)
 			if (!itemList.isEmpty() && itemList.get(0).getInventory().getItemCategory().getCategoryName().equalsIgnoreCase("Consumables")) {
 				itemSummary.put("quantity", itemList.stream().mapToInt(ItemEntity::getQuantity).sum());
 			} else {
@@ -473,13 +524,10 @@ public class ItemService {
 			List<Map<String, Object>> variants = itemList.stream().map(item -> {
 				Map<String, Object> variant = new HashMap<>();
 				variant.put("id", item.getItemId());
-				// CORRECTED: Display variant name instead of item name
 				variant.put("name", item.getVariant());
-				variant.put("serialNumber", item.getUniqueId()); // This will now reflect the generated ID
-				variant.put("quantity", item.getQuantity()); // Include quantity for consumables
-				// Add isDeleted status to the variant details for history purposes
+				variant.put("serialNumber", item.getUniqueId());
+				variant.put("quantity", item.getQuantity());
 				variant.put("isDeleted", item.getIsDeleted());
-				// Add category name to variant details for consistency
 				variant.put("categoryName", item.getInventory() != null && item.getInventory().getItemCategory() != null ? item.getInventory().getItemCategory().getCategoryName() : "N/A");
 				return variant;
 			}).collect(Collectors.toList());
@@ -494,19 +542,16 @@ public class ItemService {
 	}
 
 	public ResponseEntity<?> getListOfUniqueIDs(String itemName, String category){
-		// Use findByItemNameAndIsDeletedFalse
 		List<ItemEntity> items = itemrepo.findByItemNameAndIsDeletedFalse(itemName);
 		List<ItemEntity> availableItems = items.stream()
 				.filter(item -> "Available".equals(item.getStatus()))
 				.collect(Collectors.toList());
 
 		if(category != null && !category.isBlank() && !category.isEmpty() && category.equalsIgnoreCase("Consumables")) {
-			// For consumables, you might want to return details of available batches (variant, quantity, expiry)
-			// instead of just the whole entity.
 			List<Map<String, Object>> consumableBatches = availableItems.stream()
 					.map(item -> {
 						Map<String, Object> batchDetails = new HashMap<>();
-						batchDetails.put("itemId", item.getItemId()); // Unique ID of the batch record
+						batchDetails.put("itemId", item.getItemId());
 						batchDetails.put("variant", item.getVariant());
 						batchDetails.put("quantity", item.getQuantity());
 						batchDetails.put("expiryDate", item.getExpiryDate() != null ? item.getExpiryDate().toString() : null);
@@ -517,11 +562,9 @@ public class ItemService {
 					.status(HttpStatus.OK)
 					.body(consumableBatches);
 		}else {
-			// For non-consumables, return auto-UIDs as well
-			// This previously filtered by !item.isAutoUid(), now it will include them
 			List<String> uniqueIds = availableItems.stream()
-					.map(ItemEntity::getUniqueId) // <--- Modified: now maps all unique_ids, whether custom or auto-generated
-					.filter(id -> id != null && !id.trim().isEmpty()) // <--- Ensure non-null/empty UIDs are returned
+					.map(ItemEntity::getUniqueId)
+					.filter(id -> id != null && !id.trim().isEmpty())
 					.collect(Collectors.toList());
 			return ResponseEntity
 					.status(HttpStatus.OK)
@@ -531,16 +574,14 @@ public class ItemService {
 	}
 
 	public ResponseEntity<?> findByPreparingItemIds(List<Integer> preparingItemIds){
-		// Use findByPreparingItem_IdInAndIsDeletedFalse
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body(itemrepo.findByPreparingItem_IdInAndIsDeletedFalse(preparingItemIds));
 	}
 
 	public List<String> getAvailableVariants(String itemName) {
-		// Ensure the query only fetches non-deleted items
 		return itemrepo.findVariantsByItemNameAndStatus(itemName, "Available").stream()
-				.filter(variant -> variant != null && !variant.isEmpty()) // Filter out null or empty variants
+				.filter(variant -> variant != null && !variant.isEmpty())
 				.collect(Collectors.toList());
 	}
 
@@ -548,7 +589,6 @@ public class ItemService {
 		log.info("Fetching variants for item: {}, category: {}", itemName, categoryName);
 
 		if (categoryName != null && categoryName.equalsIgnoreCase("Consumables")) {
-			// Ensure the query only fetches non-deleted items
 			List<Object[]> results = itemrepo.findConsumableVariantQuantities(itemName, "Available");
 			log.info("Consumable variants found: {}", results.size());
 			return results.stream()
@@ -560,8 +600,6 @@ public class ItemService {
 					})
 					.collect(Collectors.toList());
 		} else {
-			// Logic for Non-Consumables
-			// Ensure the query only fetches non-deleted items
 			List<String> distinctVariants = itemrepo.findVariantsByItemNameAndStatus(itemName, "Available");
 			log.info("Non-consumable distinct variants found: {}", distinctVariants.size());
 
@@ -570,18 +608,12 @@ public class ItemService {
 						Map<String, Object> map = new java.util.HashMap<>();
 						map.put("variantName", variant);
 
-						// --- THIS IS THE CRITICAL PART FOR NON-CONSUMABLES' QUANTITY ---
-						// We need to count individual ItemEntity records that match the itemName,
-						// are 'Available', and have this specific 'variant'.
-						// The `findByItemNameAndStatusAndIsDeletedFalse` returns a List<ItemEntity>.
-						// We then filter that list by variant. This is the correct approach.
-
 						List<ItemEntity> availableItemsForVariant = itemrepo.findByItemNameAndStatusAndIsDeletedFalse(itemName, "Available")
 								.stream()
-								.filter(item -> variant.equals(item.getVariant())) // Ensure variant is not null on item
+								.filter(item -> variant.equals(item.getVariant()))
 								.collect(Collectors.toList());
 
-						map.put("quantity", availableItemsForVariant.size()); // .size() is valid on List
+						map.put("quantity", availableItemsForVariant.size());
 						return map;
 					})
 					.collect(Collectors.toList());
@@ -589,36 +621,9 @@ public class ItemService {
 	}
 
 	public ResponseEntity<?> getItemsByName(String itemName, String status){
-		// Use findByItemNameAndStatusAndIsDeletedFalse
 		List<ItemEntity> availableItems = itemrepo.findByItemNameAndStatusAndIsDeletedFalse(itemName, status);
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body(availableItems);
-	}
-
-	public ResponseEntity<?> deleteSpecificItems(List<ItemEntity> itemsToDel){
-		// Instead of deleteAll, iterate and set isDeleted to true
-		itemsToDel.forEach(item -> item.setIsDeleted(true));
-		itemrepo.saveAll(itemsToDel); // Save the updated status
-
-		/**
-		 * After soft deletion, update the overall InventoryEntity quantity
-		 * */
-		if (!itemsToDel.isEmpty()) {
-			int inventoryId = itemsToDel.get(0).getInventory().getInventoryId();
-			InventoryEntity inventory = invrepo.findById(inventoryId).orElse(null);
-			if (inventory != null) {
-				// Recalculate total quantity from non-deleted items only
-				Integer totalQuantityInInventory = itemrepo.sumQuantityByInventoryId(inventoryId);
-				if (totalQuantityInInventory == null) totalQuantityInInventory = 0;
-				inventory.setQuantity(totalQuantityInInventory);
-				inventory.setStatus(totalQuantityInInventory > 0 ? "Available" : "Out of stock");
-				invrepo.save(inventory);
-			}
-		}
-
-		return ResponseEntity
-				.status(HttpStatus.OK)
-				.body(itemsToDel);
 	}
 }

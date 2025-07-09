@@ -1,3 +1,4 @@
+// capstone/cit-lems-backend/src/main/java/com/capstone/LEMS/Repository/ItemRepository.java
 package com.capstone.LEMS.Repository;
 
 import java.time.LocalDate;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Repository;
 import com.capstone.LEMS.Entity.BatchResupplyEntity;
 import com.capstone.LEMS.Entity.ItemEntity;
 import com.capstone.LEMS.Entity.BorrowCartEntity;
+import com.capstone.LEMS.Entity.BatchPulloutEntity; // NEW: Import BatchPulloutEntity
 
 
 @Repository
@@ -42,9 +44,15 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Integer> {
 	// Instead of findAll, provide a method to get all non-deleted items
 	List<ItemEntity> findByIsDeletedFalse();
 
+	// NEW: Method to get all deleted items (for "Pullouts" tab)
+	List<ItemEntity> findByIsDeletedTrue();
+
 	long countByItemNameAndStatus(String itemName, String status);
 
 	List<ItemEntity> findByPreparingItem(PreparingItemEntity prep);
+
+	// NEW: Method to find items by BatchPulloutEntity
+	List<ItemEntity> findByBatchPullout(BatchPulloutEntity batchPullout);
 
 
 	// Existing custom queries updated to include i.isDeleted = false
@@ -75,4 +83,3 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Integer> {
 			String status
 	);
 }
-

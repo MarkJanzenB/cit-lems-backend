@@ -1,3 +1,4 @@
+// capstone/cit-lems-backend/src/main/java/com/capstone/LEMS/Entity/ItemEntity.java
 package com.capstone.LEMS.Entity;
 
 import java.time.LocalDate;
@@ -69,6 +70,11 @@ public class ItemEntity {
 	@ManyToOne
 	@JoinColumn(name = "resupply_id", nullable = true)
 	private BatchResupplyEntity batchResupply;
+
+	// NEW: Many-to-one relationship with BatchPulloutEntity
+	@ManyToOne
+	@JoinColumn(name = "pullout_id", nullable = true) // This will be the foreign key column
+	private BatchPulloutEntity batchPullout;
 
 	// Changed from 'active' to 'isDeleted'
 	@Column(nullable = false)
@@ -233,5 +239,14 @@ public class ItemEntity {
 
 	public void setIsDeleted(boolean isDeleted) { // Changed from setActive() to setIsDeleted()
 		this.isDeleted = isDeleted;
+	}
+
+	// NEW: Getter and Setter for BatchPulloutEntity
+	public BatchPulloutEntity getBatchPullout() {
+		return batchPullout;
+	}
+
+	public void setBatchPullout(BatchPulloutEntity batchPullout) {
+		this.batchPullout = batchPullout;
 	}
 }
