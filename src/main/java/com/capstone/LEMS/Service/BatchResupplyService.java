@@ -56,8 +56,13 @@ public class BatchResupplyService {
                 itemData.put("variants", group.getValue().stream().map(item -> {
                     Map<String, Object> variant = new HashMap<>();
                     variant.put("id", item.getItemId());
-                    variant.put("name", item.getItemName());
+                    // CORRECTED: Display variant name instead of item name
+                    variant.put("name", item.getVariant());
                     variant.put("serialNumber", item.getUniqueId());
+                    // Add category name to variant details for completeness
+                    variant.put("categoryName", item.getInventory() != null && item.getInventory().getItemCategory() != null ? item.getInventory().getItemCategory().getCategoryName() : "N/A");
+                    // Add isDeleted status for consistency
+                    variant.put("isDeleted", item.getIsDeleted());
                     return variant;
                 }).collect(Collectors.toList()));
                 itemDetails.add(itemData);

@@ -473,11 +473,14 @@ public class ItemService {
 			List<Map<String, Object>> variants = itemList.stream().map(item -> {
 				Map<String, Object> variant = new HashMap<>();
 				variant.put("id", item.getItemId());
-				variant.put("name", item.getItemName());
+				// CORRECTED: Display variant name instead of item name
+				variant.put("name", item.getVariant());
 				variant.put("serialNumber", item.getUniqueId()); // This will now reflect the generated ID
 				variant.put("quantity", item.getQuantity()); // Include quantity for consumables
 				// Add isDeleted status to the variant details for history purposes
 				variant.put("isDeleted", item.getIsDeleted());
+				// Add category name to variant details for consistency
+				variant.put("categoryName", item.getInventory() != null && item.getInventory().getItemCategory() != null ? item.getInventory().getItemCategory().getCategoryName() : "N/A");
 				return variant;
 			}).collect(Collectors.toList());
 
