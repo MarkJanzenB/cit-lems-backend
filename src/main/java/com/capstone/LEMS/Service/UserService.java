@@ -16,12 +16,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.capstone.LEMS.Entity.UserEntity;
+import com.capstone.LEMS.Entity.RoleEntity;
 import com.capstone.LEMS.Repository.UserRepository;
+import com.capstone.LEMS.Repository.RoleRepository;
 
 @Service
 public class UserService {
 	@Autowired
 	UserRepository userrepo;
+	
+	@Autowired
+	RoleRepository rolerepo;
 	
 	@Autowired
 	AuthenticationManager authmanager;
@@ -36,7 +41,35 @@ public class UserService {
 	public UserEntity UserRegister (UserEntity user) {
 		user.setPassword(encoder.encode(user.getPassword()));
 		user.setNew(true);
-		return userrepo.save(user);
+		UserEntity savedUser = userrepo.save(user);
+
+		// If the user is registering as Lab In-Charge (role_id: 3), automatically create a teacher account
+		if (user.getRole().getRoleId() == 3) {
+			log.info("Creating teacher account for lab in-charge: {}", user.getInstiId());
+
+			// Create a new user with teacher role
+			UserEntity teacherUser = new UserEntity();
+			teacherUser.setFname(user.getFname());
+			teacherUser.setLname(user.getLname());
+			teacherUser.setInstiId(user.getInstiId() + "-1"); // Append "-1" to create unique insti ID
+			teacherUser.setEmail(user.getEmail());
+			teacherUser.setPassword(user.getPassword()); // Already encoded above
+			teacherUser.setNew(true);
+
+			// Find and set the teacher role (role_id: 1)
+			Optional<RoleEntity> teacherRole = rolerepo.findById(1);
+			if (teacherRole.isPresent()) {
+				teacherUser.setRole(teacherRole.get());
+				try {
+					userrepo.save(teacherUser);
+					log.info("Teacher account successfully created for user: {} with modified ID: {}", user.getInstiId(), teacherUser.getInstiId());
+				} catch (Exception e) {
+					log.error("Error creating teacher account: ", e);
+				}
+			}
+		}
+
+		return savedUser;
 	}
 	
 	public String verify (String insti_id, String password) {
@@ -182,5 +215,62 @@ public class UserService {
 		return ResponseEntity
 				.status(HttpStatus.OK)
 				.body(userrepo.save(user));
+	}
+	
+	public ResponseEntity<?> activateTeacherRole(UserEntity teacherUser) {
+		log.info("Activating teacher role for user with insti_id: {}", teacherUser.getInstiId());
+		
+		// Check if the lab in-charge exists
+		UserEntity labInCharge = userrepo.findByInstiId(teacherUser.getInstiId());
+		if (labInCharge == null) {
+			log.warn("Lab in-charge account not found for insti_id: {}", teacherUser.getInstiId());
+			return ResponseEntity
+					.status(HttpStatus.NOT_FOUND)
+					.body("Lab in-charge account not found");
+		}
+		
+		// Generate the modified insti ID for teacher role
+		String teacherInstiId = teacherUser.getInstiId() + "-1";
+
+		// Check if user already has a teacher account with the modified ID
+		UserEntity existingTeacher = userrepo.findByInstiId(teacherInstiId);
+		if (existingTeacher != null) {
+			log.info("User already has a teacher account with ID: {}", teacherInstiId);
+			return ResponseEntity
+					.status(HttpStatus.CONFLICT)
+					.body("User already has a teacher account");
+		}
+		
+		// Create a new user with teacher role
+		UserEntity newTeacher = new UserEntity();
+		newTeacher.setFname(teacherUser.getFname());
+		newTeacher.setLname(teacherUser.getLname());
+		newTeacher.setInstiId(teacherInstiId); // Use the modified insti ID
+		newTeacher.setEmail(teacherUser.getEmail());
+		newTeacher.setPassword(encoder.encode(teacherUser.getPassword()));
+		newTeacher.setNew(true);
+		
+		// Find and set the teacher role (role_id: 1)
+		Optional<RoleEntity> teacherRole = rolerepo.findById(1);
+		if (teacherRole.isEmpty()) {
+			log.error("Teacher role (role_id: 1) not found in the database");
+			return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Teacher role not found in the system");
+		}
+		
+		newTeacher.setRole(teacherRole.get());
+		
+		// Save the new teacher account
+		try {
+			userrepo.save(newTeacher);
+			log.info("Teacher account successfully created with modified ID: {}", teacherInstiId);
+			return ResponseEntity.ok("Teacher account successfully activated with ID: " + teacherInstiId);
+		} catch (Exception e) {
+			log.error("Error creating teacher account: ", e);
+			return ResponseEntity
+					.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("Error activating teacher account: " + e.getMessage());
+		}
 	}
 }

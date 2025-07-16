@@ -82,4 +82,9 @@ public class UserController {
 	public ResponseEntity<?> editPfp(@RequestBody Map<String, Object> newPfpDetails){
 		return userserv.editPfp(newPfpDetails);
 	}
+	
+	@PostMapping("/activateTeacherRole")
+	public ResponseEntity<?> activateTeacherRole(@RequestBody UserEntity teacherUser) {
+		return userserv.activateTeacherRole(teacherUser);
+	}
 }
