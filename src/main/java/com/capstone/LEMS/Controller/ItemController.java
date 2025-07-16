@@ -1,3 +1,4 @@
+// capstone/cit-lems-backend/src/main/java/com/capstone/LEMS/Controller/ItemController.java
 package com.capstone.LEMS.Controller;
 
 import java.time.LocalDate;
@@ -44,14 +45,21 @@ public class ItemController {
         return itemserv.updateItems(itemToEdit, newItemDetails);
     }
 
+    // CORRECTED: Added @RequestParam int userId to the signature and passed it to the service method
     @DeleteMapping("/deleteitems")
-    public ResponseEntity<?> deleteItems(@RequestParam int bulkSize, @RequestBody ItemEntity itemsToDelete){
-        return itemserv.deleteItems(bulkSize, itemsToDelete);
+    public ResponseEntity<?> deleteItems(@RequestParam int bulkSize, @RequestBody ItemEntity itemsToDelete, @RequestParam int userId){ // MODIFIED
+        return itemserv.deleteItems(bulkSize, itemsToDelete, userId); // MODIFIED
     }
 
     @GetMapping("/getallitems")
     public List<ItemEntity> getAllItems(){
         return itemserv.getAllItems();
+    }
+
+    // NEW: Endpoint to get all deleted items
+    @GetMapping("/getdeleteditems")
+    public List<ItemEntity> getDeletedItems(){
+        return itemserv.getDeletedItems();
     }
 
     @PutMapping("/borrow")
@@ -91,11 +99,11 @@ public class ItemController {
 
     @GetMapping("/getitemsbyname/{status}/{itemName}")
     public ResponseEntity<?> getItemsByName(@PathVariable("itemName") String itemName, @PathVariable("status") String status){
-    	return itemserv.getItemsByName(itemName, status);
+        return itemserv.getItemsByName(itemName, status);
     }
-    
+
     @DeleteMapping("/deletespecificitems")
-    public ResponseEntity<?> deleteSpecificItems(@RequestBody List<ItemEntity> itemsToDel){
-    	return itemserv.deleteSpecificItems(itemsToDel);
+    public ResponseEntity<?> deleteSpecificItems(@RequestBody List<ItemEntity> itemsToDel, @RequestParam int userId){
+        return itemserv.deleteSpecificItems(itemsToDel, userId);
     }
 }

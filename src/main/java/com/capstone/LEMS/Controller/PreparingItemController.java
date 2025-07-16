@@ -62,4 +62,23 @@ public class PreparingItemController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
+
+    @DeleteMapping("/cancel/{referenceCode}")
+    public ResponseEntity<Void> cancelPreparingBatch(@PathVariable String referenceCode) {
+        preparingItemService.cancelPreparingBatch(referenceCode);
+        return ResponseEntity.ok().build();
+    }
+
+    // ADD THIS ENTIRE METHOD TO YOUR CONTROLLER FILE
+
+    @PostMapping("/manual-restock/{preparingItemId}")
+    public ResponseEntity<String> manualRestock(@PathVariable int preparingItemId) {
+        try {
+            preparingItemService.manualRestockByPreparingItemId(preparingItemId);
+            return ResponseEntity.ok("Successfully restocked item for PreparingItem ID: " + preparingItemId);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
 }

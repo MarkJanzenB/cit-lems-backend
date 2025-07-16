@@ -47,9 +47,6 @@ public class BorrowItemEntity {
     // Static atomic counter for auto increment number (per month/year)
     private static final AtomicInteger autoIncrement = new AtomicInteger(1);
 
-    @OneToMany(mappedBy = "borrowItem", cascade = CascadeType.ALL)
-    private List<TransactionHistory> transactionHistories; // Link to transaction history
-
     public BorrowItemEntity() {}
 
     public BorrowItemEntity(UserEntity user, int itemId, String uniqueId, String itemName, String categoryName, int quantity, String status, Date borrowedDate) {

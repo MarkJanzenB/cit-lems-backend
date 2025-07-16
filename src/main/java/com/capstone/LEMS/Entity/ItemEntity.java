@@ -1,3 +1,4 @@
+// capstone/cit-lems-backend/src/main/java/com/capstone/LEMS/Entity/ItemEntity.java
 package com.capstone.LEMS.Entity;
 
 import java.time.LocalDate;
@@ -70,6 +71,15 @@ public class ItemEntity {
 	@JoinColumn(name = "resupply_id", nullable = true)
 	private BatchResupplyEntity batchResupply;
 
+	// NEW: Many-to-one relationship with BatchPulloutEntity
+	@ManyToOne
+	@JoinColumn(name = "pullout_id", nullable = true) // This will be the foreign key column
+	private BatchPulloutEntity batchPullout;
+
+	// Changed from 'active' to 'isDeleted'
+	@Column(nullable = false)
+	private boolean isDeleted = false; // Default to false (not deleted) for new items
+
 	public ItemEntity() {
 		super();
 	}
@@ -90,6 +100,7 @@ public class ItemEntity {
 		this.variant = variant;
 		this.manufacturer = manufacturer;
 		this.batchResupply = batchResupply;
+		this.isDeleted = false; // Initialize to not deleted
 	}
 
 	@PrePersist
@@ -196,7 +207,7 @@ public class ItemEntity {
 	public void setBorrowCart(BorrowCartEntity borrowCart) {
 		this.borrowCart = borrowCart;
 	}
-	
+
 	public PreparingItemEntity getPreparingItem() {
 		return preparingItem;
 	}
@@ -219,5 +230,23 @@ public class ItemEntity {
 
 	public void setBatchResupply(BatchResupplyEntity batchResupply) {
 		this.batchResupply = batchResupply;
+	}
+
+	// Getter and Setter for the new 'isDeleted' field
+	public boolean getIsDeleted() { // Changed from isActive() to getIsDeleted()
+		return isDeleted;
+	}
+
+	public void setIsDeleted(boolean isDeleted) { // Changed from setActive() to setIsDeleted()
+		this.isDeleted = isDeleted;
+	}
+
+	// NEW: Getter and Setter for BatchPulloutEntity
+	public BatchPulloutEntity getBatchPullout() {
+		return batchPullout;
+	}
+
+	public void setBatchPullout(BatchPulloutEntity batchPullout) {
+		this.batchPullout = batchPullout;
 	}
 }

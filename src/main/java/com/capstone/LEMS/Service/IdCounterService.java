@@ -7,19 +7,20 @@ import com.capstone.LEMS.Repository.ItemRepository;
 
 @Service
 public class IdCounterService {
-    
+
     @Autowired
     private ItemRepository itemRepo;
-    
+
     public int getNextId() {
-        ItemEntity latestItem = itemRepo.findTopByIsAutoUidTrueOrderByItemIdDesc();
-        
+        // Changed to findTopByIsAutoUidTrueAndIsDeletedFalseOrderByItemIdDesc
+        ItemEntity latestItem = itemRepo.findTopByIsAutoUidTrueAndIsDeletedFalseOrderByItemIdDesc();
+
         if (latestItem != null && latestItem.getUniqueId() != null) {
             String uniqueId = latestItem.getUniqueId();
             String numberPart = uniqueId.replaceAll("\\D", "");
             return Integer.parseInt(numberPart) + 1;
         }
-        
+
         return 1;
     }
 }

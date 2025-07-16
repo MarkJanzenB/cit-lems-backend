@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.capstone.LEMS.Entity.TransactionHistory; // Import TransactionHistory
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -53,8 +52,6 @@ public class BatchResupplyEntity {
     @OneToMany(mappedBy = "batchResupply", cascade = CascadeType.ALL)
     private List<ItemEntity> items;
 
-    @OneToMany(mappedBy = "batchResupply", cascade = CascadeType.ALL)
-    private List<TransactionHistory> transactionHistories; // Link to transaction history
 
     public BatchResupplyEntity() {
         super();
