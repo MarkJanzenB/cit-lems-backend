@@ -626,4 +626,21 @@ public class ItemService {
 				.status(HttpStatus.OK)
 				.body(availableItems);
 	}
+
+//	@Autowired
+//	private ItemRepository itemRepo;
+
+//	public List<ItemEntity> getItemsByStatus(String status) {
+//		return itemRepo.findByStatusAndIsDeletedFalse(status);
+//	}
+
+	public List<ItemEntity> getItemsByStatus(String status, Integer userId) {
+		if (userId != null) {
+			// If userId is provided, filter by user
+			return itemrepo.findByStatusAndUser_UserIdAndIsDeletedFalse(status, userId);
+		}
+		// Otherwise, return all items with the given status
+		return itemrepo.findByStatusAndIsDeletedFalse(status);
+	}
+
 }

@@ -40,6 +40,9 @@ public interface ItemRepository extends JpaRepository<ItemEntity, Integer> {
 	List<ItemEntity> findByPreparingItem_IdInAndIsDeletedFalse(List<Integer> preparingItemIds);
 	List<ItemEntity> findByItemIdAndIsDeletedFalse(int itemId);
 	ItemEntity findByItemNameIgnoreCaseAndIsDeletedFalse(String itemName);
+	List<ItemEntity> findByStatusAndIsDeletedFalse(String status);
+	List<ItemEntity> findByStatusAndUser_UserIdAndIsDeletedFalse(String status, Integer userId);
+
 
 	// Instead of findAll, provide a method to get all non-deleted items
 	List<ItemEntity> findByIsDeletedFalse();

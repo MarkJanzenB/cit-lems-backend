@@ -106,4 +106,17 @@ public class ItemController {
     public ResponseEntity<?> deleteSpecificItems(@RequestBody List<ItemEntity> itemsToDel, @RequestParam int userId){
         return itemserv.deleteSpecificItems(itemsToDel, userId);
     }
+
+//    @GetMapping("/damaged")
+//    public ResponseEntity<List<ItemEntity>> getDamagedItems() {
+//        List<ItemEntity> damagedItems = itemserv.getItemsByStatus("Damage");
+//        return ResponseEntity.ok(damagedItems);
+//    }
+
+    @GetMapping("/damaged")
+    public ResponseEntity<List<ItemEntity>> getDamagedItems(@RequestParam(required = false) Integer userId) {
+        List<ItemEntity> damagedItems = itemserv.getItemsByStatus("Damage", userId);
+        return ResponseEntity.ok(damagedItems);
+    }
+
 }
